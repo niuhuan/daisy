@@ -1,0 +1,41 @@
+name: daisy
+description: A comic reader.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.16.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  flutter_rust_bridge:
+    path: ../flutter_rust_bridge/frb_dart
+  date_format: ^2.0.5
+  uuid: ^3.0.6
+  awesome_select: ^5.1.0
+  another_xlider: ^1.0.1+2
+  event: ^2.1.2
+  modal_bottom_sheet: ^2.0.1
+  photo_view: ^0.13.0
+  scrollable_positioned_list: ^0.2.3
+  permission_handler: ^9.2.0
+  flutter_styled_toast: ^2.0.0
+  flutter_svg: ^1.0.3
+  flutter_search_bar: ^3.0.0-dev.1
+  url_launcher: ^6.0.20
+  flutter_html: ^3.0.0-alpha.3
+  flutter_colorpicker: ^1.0.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^1.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - lib/assets/

@@ -1,0 +1,24 @@
+[package]
+name = "ci"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "check-release"
+path = "src/check_release/main.rs"
+
+[[bin]]
+name = "check-asset"
+path = "src/check_asset/main.rs"
+
+[[bin]]
+name = "upload-asset"
+path = "src/upload_asset/main.rs"
+
+[dependencies]
+anyhow = "1.0.56"
+reqwest = { version = "0.11.10", features = ["json"] }
+serde = "1.0.136"
+serde_derive = "1.0.136"
+serde_json = "1.0.79"
+tokio = { version = "1.17.0", features = ["full"] }

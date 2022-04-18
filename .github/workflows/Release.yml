@@ -1,0 +1,326 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+env:
+  flutter_channel: 'stable'
+  flutter_version: '2.10.3'
+  LLVM_VERSION: '10.0'
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+jobs:
+
+  ci-pass:
+    name: CI is green
+    runs-on: ubuntu-latest
+    needs:
+      - check_release
+      - build_release_assets
+    steps:
+      - run: exit 0
+
+  check_release:
+    name: Check release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cargo cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            daisy/ci/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ github.event.inputs.repo }}
+          path: 'daisy'
+
+      - name: Check release
+        run: |
+          cd daisy/ci
+          cargo run --bin check-release
+
+  build_release_assets:
+    name: Build release assets
+    needs:
+      - check_release
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+#          - target: linux
+#            host: ubuntu-latest
+          - target: windows
+            host: windows-latest
+          - target: macos
+            host: macos-latest
+          - target: ios
+            host: macos-latest
+          - target: android-arm32
+            host: ubuntu-latest
+          - target: android-arm64
+            host: ubuntu-latest
+          - target: android-x86_64
+            host: ubuntu-latest
+
+    runs-on: ${{ matrix.config.host }}
+
+    env:
+      TARGET: ${{ matrix.config.target }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: 'daisy'
+
+      - name: Cargo cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            daisy/ci/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - id: check_asset
+        name: Check asset
+        run: |
+          cd daisy/ci
+          cargo run --bin check-asset
+
+      - name: Check core
+        if: steps.check_asset.outputs.skip_build != 'true'
+        uses: actions/checkout@v3
+        with:
+          repository: 'niuhuan/daisy-rs-core'
+          token: ${{ secrets.GH_TOKEN }}
+          path: 'daisy/native'
+
+      - name: Check bridge
+        if: steps.check_asset.outputs.skip_build != 'true'
+        uses: actions/checkout@v3
+        with:
+          repository: 'fzyzcjy/flutter_rust_bridge'
+          path: 'flutter_rust_bridge'
+
+      - name: Install flutter_rust_bridge
+        if: steps.check_asset.outputs.skip_build != 'true'
+        run: |
+          cd flutter_rust_bridge/frb_codegen
+          cargo install --path .
+          cd ../..
+
+      - name: Cache Flutter dependencies (Linux/Android)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' || matrix.config.target == 'linux' )
+        uses: actions/cache@v3
+        with:
+          path: /opt/hostedtoolcache/flutter
+          key: ${{ runner.os }}-flutter
+
+      - name: Setup flutter
+        if: steps.check_asset.outputs.skip_build != 'true'
+        uses: subosito/flutter-action@v2.3.0
+        with:
+          channel: ${{ env.flutter_channel }}
+          flutter-version: ${{ env.flutter_version }}
+
+      - name: Setup ffigen
+        if: steps.check_asset.outputs.skip_build != 'true'
+        run: |
+          dart pub global activate ffigen
+
+#      - name: Install LLVM and Clang (macos/ios)
+#        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'macos' || matrix.config.target == 'ios' )
+#        uses: KyleMayes/install-llvm-action@v1
+#        with:
+#          version: ${{ env.LLVM_VERSION }}
+#          cached: ${{ steps.cache-llvm.outputs.cache-hit }}
+
+      - name: Install LLVM and Clang (Linux/Android)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' || matrix.config.target == 'linux' )
+        run: |
+          sudo apt update
+          sudo apt install -y libclang-dev
+
+      - name: Install cargo tools (non-android)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'macos' || matrix.config.target == 'windows' || matrix.config.target == 'linux' )
+        run: |
+          cargo install cbindgen
+
+      - name: Install cargo tools (Android)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
+        run: |
+          cargo install cargo-ndk
+
+      - name: Setup java (Android)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: 'zulu'
+
+      - name: Setup android tools (Android)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
+        uses: maxim-lobanov/setup-android-tools@v1
+        with:
+          packages: |
+            platform-tools
+            platforms;android-32
+            build-tools;30.0.2
+            ndk;22.1.7171670
+
+      - name: Set-Version (All)
+        if: steps.check_asset.outputs.skip_build != 'true'
+        run: |
+          cd daisy/ci
+          cp version.code.txt ../lib/assets/version.txt
+
+      - name: Install rust target and build (ios)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'ios')
+        run: |
+          rustup target install aarch64-apple-ios
+          cd daisy
+          echo > lib/bridge_generated.dart
+          echo > ios/Runner/bridge_generated.h
+          echo > native/src/bridge_generated.rs
+          flutter_rust_bridge_codegen \
+            --rust-input native/src/api.rs \
+            --dart-output lib/bridge_generated.dart \
+            --c-output ios/Runner/bridge_generated.h \
+            --rust-crate-dir native \
+            --class-name Native
+          cargo build --manifest-path native/Cargo.toml --features= --lib --release --target=aarch64-apple-ios
+          cp native/target/aarch64-apple-ios/release/libnative.a ios/Runner/
+          flutter build ios --no-simulator --no-codesign --release
+          cd build
+          rm -rf Payload
+          mkdir Payload
+          mv ios/iphoneos/Runner.app Payload/
+          sh ../scripts/thin-payload.sh Payload
+          zip -r -9 nosign.ipa Payload
+          cd ..
+
+      - name: Install rust target and build (Android-arm64)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm64')
+        run: |
+          rustup target install aarch64-linux-android
+          cd daisy
+          echo > native/src/bridge_generated.rs
+          flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart
+          cd native
+          cargo ndk -o ../android/app/src/main/jniLibs -t arm64-v8a build --release
+          cd ..
+          flutter build apk --target-platform android-arm64
+
+      - name: Install rust target and build (Android-arm32)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32')
+        run: |
+          rustup target install armv7-linux-androideabi
+          cd daisy
+          echo > native/src/bridge_generated.rs
+          flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart
+          cd native
+          cargo ndk -o ../android/app/src/main/jniLibs -t armeabi-v7a build --release
+          cd ..
+          flutter build apk --target-platform android-arm
+
+      - name: Install rust target and build (Android-x86_64)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-x86_64')
+        run: |
+          rustup target install x86_64-linux-android
+          cd daisy
+          echo > native/src/bridge_generated.rs
+          flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart
+          cd native
+          cargo ndk -o ../android/app/src/main/jniLibs -t x86_64 build --release
+          cd ..
+          flutter build apk --target-platform android-x64
+
+      - name: Install dependencies and build (Linux)
+        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'linux'
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        run: |
+          cd daisy
+          curl -JOL https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod a+x appimagetool-x86_64.AppImage
+          mkdir -p ${GITHUB_WORKSPACE}/bin
+          mv appimagetool-x86_64.AppImage ${GITHUB_WORKSPACE}/bin/appimagetool
+          echo ::add-path::${GITHUB_WORKSPACE}/bin
+          sudo apt-get update
+          sudo apt-get install -y libgl1-mesa-dev xorg-dev
+          curl -JOL https://github.com/junmer/source-han-serif-ttf/raw/master/SubsetTTF/CN/SourceHanSerifCN-Regular.ttf
+          mkdir -p fonts
+          mv SourceHanSerifCN-Regular.ttf fonts/Roboto.ttf
+          cat ci/linux_font.yaml >> pubspec.yaml
+          flutter config --enable-linux-desktop
+          flutter build linux
+
+      - name: build (windows)
+        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'windows'
+        run: |
+          cd daisy
+          echo $null > native/src/bridge_generated.rs
+          flutter_rust_bridge_codegen --rust-crate-dir native --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart --class-name Native
+          flutter config --enable-windows-desktop
+          flutter build windows
+          cd build/windows/runner/Release
+          Compress-Archive * ../../../../build/windows.zip
+          cd ../../../..
+
+      - name: Build (macos)
+        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'macos'
+        run: |
+          cd daisy
+          echo > native/src/bridge_generated.rs
+          flutter_rust_bridge_codegen \
+              --rust-input native/src/api.rs \
+              --dart-output lib/bridge_generated.dart \
+              --c-output macos/Runner/bridge_generated.h \
+              --rust-crate-dir native \
+              --class-name Native
+          flutter config --enable-macos-desktop
+          flutter build macos
+          cd build
+          mkdir appimage
+          mv macos/Build/Products/Release/daisy.app appimage/
+          ln -sf /Applications appimage/
+          hdiutil create -volname daisy -srcfolder appimage -ov -format UDBZ macos.dmg
+          cd ..
+
+      - name: Sign APK (Android)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
+        env:
+          KEY_FILE_BASE64: ${{ secrets.KEY_FILE_BASE64 }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          cd daisy
+          echo $KEY_FILE_BASE64 > key.jks.base64
+          base64 -d key.jks.base64 > key.jks
+          echo $KEY_PASSWORD | $ANDROID_HOME/build-tools/30.0.2/apksigner sign --ks key.jks build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload Asset (All)
+        if: steps.check_asset.outputs.skip_build != 'true'
+        run: |
+          cd daisy/ci
+          cargo run --bin upload-asset
+
