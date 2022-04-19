@@ -32,8 +32,7 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            daisy/ci/target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-
 
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
@@ -59,8 +58,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-#          - target: linux
-#            host: ubuntu-latest
+          - target: linux
+            host: ubuntu-latest
           - target: windows
             host: windows-latest
           - target: macos
@@ -93,8 +92,7 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            daisy/ci/target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-
 
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
@@ -126,7 +124,7 @@ jobs:
         if: steps.check_asset.outputs.skip_build != 'true'
         run: |
           cd flutter_rust_bridge/frb_codegen
-          cargo install --path .
+          cargo install --path . --force
           cd ../..
 
       - name: Cache Flutter dependencies (Linux/Android)
@@ -147,13 +145,6 @@ jobs:
         if: steps.check_asset.outputs.skip_build != 'true'
         run: |
           dart pub global activate ffigen
-
-#      - name: Install LLVM and Clang (macos/ios)
-#        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'macos' || matrix.config.target == 'ios' )
-#        uses: KyleMayes/install-llvm-action@v1
-#        with:
-#          version: ${{ env.LLVM_VERSION }}
-#          cached: ${{ steps.cache-llvm.outputs.cache-hit }}
 
       - name: Install LLVM and Clang (Linux/Android)
         if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' || matrix.config.target == 'linux' )
@@ -257,23 +248,21 @@ jobs:
 
       - name: Install dependencies and build (Linux)
         if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'linux'
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         run: |
-          cd daisy
+          sudo apt-get update
+          sudo apt install -y ninja-build liblzma-dev libgtk-3-dev libgl1-mesa-dev xorg-dev
           curl -JOL https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod a+x appimagetool-x86_64.AppImage
-          mkdir -p ${GITHUB_WORKSPACE}/bin
-          mv appimagetool-x86_64.AppImage ${GITHUB_WORKSPACE}/bin/appimagetool
-          echo ::add-path::${GITHUB_WORKSPACE}/bin
-          sudo apt-get update
-          sudo apt-get install -y libgl1-mesa-dev xorg-dev
-          curl -JOL https://github.com/junmer/source-han-serif-ttf/raw/master/SubsetTTF/CN/SourceHanSerifCN-Regular.ttf
-          mkdir -p fonts
-          mv SourceHanSerifCN-Regular.ttf fonts/Roboto.ttf
-          cat ci/linux_font.yaml >> pubspec.yaml
+          mv appimagetool-x86_64.AppImage appimagetool
+          cd daisy
+          echo > native/src/bridge_generated.rs
+          flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart
           flutter config --enable-linux-desktop
-          flutter build linux
+          flutter build linux --release
+          mv build/linux/x64/release/bundle/{daisy,AppRun}
+          cp linux/appimage/* build/linux/x64/release/bundle/
+          ../appimagetool build/linux/x64/release/bundle/
+          mv *.AppImage build/linux.AppImage
 
       - name: build (windows)
         if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'windows'
