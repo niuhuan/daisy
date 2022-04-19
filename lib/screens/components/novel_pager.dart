@@ -3,10 +3,23 @@ import 'package:daisy/screens/novel_detail_screen.dart';
 import 'package:daisy/screens/components/images.dart';
 import 'package:flutter/material.dart';
 import 'package:daisy/const.dart';
-import '../../utils.dart';
+
+class NovelInPager {
+  final String cover;
+  final String name;
+  final String authors;
+  final int id;
+
+  NovelInPager({
+    required this.cover,
+    required this.name,
+    required this.authors,
+    required this.id,
+  });
+}
 
 class NovelPager extends StatefulWidget {
-  final Future<List<NovelInFilter>> Function(int page) loadNovel;
+  final Future<List<NovelInPager>> Function(int page) loadNovel;
 
   const NovelPager(this.loadNovel, {Key? key}) : super(key: key);
 
@@ -18,7 +31,7 @@ class _NovelPagerState extends State<NovelPager> {
   // page 从0开始
   int _currentPage = 0;
 
-  final List<NovelInFilter> _list = [];
+  final List<NovelInPager> _list = [];
   bool _loading = false;
   bool _over = false;
   bool _fail = false;
@@ -151,7 +164,7 @@ class _NovelPagerState extends State<NovelPager> {
 }
 
 class NovelCardInPager extends StatelessWidget {
-  final NovelInFilter novel;
+  final NovelInPager novel;
 
   const NovelCardInPager({Key? key, required this.novel}) : super(key: key);
 

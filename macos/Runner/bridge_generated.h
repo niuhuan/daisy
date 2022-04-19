@@ -67,7 +67,7 @@ void wire_comic_view_page(int64_t port_,
                           int32_t chapter_order,
                           int32_t page_rank);
 
-void wire_load_view_logs(int64_t port_, int64_t page);
+void wire_load_comic_view_logs(int64_t port_, int64_t page);
 
 void wire_view_log_by_comic_id(int64_t port_, int32_t comic_id);
 
@@ -75,11 +75,29 @@ void wire_news_categories(int64_t port_);
 
 void wire_news_list(int64_t port_, int64_t id, int64_t page);
 
+void wire_novel_categories(int64_t port_);
+
+void wire_novel_list(int64_t port_, int32_t category, int64_t process, int64_t sort, int64_t page);
+
 void wire_novel_detail(int64_t port_, int32_t id);
 
 void wire_novel_chapters(int64_t port_, int32_t id);
 
 void wire_novel_content(int64_t port_, int32_t volume_id, int32_t chapter_id);
+
+void wire_load_novel_view_logs(int64_t port_, int64_t page);
+
+void wire_view_log_by_novel_id(int64_t port_, int32_t novel_id);
+
+void wire_novel_view_page(int64_t port_,
+                          int32_t novel_id,
+                          int32_t volume_id,
+                          struct wire_uint_8_list *volume_title,
+                          int32_t volume_order,
+                          int32_t chapter_id,
+                          struct wire_uint_8_list *chapter_title,
+                          int32_t chapter_order,
+                          int64_t progress);
 
 void wire_auto_clean(int64_t port_, int64_t time);
 
@@ -111,13 +129,18 @@ static int64_t dummy_method_to_enforce_bundling(void) {
     dummy_var ^= ((int64_t) (void*) wire_comic_chapter_detail);
     dummy_var ^= ((int64_t) (void*) wire_comment);
     dummy_var ^= ((int64_t) (void*) wire_comic_view_page);
-    dummy_var ^= ((int64_t) (void*) wire_load_view_logs);
+    dummy_var ^= ((int64_t) (void*) wire_load_comic_view_logs);
     dummy_var ^= ((int64_t) (void*) wire_view_log_by_comic_id);
     dummy_var ^= ((int64_t) (void*) wire_news_categories);
     dummy_var ^= ((int64_t) (void*) wire_news_list);
+    dummy_var ^= ((int64_t) (void*) wire_novel_categories);
+    dummy_var ^= ((int64_t) (void*) wire_novel_list);
     dummy_var ^= ((int64_t) (void*) wire_novel_detail);
     dummy_var ^= ((int64_t) (void*) wire_novel_chapters);
     dummy_var ^= ((int64_t) (void*) wire_novel_content);
+    dummy_var ^= ((int64_t) (void*) wire_load_novel_view_logs);
+    dummy_var ^= ((int64_t) (void*) wire_view_log_by_novel_id);
+    dummy_var ^= ((int64_t) (void*) wire_novel_view_page);
     dummy_var ^= ((int64_t) (void*) wire_auto_clean);
     dummy_var ^= ((int64_t) (void*) new_box_autoadd_i32);
     dummy_var ^= ((int64_t) (void*) new_int_32_list);

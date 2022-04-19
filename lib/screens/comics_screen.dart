@@ -95,7 +95,7 @@ class _ComicsScreenState extends State<ComicsScreen>
         Expanded(child: Container()),
         Icon(Icons.loop, color: Colors.white70.withAlpha(150)),
         Text(
-          "小说",
+          "切换",
           style: TextStyle(
             fontSize: 10,
             color: Colors.white70.withAlpha(150),

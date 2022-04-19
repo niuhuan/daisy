@@ -1,5 +1,8 @@
 daisy
 =====
+[![license](https://img.shields.io/github/license/niuhuan/daisy)](https://raw.githubusercontent.com/niuhuan/daisy/master/LICENSE)
+[![releases](https://img.shields.io/github/v/release/niuhuan/daisy)](https://github.com/niuhuan/daisy/releases)
+[![downloads](https://img.shields.io/github/downloads/niuhuan/daisy/total)](https://github.com/niuhuan/daisy/releases)
 
 一个简洁大方的漫画与轻小说客户端, 同时支持支持 Android / iOS / MacOS / Windows / Linux.
 
@@ -12,10 +15,11 @@ daisy
 ## 软件截图
 
 ![](images/st01.png)
-
 ![](images/st02.png)
 
 ![](images/st03.jpg)
+![](images/st04.jpg)
+
 
 ## 技术架构
 

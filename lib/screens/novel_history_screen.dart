@@ -3,28 +3,27 @@ import 'dart:convert';
 import 'package:daisy/ffi.dart';
 import 'package:flutter/material.dart';
 
-import 'components/comic_pager.dart';
+import 'components/novel_pager.dart';
 
-class ComicHistoryScreen extends StatefulWidget {
-  const ComicHistoryScreen({Key? key}) : super(key: key);
+class NovelHistoryScreen extends StatefulWidget {
+  const NovelHistoryScreen({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _ComicHistoryScreenState();
+  State<StatefulWidget> createState() => _NovelHistoryScreenState();
 }
 
-class _ComicHistoryScreenState extends State<ComicHistoryScreen>
+class _NovelHistoryScreenState extends State<NovelHistoryScreen>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => false;
 
-  Future<List<ComicInListCard>> _loadComic(int page) async {
-    return (await native.loadComicViewLogs(page: page))
-        .map((e) => ComicInListCard(
-              id: e.comicId,
-              title: e.comicTitle,
-              cover: e.comicCover,
-              authors: mapTitle(e.comicAuthors),
-              types: mapTitle(e.comicTypes),
+  Future<List<NovelInPager>> _loadNovel(int page) async {
+    return (await native.loadNovelViewLogs(page: page))
+        .map((e) => NovelInPager(
+              id: e.novelId,
+              name: e.novelTitle,
+              cover: e.novelCover,
+              authors: mapTitle(e.novelAuthors),
             ))
         .toList();
   }
@@ -50,6 +49,6 @@ class _ComicHistoryScreenState extends State<ComicHistoryScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return ComicPager(_loadComic);
+    return NovelPager(_loadNovel);
   }
 }

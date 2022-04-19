@@ -1,13 +1,12 @@
 import 'package:daisy/screens/about_screen.dart';
-import 'package:daisy/screens/novels_history_screen.dart';
 import 'package:daisy/screens/components/badged.dart';
 import 'package:flutter/material.dart';
-import 'package:daisy/screens/novels_browser_screen.dart';
+import 'package:daisy/screens/novel_browser_screen.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
 
 import 'app_screen.dart';
-import 'comics_screen.dart';
-import 'novels_search_screen.dart';
+import 'novel_history_screen.dart';
+import 'novel_search_screen.dart';
 
 class NovelsScreen extends StatefulWidget {
   const NovelsScreen({Key? key}) : super(key: key);
@@ -94,7 +93,7 @@ class _NovelsScreenState extends State<NovelsScreen>
         Expanded(child: Container()),
         Icon(Icons.loop, color: Colors.white70.withAlpha(150)),
         Text(
-          "漫画",
+          "切换",
           style: TextStyle(
             fontSize: 10,
             color: Colors.white70.withAlpha(150),
@@ -169,7 +168,7 @@ class _NovelsScreenState extends State<NovelsScreen>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => NovelsSearchScreen(value),
+            builder: (context) => NovelSearchScreen(value),
           ),
         );
       }
@@ -192,9 +191,9 @@ class NavPage {
 
 const _navPages = [
   NavPage(
-    screen: NovelsHistoryScreen(),
+    screen: NovelHistoryScreen(),
     title: "历史",
     icon: Icons.history,
   ),
-  NavPage(screen: NovelsBrowserScreen(), title: "浏览", icon: Icons.blur_linear),
+  NavPage(screen: NovelBrowserScreen(), title: "浏览", icon: Icons.blur_linear),
 ];

@@ -6,14 +6,14 @@ import '../const.dart';
 import '../ffi.dart';
 import 'components/novel_pager.dart';
 
-class NovelsBrowserScreen extends StatefulWidget {
-  const NovelsBrowserScreen({Key? key}) : super(key: key);
+class NovelBrowserScreen extends StatefulWidget {
+  const NovelBrowserScreen({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _NovelsBrowserScreenState();
+  State<StatefulWidget> createState() => _NovelBrowserScreenState();
 }
 
-class _NovelsBrowserScreenState extends State<NovelsBrowserScreen>
+class _NovelBrowserScreenState extends State<NovelBrowserScreen>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
@@ -34,13 +34,16 @@ class _NovelsBrowserScreenState extends State<NovelsBrowserScreen>
   int _process = 0;
   int _sort = 1;
 
-  Future<List<NovelInFilter>> _loadNovel(int page) async {
+  Future<List<NovelInPager>> _loadNovel(int page) async {
     return (await native.novelList(
       category: _selectedNovelCategory?.tagId ?? 0,
       process: _process,
       sort: _sort,
       page: page,
-    ));
+    ))
+        .map((e) => NovelInPager(
+            cover: e.cover, name: e.name, authors: e.authors, id: e.id))
+        .toList();
   }
 
   Widget _filterBar() {
