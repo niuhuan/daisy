@@ -23,27 +23,9 @@ class _NovelHistoryScreenState extends State<NovelHistoryScreen>
               id: e.novelId,
               name: e.novelTitle,
               cover: e.novelCover,
-              authors: mapTitle(e.novelAuthors),
+              authors: e.novelAuthors,
             ))
         .toList();
-  }
-
-  String mapTitle(String json) {
-    try {
-      List maps = jsonDecode(json);
-      return maps.cast<Map>().map((e) {
-        try {
-          String title = e["title"];
-          return title;
-        } catch (e, s) {
-          print("$e\n$s");
-        }
-        return "";
-      }).join("/");
-    } catch (e, s) {
-      print("$e\n$s");
-    }
-    return "";
   }
 
   @override

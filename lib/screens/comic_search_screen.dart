@@ -44,7 +44,13 @@ class _ComicSearchScreenState extends State<ComicSearchScreen> {
     return AppBar(
       title: Text("搜索 - ${widget.content}"),
       actions: [
-        _searchBar.getSearchAction(context),
+        IconButton(
+          onPressed: () {
+            _textEditController.text = widget.content;
+            _searchBar.beginSearch(context);
+          },
+          icon: const Icon(Icons.search),
+        ),
       ],
     );
   }
@@ -59,7 +65,7 @@ class _ComicSearchScreenState extends State<ComicSearchScreen> {
     setState: setState,
     onSubmitted: (value) {
       if (value.isNotEmpty) {
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => ComicSearchScreen(value),

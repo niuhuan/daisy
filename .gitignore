@@ -50,6 +50,7 @@ jniLibs
 # lock
 pubspec.lock
 Cargo.lock
-lib/bridge_generated.dart
+bridge_generated.dart
+bridge_generated.h
 version.txt
 libnative.a
