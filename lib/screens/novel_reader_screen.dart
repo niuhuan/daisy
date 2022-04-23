@@ -146,6 +146,7 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
                       Column(
                         children: [
                           AppBar(
+                            backgroundColor: Colors.black.withOpacity(.5),
                             title: Text(widget.chapter.chapterName),
                             actions: [
                               IconButton(

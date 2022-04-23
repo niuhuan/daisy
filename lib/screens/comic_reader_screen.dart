@@ -396,6 +396,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
   Widget _buildAppBar() => _fullScreen
       ? Container()
       : AppBar(
+          backgroundColor: Colors.black.withOpacity(.5),
           title: Text(widget.chapter.title),
           actions: [
             IconButton(
@@ -1196,7 +1197,8 @@ class _ComicReaderGalleryState extends _ComicReaderState {
         color: Colors.transparent,
         child: Container(
           margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.only(left: 10, right: 10, top: 4, bottom: 4),
+          padding:
+              const EdgeInsets.only(left: 10, right: 10, top: 4, bottom: 4),
           decoration: const BoxDecoration(
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(10),

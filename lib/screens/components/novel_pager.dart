@@ -50,10 +50,6 @@ class _NovelPagerState extends State<NovelPager> {
       }
       _list.addAll(list);
       _currentPage++;
-      if (_over == false && _fail == false && _controller.position.maxScrollExtent == 0) {
-        // 异步加载下一页
-        var _ = _loadNextPage();
-      }
     } catch (e, s) {
       print("$e");
       print("$s");
