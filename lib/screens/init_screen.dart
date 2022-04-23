@@ -13,6 +13,7 @@ import 'package:daisy/ffi.dart';
 import '../configs/auto_clean.dart';
 import '../configs/last_module.dart';
 import '../configs/novel_font_size.dart';
+import '../configs/themes.dart';
 import 'comics_screen.dart';
 
 class InitScreen extends StatefulWidget {
@@ -35,6 +36,7 @@ class _InitScreenState extends State<InitScreen> {
     await initNovelBackgroundColor();
     await initVersion();
     await initLastModule();
+    await initTheme();
     autoCheckNewVersion();
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (BuildContext context) => AppScreen(lastModule)),

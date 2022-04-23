@@ -13,7 +13,9 @@ late int _novelFontColorLight;
 late int _novelFontColorDark;
 
 getNovelFontColor(BuildContext context) =>
-    Color(Theme.of(context).brightness == Brightness.dark
+    Color(Theme
+        .of(context)
+        .brightness == Brightness.dark
         ? _novelFontColorDark
         : _novelFontColorLight);
 
@@ -39,9 +41,15 @@ Future _initNovelFontColorDark() async {
 }
 
 Future modifyNovelFontColor(BuildContext context) async {
-  bool dark = Theme.of(context).brightness == Brightness.dark;
-  Color? color = await chooseColor(context,
-      title: "", src: Color(dark ? _novelFontColorDark : _novelFontColorLight));
+  bool dark = Theme
+      .of(context)
+      .brightness == Brightness.dark;
+
+  Color? color = await chooseColor(
+    context,
+    title: "选择字体颜色" + (dark ? " (黑暗模式)" :""),
+    src: Color(dark ? _novelFontColorDark : _novelFontColorLight),
+  );
   if (color != null) {
     print("COLOR : $color");
     if (dark) {
@@ -55,7 +63,7 @@ Future modifyNovelFontColor(BuildContext context) async {
         k: _propertyKeyLight,
         v: color.value.toString(),
       );
-      _novelFontColorLight= color.value;
+      _novelFontColorLight = color.value;
     }
   }
 }

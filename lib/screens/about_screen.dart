@@ -1,4 +1,5 @@
 import 'package:daisy/configs/auto_clean.dart';
+import 'package:daisy/configs/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:daisy/configs/versions.dart';
 
@@ -38,6 +39,9 @@ class _AboutState extends State<AboutScreen> {
           const Divider(),
           const Divider(),
           autoCleanSetting(),
+          const Divider(),
+          lightThemeSetting(),
+          darkThemeSetting(),
           const Divider(),
         ],
       ),

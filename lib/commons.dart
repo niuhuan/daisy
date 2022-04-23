@@ -227,7 +227,7 @@ Future chooseColor(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Pick a color!'),
+        title: Text(title ?? 'Pick a color!'),
         content: SingleChildScrollView(
           child: StatefulBuilder(
             builder: (BuildContext context,

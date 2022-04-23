@@ -40,8 +40,11 @@ Future _initNovelBackgroundColorDark() async {
 
 Future modifyNovelBackgroundColor(BuildContext context) async {
   bool dark = Theme.of(context).brightness == Brightness.dark;
-  Color? color = await chooseColor(context,
-      title: "", src: Color(dark ? _novelBackgroundColorDark : _novelBackgroundColorLight));
+  Color? color = await chooseColor(
+    context,
+    title: "选择背景颜色" + (dark ? " (黑暗模式)" : ""),
+    src: Color(dark ? _novelBackgroundColorDark : _novelBackgroundColorLight),
+  );
   if (color != null) {
     print("COLOR : $color");
     if (dark) {
@@ -55,7 +58,7 @@ Future modifyNovelBackgroundColor(BuildContext context) async {
         k: _propertyKeyLight,
         v: color.value.toString(),
       );
-      _novelBackgroundColorLight= color.value;
+      _novelBackgroundColorLight = color.value;
     }
   }
 }
