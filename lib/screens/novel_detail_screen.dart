@@ -250,6 +250,7 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                                     novel: _detail,
                                     volume: volume,
                                     chapter: e,
+                                    volumes: _volumes,
                                     // loadChapter: _loadChapterF(),
                                     // initRank: 0,
                                   ),

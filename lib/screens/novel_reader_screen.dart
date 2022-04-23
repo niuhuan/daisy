@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -5,11 +6,12 @@ import 'package:daisy/configs/novel_background_color.dart';
 import 'package:daisy/ffi.dart';
 import 'package:daisy/screens/components/connect_loading.dart';
 import 'package:daisy/screens/components/content_error.dart';
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:html/parser.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../configs/novel_font_color.dart';
 import '../configs/novel_font_size.dart';
@@ -18,11 +20,13 @@ class NovelReaderScreen extends StatefulWidget {
   final NovelDetail novel;
   final NovelVolume volume;
   final NovelChapter chapter;
+  final List<NovelVolume> volumes;
 
   const NovelReaderScreen({
     required this.novel,
     required this.volume,
     required this.chapter,
+    required this.volumes,
     Key? key,
   }) : super(key: key);
 
@@ -150,6 +154,10 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
                             title: Text(widget.chapter.chapterName),
                             actions: [
                               IconButton(
+                                onPressed: _onChooseEp,
+                                icon: const Icon(Icons.menu_open),
+                              ),
+                              IconButton(
                                 onPressed: _bottomMenu,
                                 icon: const Icon(Icons.more_horiz),
                               )
@@ -163,6 +171,25 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
           );
         },
       ),
+    );
+  }
+
+  Future _onChooseEp() async {
+    showMaterialModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xAA000000),
+      builder: (context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * (.45),
+          child: _EpChooser(
+            widget.novel,
+            widget.volume,
+            widget.chapter,
+            widget.volumes,
+            onChangeEp,
+          ),
+        );
+      },
     );
   }
 
@@ -244,6 +271,95 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Future onChangeEp(NovelDetail n, NovelVolume v, NovelChapter c) async {
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+      builder: (BuildContext context)=> NovelReaderScreen(
+        novel: n,
+        volume: v,
+        chapter: c,
+        volumes: widget.volumes,
+      ),
+    ));
+  }
+}
+
+class _EpChooser extends StatefulWidget {
+  final NovelDetail novel;
+  final NovelVolume volume;
+  final NovelChapter chapter;
+  final List<NovelVolume> volumes;
+  final FutureOr Function(NovelDetail, NovelVolume, NovelChapter) onChangeEp;
+
+  const _EpChooser(
+    this.novel,
+    this.volume,
+    this.chapter,
+    this.volumes,
+    this.onChangeEp,
+  );
+
+  @override
+  State<StatefulWidget> createState() => _EpChooserState();
+}
+
+class _EpChooserState extends State<_EpChooser> {
+  int position = 0;
+  List<Widget> widgets = [];
+
+  @override
+  void initState() {
+    for (var c in widget.volumes) {
+      widgets.add(Container(
+        margin: const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 5),
+        child: Text(
+          c.title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ));
+      final cd = [...c.chapters];
+      cd.sort((o1, o2) => o1.chapterOrder - o2.chapterOrder);
+      for (var ci in c.chapters) {
+        if (widget.chapter.chapterId == ci.chapterId) {
+          position = widgets.length > 2 ? widgets.length - 2 : 0;
+        }
+        widgets.add(Container(
+          margin: const EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5),
+          decoration: BoxDecoration(
+            color: widget.chapter.chapterId == ci.chapterId
+                ? Colors.grey.withAlpha(100)
+                : null,
+            border: Border.all(
+              color: const Color(0xff484c60),
+              style: BorderStyle.solid,
+              width: .5,
+            ),
+          ),
+          child: MaterialButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              widget.onChangeEp(widget.novel, c, ci);
+            },
+            textColor: Colors.white,
+            child: Text(ci.chapterName),
+          ),
+        ));
+      }
+    }
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScrollablePositionedList.builder(
+      initialScrollIndex: position,
+      itemCount: widgets.length,
+      itemBuilder: (BuildContext context, int index) => widgets[index],
     );
   }
 }
