@@ -800,49 +800,62 @@ class _EpChooser extends StatefulWidget {
 }
 
 class _EpChooserState extends State<_EpChooser> {
+  int position = 0;
+  List<Widget> widgets = [];
+
+  @override
+  void initState() {
+    for (var c in widget.comicDetail.chapters) {
+      widgets.add(Container(
+        margin: const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 5),
+        child: Text(
+          c.title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ));
+      final cd = [...c.data];
+      cd.sort((o1, o2) => o1.chapterOrder - o2.chapterOrder);
+      for (var ci in c.data) {
+        if (widget.chapter.chapterId == ci.chapterId) {
+          position = widgets.length > 2 ? widgets.length - 2 : 0;
+        }
+        widgets.add(Container(
+          margin: const EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5),
+          decoration: BoxDecoration(
+            color: widget.chapter.chapterId == ci.chapterId
+                ? Colors.grey.withAlpha(100)
+                : null,
+            border: Border.all(
+              color: const Color(0xff484c60),
+              style: BorderStyle.solid,
+              width: .5,
+            ),
+          ),
+          child: MaterialButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              widget.onChangeEp(ci.chapterId);
+            },
+            textColor: Colors.white,
+            child: Text(ci.chapterTitle),
+          ),
+        ));
+      }
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // todo choose ep
-    return Container();
+    return ScrollablePositionedList.builder(
+      initialScrollIndex: position,
+      itemCount: widgets.length,
+      itemBuilder: (BuildContext context, int index) => widgets[index],
+    );
   }
-// @override
-// Widget build(BuildContext context) {
-//   var entries = widget.chapter.chapters;
-//   entries.sort(
-//     (a, b) => int.parse(a.sort).compareTo(int.parse(b.sort)),
-//   );
-//   var widgets = [
-//     Container(height: 20),
-//     ...entries.map((e) {
-//       return Container(
-//         margin: const EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5),
-//         decoration: BoxDecoration(
-//           color:
-//               widget.chapter.id == e.id ? Colors.grey.withAlpha(100) : null,
-//           border: Border.all(
-//             color: const Color(0xff484c60),
-//             style: BorderStyle.solid,
-//             width: .5,
-//           ),
-//         ),
-//         child: MaterialButton(
-//           onPressed: () {
-//             Navigator.of(context).pop();
-//             widget.onChangeEp(e.id);
-//           },
-//           textColor: Colors.white,
-//           child: Text(e.sort + (e.name == "" ? "" : (" - ${e.name}"))),
-//         ),
-//       );
-//     })
-//   ];
-//   final index = entries.map((e) => e.id).toList().indexOf(widget.chapter.id);
-//   return ScrollablePositionedList.builder(
-//     initialScrollIndex: index < 2 ? 0 : index - 2,
-//     itemCount: widgets.length,
-//     itemBuilder: (BuildContext context, int index) => widgets[index],
-//   );
-// }
 }
 
 class _SettingPanel extends StatefulWidget {
