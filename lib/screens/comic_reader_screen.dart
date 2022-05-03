@@ -24,6 +24,7 @@ class ComicReaderScreen extends StatefulWidget {
   final int chapterId;
   final int initRank;
   final Future<ChapterDetail> Function(int chapterId) loadChapter;
+  final bool fullScreenOnInit;
 
   const ComicReaderScreen({
     Key? key,
@@ -31,6 +32,7 @@ class ComicReaderScreen extends StatefulWidget {
     required this.chapterId,
     required this.initRank,
     required this.loadChapter,
+    this.fullScreenOnInit = false,
   }) : super(key: key);
 
   @override
@@ -41,8 +43,10 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
   late ReaderType _readerType;
   late ReaderDirection _readerDirection;
   late Future<ChapterDetail> _chapterFuture;
+  bool _loaded = false;
 
   void _load() {
+    // todo multiple used setState and FutureBuilder, it is not good.
     setState(() {
       _readerType = currentReaderType;
       _readerDirection = currentReaderDirection;
@@ -54,6 +58,9 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
           chapterOrder: value.chapterOrder,
           pageRank: widget.initRank,
         ); // 在后台
+        setState(() {
+          _loaded = true;
+        });
         return value;
       });
     });
@@ -67,13 +74,13 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _chapterFuture,
-      builder: (BuildContext context, AsyncSnapshot<ChapterDetail> snapshot) {
-        if (snapshot.hasError) {
-          return Scaffold(
-            appBar: AppBar(),
-            body: ContentError(
+    return Scaffold(
+      appBar: _loaded ? null : AppBar(),
+      body: FutureBuilder(
+        future: _chapterFuture,
+        builder: (BuildContext context, AsyncSnapshot<ChapterDetail> snapshot) {
+          if (snapshot.hasError) {
+            return ContentError(
               onRefresh: () async {
                 setState(() {
                   _chapterFuture = native.comicChapterDetail(
@@ -84,23 +91,18 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
               },
               error: snapshot.error,
               stackTrace: snapshot.stackTrace,
-            ),
-          );
-        }
-        if (snapshot.connectionState != ConnectionState.done) {
-          return Scaffold(
-            appBar: AppBar(),
-            body: const ContentLoading(),
-          );
-        }
-        final chapter = snapshot.requireData;
-        final screen = Scaffold(
-          backgroundColor: Colors.black,
-          body: _ComicReader(
+            );
+          }
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const ContentLoading();
+          }
+          final chapter = snapshot.requireData;
+          final screen = _ComicReader(
             comic: widget.comic,
             chapter: chapter,
             startIndex: widget.initRank,
-            reload: (int index) async {
+            fullScreenOnInit: widget.fullScreenOnInit,
+            reload: (int index, bool fullScreenOnInit) async {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (BuildContext context) {
                   return ComicReaderScreen(
@@ -108,11 +110,12 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
                     chapterId: widget.chapterId,
                     initRank: index,
                     loadChapter: widget.loadChapter,
+                    fullScreenOnInit: fullScreenOnInit,
                   );
                 }),
               );
             },
-            onChangeEp: (int chapterId) async {
+            onChangeEp: (int chapterId, bool fullScreenOnInit) async {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (BuildContext context) {
                   return ComicReaderScreen(
@@ -120,16 +123,17 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
                     chapterId: chapterId,
                     initRank: 0,
                     loadChapter: widget.loadChapter,
+                    fullScreenOnInit: fullScreenOnInit,
                   );
                 }),
               );
             },
             readerType: _readerType,
             readerDirection: _readerDirection,
-          ),
-        );
-        return readerKeyboardHolder(screen);
-      },
+          );
+          return readerKeyboardHolder(screen);
+        },
+      ),
     );
   }
 }
@@ -203,11 +207,12 @@ class _ReaderControllerEventArgs extends EventArgs {
 class _ComicReader extends StatefulWidget {
   final ComicDetail comic;
   final ChapterDetail chapter;
-  final FutureOr Function(int) reload;
-  final FutureOr Function(int) onChangeEp;
+  final FutureOr Function(int, bool) reload;
+  final FutureOr Function(int, bool) onChangeEp;
   final int startIndex;
   final ReaderType readerType;
   final ReaderDirection readerDirection;
+  final bool fullScreenOnInit;
 
   const _ComicReader({
     required this.comic,
@@ -217,6 +222,7 @@ class _ComicReader extends StatefulWidget {
     required this.startIndex,
     required this.readerType,
     required this.readerDirection,
+    required this.fullScreenOnInit,
     Key? key,
   }) : super(key: key);
 
@@ -270,7 +276,10 @@ abstract class _ComicReaderState extends State<_ComicReader> {
 
   @override
   void initState() {
-    _fullScreen = false;
+    _fullScreen = widget.fullScreenOnInit;
+    if (_fullScreen) {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+    }
     _current = widget.startIndex;
     _slider = widget.startIndex;
     _readerControllerEvent.subscribe(_onPageControl);
@@ -312,21 +321,184 @@ abstract class _ComicReaderState extends State<_ComicReader> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        _buildViewer(),
-        _buildFrame(),
-      ],
+    switch (currentReaderControllerType) {
+      // 按钮
+      case ReaderControllerType.controller:
+        return Stack(
+          children: [
+            _buildViewer(),
+            _buildBar(_buildFullScreenControllerStackItem()),
+          ],
+        );
+      case ReaderControllerType.touchOnce:
+        return Stack(
+          children: [
+            _buildTouchOnceControllerAction(_buildViewer()),
+            _buildBar(Container()),
+          ],
+        );
+      case ReaderControllerType.touchDouble:
+        return Stack(
+          children: [
+            _buildTouchDoubleControllerAction(_buildViewer()),
+            _buildBar(Container()),
+          ],
+        );
+      case ReaderControllerType.touchDoubleOnceNext:
+        return Stack(
+          children: [
+            _buildTouchDoubleOnceNextControllerAction(_buildViewer()),
+            _buildBar(Container()),
+          ],
+        );
+      case ReaderControllerType.threeArea:
+        return Stack(
+          children: [
+            _buildViewer(),
+            _buildBar(_buildThreeAreaControllerAction()),
+          ],
+        );
+    }
+  }
+
+  Widget _buildFullScreenControllerStackItem() {
+    if (currentReaderSliderPosition == ReaderSliderPosition.bottom &&
+        !_fullScreen) {
+      return Container();
+    }
+    return Align(
+      alignment: Alignment.bottomLeft,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          padding:
+              const EdgeInsets.only(left: 10, right: 10, top: 4, bottom: 4),
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(10),
+              bottomRight: Radius.circular(10),
+            ),
+            color: Color(0x88000000),
+          ),
+          child: GestureDetector(
+            onTap: () {
+              _onFullScreenChange(!_fullScreen);
+            },
+            child: Icon(
+              _fullScreen ? Icons.fullscreen_exit : Icons.fullscreen_outlined,
+              size: 30,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildFrame() {
+  Widget _buildTouchOnceControllerAction(Widget child) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        _onFullScreenChange(!_fullScreen);
+      },
+      child: child,
+    );
+  }
+
+  Widget _buildTouchDoubleControllerAction(Widget child) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onDoubleTap: () {
+        _onFullScreenChange(!_fullScreen);
+      },
+      child: child,
+    );
+  }
+
+  Widget _buildTouchDoubleOnceNextControllerAction(Widget child) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        _readerControllerEvent.broadcast(_ReaderControllerEventArgs("DOWN"));
+      },
+      onDoubleTap: () {
+        _onFullScreenChange(!_fullScreen);
+      },
+      child: child,
+    );
+  }
+
+  Widget _buildThreeAreaControllerAction() {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        var up = Expanded(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              _readerControllerEvent
+                  .broadcast(_ReaderControllerEventArgs("UP"));
+            },
+            child: Container(),
+          ),
+        );
+        var down = Expanded(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              _readerControllerEvent
+                  .broadcast(_ReaderControllerEventArgs("DOWN"));
+            },
+            child: Container(),
+          ),
+        );
+        var fullScreen = Expanded(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => _onFullScreenChange(!_fullScreen),
+            child: Container(),
+          ),
+        );
+        late Widget child;
+        switch (currentReaderDirection) {
+          case ReaderDirection.topToBottom:
+            child = Column(children: [
+              up,
+              fullScreen,
+              down,
+            ]);
+            break;
+          case ReaderDirection.leftToRight:
+            child = Row(children: [
+              up,
+              fullScreen,
+              down,
+            ]);
+            break;
+          case ReaderDirection.rightToLeft:
+            child = Row(children: [
+              down,
+              fullScreen,
+              up,
+            ]);
+            break;
+        }
+        return SizedBox(
+          width: constraints.maxWidth,
+          height: constraints.maxHeight,
+          child: child,
+        );
+      },
+    );
+  }
+
+  Widget _buildBar(Widget child) {
     switch (currentReaderSliderPosition) {
       case ReaderSliderPosition.bottom:
         return Column(
           children: [
             _buildAppBar(),
-            Expanded(child: _buildController()),
+            Expanded(child: child),
             _fullScreen
                 ? Container()
                 : Container(
@@ -368,7 +540,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
             Expanded(
               child: Stack(
                 children: [
-                  _buildController(),
+                  child,
                   _buildSliderRight(),
                 ],
               ),
@@ -382,7 +554,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
             Expanded(
               child: Stack(
                 children: [
-                  _buildController(),
+                  child,
                   _buildSliderLeft(),
                 ],
               ),
@@ -390,7 +562,6 @@ abstract class _ComicReaderState extends State<_ComicReader> {
           ],
         );
     }
-    return Container();
   }
 
   Widget _buildAppBar() => _fullScreen
@@ -523,153 +694,6 @@ abstract class _ComicReaderState extends State<_ComicReader> {
     );
   }
 
-  Widget _buildController() {
-    switch (currentReaderControllerType) {
-      case ReaderControllerType.touchOnce:
-        return _buildTouchOnceController();
-      case ReaderControllerType.controller:
-        return _buildFullScreenController();
-      case ReaderControllerType.touchDouble:
-        return _buildTouchDoubleController();
-      case ReaderControllerType.touchDoubleOnceNext:
-        return _buildTouchDoubleOnceNextController();
-      case ReaderControllerType.threeArea:
-        return _buildThreeAreaController();
-    }
-  }
-
-  Widget _buildFullScreenController() {
-    if (currentReaderSliderPosition == ReaderSliderPosition.bottom &&
-        !_fullScreen) {
-      return Container();
-    }
-    return Align(
-      alignment: Alignment.bottomLeft,
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          padding:
-              const EdgeInsets.only(left: 10, right: 10, top: 4, bottom: 4),
-          margin: const EdgeInsets.only(bottom: 10),
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topRight: Radius.circular(10),
-              bottomRight: Radius.circular(10),
-            ),
-            color: Color(0x88000000),
-          ),
-          child: GestureDetector(
-            onTap: () {
-              _onFullScreenChange(!_fullScreen);
-            },
-            child: Icon(
-              _fullScreen ? Icons.fullscreen_exit : Icons.fullscreen_outlined,
-              size: 30,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTouchOnceController() {
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onTap: () {
-        _onFullScreenChange(!_fullScreen);
-      },
-      child: Container(),
-    );
-  }
-
-  Widget _buildTouchDoubleController() {
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onDoubleTap: () {
-        _onFullScreenChange(!_fullScreen);
-      },
-      child: Container(),
-    );
-  }
-
-  Widget _buildTouchDoubleOnceNextController() {
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onTap: () {
-        _readerControllerEvent.broadcast(_ReaderControllerEventArgs("DOWN"));
-      },
-      onDoubleTap: () {
-        _onFullScreenChange(!_fullScreen);
-      },
-      child: Container(),
-    );
-  }
-
-  Widget _buildThreeAreaController() {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        var up = Expanded(
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () {
-              _readerControllerEvent.broadcast(
-                _ReaderControllerEventArgs("UP"),
-              );
-            },
-            child: Container(),
-          ),
-        );
-        var down = Expanded(
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () {
-              _readerControllerEvent
-                  .broadcast(_ReaderControllerEventArgs("DOWN"));
-            },
-            child: Container(),
-          ),
-        );
-        var fullScreen = Expanded(
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () => _onFullScreenChange(!_fullScreen),
-            child: Container(),
-          ),
-        );
-        late Widget child;
-        switch (currentReaderDirection) {
-          case ReaderDirection.topToBottom:
-            child = Column(children: [
-              up,
-              fullScreen,
-              down,
-            ]);
-            break;
-          case ReaderDirection.leftToRight:
-            child = Row(children: [
-              up,
-              fullScreen,
-              down,
-            ]);
-            break;
-          case ReaderDirection.rightToLeft:
-            child = Row(children: [
-              down,
-              fullScreen,
-              up,
-            ]);
-            break;
-        }
-        return SizedBox(
-          width: constraints.maxWidth,
-          height: constraints.maxHeight,
-          child: child,
-        );
-      },
-    );
-  }
-
   Future _onChooseEp() async {
     showMaterialModalBottomSheet(
       context: context,
@@ -697,7 +721,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
     );
     if (widget.readerDirection != currentReaderDirection ||
         widget.readerType != currentReaderType) {
-      widget.reload(_current);
+      widget.reload(_current, _fullScreen);
     } else {
       setState(() {});
     }
@@ -715,13 +739,13 @@ abstract class _ComicReaderState extends State<_ComicReader> {
   bool _fullscreenController() {
     switch (currentReaderControllerType) {
       case ReaderControllerType.touchOnce:
-        return true;
+        return false;
       case ReaderControllerType.controller:
         return false;
       case ReaderControllerType.touchDouble:
-        return true;
+        return false;
       case ReaderControllerType.touchDoubleOnceNext:
-        return true;
+        return false;
       case ReaderControllerType.threeArea:
         return true;
     }
@@ -779,7 +803,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
       int newEpOrder = orders[orders.indexOf(_c.chapterOrder) + 1];
       for (var i = 0; i < _v.data.length; i++) {
         if (_v.data[i].chapterOrder == newEpOrder) {
-          widget.onChangeEp(_v.data[i].chapterId);
+          widget.onChangeEp(_v.data[i].chapterId, _fullScreen);
         }
       }
     } else {
@@ -791,7 +815,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
 class _EpChooser extends StatefulWidget {
   final ComicDetail comicDetail;
   final ChapterDetail chapter;
-  final FutureOr Function(int) onChangeEp;
+  final FutureOr Function(int, bool) onChangeEp;
 
   const _EpChooser(this.comicDetail, this.chapter, this.onChangeEp);
 
@@ -837,7 +861,7 @@ class _EpChooserState extends State<_EpChooser> {
           child: MaterialButton(
             onPressed: () {
               Navigator.of(context).pop();
-              widget.onChangeEp(ci.chapterId);
+              widget.onChangeEp(ci.chapterId, false);
             },
             textColor: Colors.white,
             child: Text(ci.chapterTitle),
