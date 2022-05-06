@@ -1,0 +1,68 @@
+import 'package:daisy/ffi.dart';
+import 'package:daisy/screens/login_screen.dart';
+import 'package:event/event.dart';
+import 'package:flutter/material.dart';
+
+final loginEvent = Event();
+
+var _loginInfo = LoginInfo(status: 1, message: "");
+
+LoginInfo get loginInfo => _loginInfo;
+
+set loginInfo(LoginInfo info) {
+  _loginInfo = info;
+  loginEvent.broadcast();
+}
+
+Future initLogin() async {
+  _loginInfo = await native.preLogin();
+  loginEvent.broadcast();
+}
+
+_LoginScreen loginScreen(Widget Function() builder) {
+  return _LoginScreen(builder);
+}
+
+class _LoginScreen extends StatefulWidget {
+  final Widget Function() builder;
+
+  const _LoginScreen(this.builder);
+
+  @override
+  State<StatefulWidget> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<_LoginScreen> {
+  @override
+  void initState() {
+    loginEvent.subscribe(_setState);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    loginEvent.unsubscribe(_setState);
+    super.dispose();
+  }
+
+  _setState(_) {
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (loginInfo.status == 0) return widget.builder();
+    return Center(
+      child: MaterialButton(
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const LoginScreen();
+            },
+          ));
+        },
+        child: const Text("去登录"),
+      ),
+    );
+  }
+}

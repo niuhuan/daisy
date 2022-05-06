@@ -29,6 +29,7 @@ dependencies:
   url_launcher: ^6.0.20
   flutter_html: ^3.0.0-alpha.3
   flutter_colorpicker: ^1.0.3
+  crypto: ^3.0.2
 
 dev_dependencies:
   flutter_test:

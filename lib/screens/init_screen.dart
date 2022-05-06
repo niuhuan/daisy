@@ -1,3 +1,4 @@
+import 'package:daisy/configs/login.dart';
 import 'package:daisy/configs/novel_background_color.dart';
 import 'package:daisy/configs/novel_font_color.dart';
 import 'package:daisy/configs/reader_controller_type.dart';
@@ -37,6 +38,7 @@ class _InitScreenState extends State<InitScreen> {
     await initVersion();
     await initLastModule();
     await initTheme();
+    await initLogin();
     autoCheckNewVersion();
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (BuildContext context) => AppScreen(lastModule)),

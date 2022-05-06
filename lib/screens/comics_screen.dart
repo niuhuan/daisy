@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:daisy/screens/comic_browser_screen.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
 
+import 'comic_bookshelf_screen.dart';
 import 'comic_search_screen.dart';
-import 'novels_screen.dart';
 
 class ComicsScreen extends StatefulWidget {
   const ComicsScreen({Key? key}) : super(key: key);
@@ -193,9 +193,9 @@ class NavPage {
 
 const _navPages = [
   NavPage(
-    screen: ComicHistoryScreen(),
-    title: "历史",
-    icon: Icons.history,
+    screen: ComicBookshelfScreen(),
+    title: "书架",
+    icon: Icons.history_edu,
   ),
   NavPage(screen: ComicBrowserScreen(), title: "浏览", icon: Icons.blur_linear),
 ];
