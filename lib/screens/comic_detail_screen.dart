@@ -162,21 +162,21 @@ class _ComicDetailScreenState extends State<ComicDetailScreen> with RouteAware {
         if (viewLog != null) {
           if (viewLog.chapterId != 0) {
             return _continueButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ComicReaderScreen(
-                        comic: comic,
-                        chapterId: viewLog.chapterId,
-                        loadChapter: _loadChapterF(comic),
-                        initRank: viewLog.pageRank,
-                      ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ComicReaderScreen(
+                      comic: comic,
+                      chapterId: viewLog.chapterId,
+                      loadChapter: _loadChapterF(comic),
+                      initRank: viewLog.pageRank,
                     ),
-                  );
-                },
-                text:
-                    "继续阅读 ${viewLog.chapterTitle} - P.${viewLog.pageRank + 1}");
+                  ),
+                );
+              },
+              text: "继续阅读 ${viewLog.chapterTitle} - P.${viewLog.pageRank + 1}",
+            );
           }
         }
         if (comic.chapters.isNotEmpty) {
