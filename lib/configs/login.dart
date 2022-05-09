@@ -20,7 +20,7 @@ Future initLogin() async {
   var username = await native.loadProperty(k: "username");
   var password = await native.loadProperty(k: "password");
   if (username.isNotEmpty && password.isNotEmpty) {
-    loginInfo = await native.reLogin(
+    loginInfo = await native.preLogin(
       nickname: username,
       passwd: generateMD5(password).toUpperCase(),
     );
