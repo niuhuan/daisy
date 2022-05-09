@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
@@ -255,4 +258,42 @@ Future chooseColor(
     },
   );
   return hasOk != null ? color : null;
+}
+
+Future<bool> confirmDialog(
+  BuildContext context,
+  String title,
+  String content,
+) async {
+  return await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text(title),
+                content: SingleChildScrollView(
+                  child: ListBody(
+                    children: <Widget>[Text(content)],
+                  ),
+                ),
+                actions: <Widget>[
+                  MaterialButton(
+                    child: const Text('取消'),
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                  ),
+                  MaterialButton(
+                    child: const Text('确定'),
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                  ),
+                ],
+              )) ??
+      false;
+}
+
+String generateMD5(String data) {
+  Uint8List content = (const Utf8Encoder()).convert(data);
+  Digest digest = md5.convert(content);
+  return digest.toString();
 }

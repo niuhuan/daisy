@@ -3,6 +3,8 @@ import 'package:daisy/screens/login_screen.dart';
 import 'package:event/event.dart';
 import 'package:flutter/material.dart';
 
+import '../commons.dart';
+
 final loginEvent = Event();
 
 var _loginInfo = LoginInfo(status: 1, message: "");
@@ -15,7 +17,14 @@ set loginInfo(LoginInfo info) {
 }
 
 Future initLogin() async {
-  _loginInfo = await native.preLogin();
+  var username = await native.loadProperty(k: "username");
+  var password = await native.loadProperty(k: "password");
+  if (username.isNotEmpty && password.isNotEmpty) {
+    loginInfo = await native.reLogin(
+      nickname: username,
+      passwd: generateMD5(password).toUpperCase(),
+    );
+  }
   loginEvent.broadcast();
 }
 

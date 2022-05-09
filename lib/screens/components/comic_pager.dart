@@ -2,7 +2,6 @@ import 'package:daisy/screens/comic_detail_screen.dart';
 import 'package:daisy/screens/components/images.dart';
 import 'package:flutter/material.dart';
 import 'package:daisy/const.dart';
-import 'package:daisy/screens/components/image_cache_provider.dart';
 import '../../utils.dart';
 
 class ComicInListCard {

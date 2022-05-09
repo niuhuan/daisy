@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:daisy/configs/novel_background_color.dart';
 import 'package:daisy/ffi.dart';
-import 'package:daisy/screens/components/connect_loading.dart';
 import 'package:daisy/screens/components/content_error.dart';
-import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -15,6 +12,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../configs/novel_font_color.dart';
 import '../configs/novel_font_size.dart';
+import 'components/content_loading.dart';
 
 class NovelReaderScreen extends StatefulWidget {
   final NovelDetail novel;

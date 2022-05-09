@@ -1,6 +1,5 @@
 import 'package:daisy/screens/about_screen.dart';
 import 'package:daisy/screens/app_screen.dart';
-import 'package:daisy/screens/comic_history_screen.dart';
 import 'package:daisy/screens/components/badged.dart';
 import 'package:flutter/material.dart';
 import 'package:daisy/screens/comic_browser_screen.dart';

@@ -1,8 +1,8 @@
 import 'package:daisy/screens/components/content_error.dart';
 import 'package:daisy/screens/components/images.dart';
+import 'package:daisy/screens/components/subscribed_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:daisy/ffi.dart';
-import 'package:daisy/screens/components/connect_loading.dart';
 import 'package:uuid/uuid.dart';
 
 import '../commons.dart';
@@ -10,6 +10,7 @@ import '../const.dart';
 import '../utils.dart';
 import 'comic_reader_screen.dart';
 import 'components/comment_pager.dart';
+import 'components/content_loading.dart';
 
 class ComicDetailScreen extends StatefulWidget {
   final int comicId;
@@ -108,6 +109,9 @@ class _ComicDetailScreenState extends State<ComicDetailScreen> with RouteAware {
           child: Scaffold(
             appBar: AppBar(
               title: Text(comic.title),
+              actions: [
+                SubscribedIcon(objType: 0, objId: widget.comicId),
+              ],
             ),
             body: ListView(
               children: [

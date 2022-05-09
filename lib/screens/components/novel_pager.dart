@@ -1,4 +1,3 @@
-import 'package:daisy/ffi.dart';
 import 'package:daisy/screens/novel_detail_screen.dart';
 import 'package:daisy/screens/components/images.dart';
 import 'package:flutter/material.dart';

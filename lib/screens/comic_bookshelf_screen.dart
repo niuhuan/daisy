@@ -1,12 +1,8 @@
-import 'dart:convert';
-
-import 'package:daisy/ffi.dart';
 import 'package:daisy/screens/comic_downloads_screen.dart';
 import 'package:daisy/screens/comic_history_screen.dart';
 import 'package:daisy/screens/comic_subscribed_screen.dart';
 import 'package:flutter/material.dart';
 
-import 'components/comic_pager.dart';
 
 class ComicBookshelfScreen extends StatefulWidget {
   const ComicBookshelfScreen({Key? key}) : super(key: key);
@@ -95,11 +91,11 @@ const _navPages = [
     title: "历史",
     icon: Icons.history,
   ),
-  NavPage(
-    screen: ComicDownloadsScreen(),
-    title: "下载",
-    icon: Icons.download,
-  ),
+  // NavPage(
+  //   screen: ComicDownloadsScreen(),
+  //   title: "下载",
+  //   icon: Icons.download,
+  // ),
   NavPage(
     screen: ComicSubscribedScreen(),
     title: "订阅",

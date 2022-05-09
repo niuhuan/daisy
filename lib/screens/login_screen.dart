@@ -1,14 +1,10 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
-import 'package:crypto/crypto.dart';
 import 'package:daisy/ffi.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../commons.dart';
 import '../configs/login.dart';
-import 'components/connect_loading.dart';
+import 'components/content_loading.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -161,10 +157,4 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     }
   }
-}
-
-String generateMD5(String data) {
-  Uint8List content = (const Utf8Encoder()).convert(data);
-  Digest digest = md5.convert(content);
-  return digest.toString();
 }

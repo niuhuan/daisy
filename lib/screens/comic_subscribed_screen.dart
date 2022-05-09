@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:daisy/configs/login.dart';
 import 'package:daisy/ffi.dart';
 import 'package:flutter/material.dart';
-
 import 'components/comic_pager.dart';
 
 class ComicSubscribedScreen extends StatefulWidget {

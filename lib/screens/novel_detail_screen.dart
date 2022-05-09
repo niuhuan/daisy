@@ -1,17 +1,13 @@
-import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-
-import '../bridge_generated.dart';
 import '../commons.dart';
 import '../const.dart';
 import '../ffi.dart';
 import '../utils.dart';
 import 'components/comment_pager.dart';
-import 'components/connect_loading.dart';
 import 'components/content_error.dart';
+import 'components/content_loading.dart';
 import 'components/images.dart';
 import 'novel_reader_screen.dart';
 

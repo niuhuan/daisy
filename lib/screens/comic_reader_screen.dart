@@ -251,8 +251,10 @@ abstract class _ComicReaderState extends State<_ComicReader> {
 
   Future _onFullScreenChange(bool fullScreen) async {
     setState(() {
-      SystemChrome.setEnabledSystemUIOverlays(
-          fullScreen ? [] : SystemUiOverlay.values);
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: fullScreen ? [] : SystemUiOverlay.values,
+      );
       _fullScreen = fullScreen;
     });
   }
@@ -296,7 +298,10 @@ abstract class _ComicReaderState extends State<_ComicReader> {
       delVolumeListen();
     }
     if (Platform.isAndroid || Platform.isIOS) {
-      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: SystemUiOverlay.values,
+      );
     }
     super.dispose();
   }

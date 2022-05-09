@@ -1,7 +1,6 @@
 import 'package:daisy/commons.dart';
 import 'package:daisy/ffi.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 const _propertyKeyLight = "novel_background_color_light";
 const _propertyKeyDark = "novel_background_color_dark";
