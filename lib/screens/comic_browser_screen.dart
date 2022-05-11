@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:daisy/commons.dart';
+import 'package:daisy/screens/components/content_error.dart';
+import 'package:daisy/screens/components/content_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:daisy/ffi.dart';
 
@@ -33,6 +35,47 @@ class _ComicBrowserScreenState extends State<ComicBrowserScreen>
 
   int _sort = 1;
 
+  late Future<ComicCategoryGroup<List<ComicCategory>>> _filterGroupsFuture =
+      _loadFilterGroups();
+
+  Future<ComicCategoryGroup<List<ComicCategory>>> _loadFilterGroups() async {
+    try {
+      final serverCategories = await _loadFilters();
+      return ComicCategoryGroup<List<ComicCategory>>(
+        _mapToCategory(serverCategories[0]),
+        _mapToCategory(serverCategories[1]),
+        _mapToCategory(serverCategories[2]),
+        _mapToCategory(serverCategories[3]),
+      );
+    } catch (e, s) {
+      print("$e\n$s");
+      return comicCategories;
+    }
+  }
+
+  List<ComicCategory> _mapToCategory(ComicFilter serverCategory) {
+    List<ComicCategory> c = [];
+    for (var value in serverCategory.items) {
+      if (value.tagId != 0) {
+        c.add(ComicCategory(
+          title: value.tagName,
+          cover: '',
+          tagId: value.tagId,
+        ));
+      }
+    }
+    return c;
+  }
+
+  Future<List<ComicFilter>> _loadFilters() async {
+    try {
+      return await native.comicClassifyFilters();
+    } catch (e, s) {
+      print("$e\n$s");
+      return await native.comicClassifyFiltersOld();
+    }
+  }
+
   Future<List<ComicInListCard>> _loadComic(int page) async {
     return (await native.comicClassifyWithLevel(
       sort: _sort,
@@ -52,7 +95,7 @@ class _ComicBrowserScreenState extends State<ComicBrowserScreen>
         .toList();
   }
 
-  Widget _filterBar() {
+  Widget _filterBar(ComicCategoryGroup<List<ComicCategory>> comicCategories) {
     final borderColor = Theme.of(context).dividerColor;
     return Row(children: [
       Expanded(
@@ -222,14 +265,36 @@ class _ComicBrowserScreenState extends State<ComicBrowserScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(50),
-        child: _filterBar(),
-      ),
-      body: ComicPager(_loadComic,
-          key: Key(
-              "${_selectedComicCategories.filtered().map((e) => e!.tagId.toString()).join("_")}:$_sort")),
+    return FutureBuilder(
+      future: _filterGroupsFuture,
+      builder: (BuildContext context,
+          AsyncSnapshot<ComicCategoryGroup<List<ComicCategory>>> snapshot) {
+        if (snapshot.hasError) {
+          return ContentError(
+            error: snapshot.error,
+            stackTrace: snapshot.stackTrace,
+            onRefresh: () async {
+              setState(() {
+                _filterGroupsFuture = _loadFilterGroups();
+              });
+            },
+          );
+        }
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const ContentLoading();
+        }
+        return Scaffold(
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(50),
+            child: _filterBar(snapshot.requireData),
+          ),
+          body: ComicPager(
+            _loadComic,
+            key: Key(
+                "${_selectedComicCategories.filtered().map((e) => e!.tagId.toString()).join("_")}:$_sort"),
+          ),
+        );
+      },
     );
   }
 }
