@@ -17,6 +17,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../commons.dart';
+import 'components/image_cache_provider.dart';
 import 'components/images.dart';
 
 class ComicReaderScreen extends StatefulWidget {
@@ -1172,14 +1173,19 @@ class _ComicReaderGalleryState extends _ComicReaderState {
       itemCount: widget.chapter.pageUrl.length,
       allowImplicitScrolling: true,
       builder: (BuildContext context, int index) {
-        return PhotoViewGalleryPageOptions.customChild(
+        return PhotoViewGalleryPageOptions(
           filterQuality: FilterQuality.high,
-          child: LoadingCacheImage(
+          imageProvider: ImageCacheProvider(
             url: widget.chapter.pageUrl[index],
             useful: 'comic_reader',
             extendsFieldIntFirst: widget.comic.id,
             extendsFieldIntSecond: widget.chapter.chapterId,
             extendsFieldIntThird: index,
+          ),
+          errorBuilder: (c, e, s) => LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              return buildError(constraints.maxWidth, constraints.maxHeight);
+            },
           ),
         );
       },
