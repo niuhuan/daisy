@@ -287,11 +287,13 @@ jobs:
               --c-output macos/Runner/bridge_generated.h \
               --rust-crate-dir native \
               --class-name Native
+          cargo build --manifest-path native/Cargo.toml --release --target x86_64-apple-darwin
           flutter config --enable-macos-desktop
           flutter build macos
           cd build
           mkdir appimage
           mv macos/Build/Products/Release/daisy.app appimage/
+          mv native/target/x86_64-apple-darwin/release/libnative.dylib appimage/daisy.app/Contents/Frameworks/
           ln -sf /Applications appimage/
           hdiutil create -volname daisy -srcfolder appimage -ov -format UDBZ macos.dmg
           cd ..
