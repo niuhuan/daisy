@@ -1,5 +1,6 @@
 import 'package:daisy/screens/about_screen.dart';
 import 'package:daisy/screens/components/badged.dart';
+import 'package:daisy/screens/novel_bookshelf_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:daisy/screens/novel_browser_screen.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
@@ -191,9 +192,9 @@ class NavPage {
 
 const _navPages = [
   NavPage(
-    screen: NovelHistoryScreen(),
-    title: "历史",
-    icon: Icons.history,
+    screen: NovelBookshelfScreen(),
+    title: "书架",
+    icon: Icons.history_edu,
   ),
   NavPage(screen: NovelBrowserScreen(), title: "浏览", icon: Icons.blur_linear),
 ];
