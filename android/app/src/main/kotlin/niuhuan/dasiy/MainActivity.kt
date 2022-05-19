@@ -8,6 +8,7 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.view.Display
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import io.flutter.Log
@@ -60,6 +61,13 @@ class MainActivity: FlutterActivity() {
                 when (call.method) {
                     "root" -> context!!.filesDir.absolutePath
                     "saveImageToGallery" -> saveImageToGallery(call.arguments as String)
+                    "androidGetModes" -> {
+                        modes()
+                    }
+                    "androidSetMode" -> {
+                        setMode(call.argument("mode")!!)
+                    }
+                    "androidGetVersion" -> Build.VERSION.SDK_INT
                     else -> {
                         notImplementedToken
                     }
@@ -86,6 +94,57 @@ class MainActivity: FlutterActivity() {
                     contentValues.clear()
                     contentValues.put(MediaStore.Video.Media.IS_PENDING, 0)
                     contentResolver.update(uri, contentValues, null, null)
+                }
+            }
+        }
+    }
+
+    // fps mods
+    private fun mixDisplay(): Display? {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            display?.let {
+                return it
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            windowManager.defaultDisplay?.let {
+                return it
+            }
+        }
+        return null
+    }
+
+    private fun modes(): List<String> {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mixDisplay()?.let { display ->
+                return display.supportedModes.map { mode ->
+                    mode.toString()
+                }
+            }
+        }
+        return ArrayList()
+    }
+
+    private fun setMode(string: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mixDisplay()?.let { display ->
+                if (string == "") {
+                    uiThreadHandler.post {
+                        window.attributes = window.attributes.also { attr ->
+                            attr.preferredDisplayModeId = 0
+                        }
+                    }
+                    return
+                }
+                return display.supportedModes.forEach { mode ->
+                    if (mode.toString() == string) {
+                        uiThreadHandler.post {
+                            window.attributes = window.attributes.also { attr ->
+                                attr.preferredDisplayModeId = mode.modeId
+                            }
+                        }
+                        return
+                    }
                 }
             }
         }

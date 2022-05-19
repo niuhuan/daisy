@@ -1,3 +1,5 @@
+import 'package:daisy/configs/android_display_mode.dart';
+import 'package:daisy/configs/android_version.dart';
 import 'package:daisy/configs/login.dart';
 import 'package:daisy/configs/novel_background_color.dart';
 import 'package:daisy/configs/novel_font_color.dart';
@@ -26,6 +28,8 @@ class InitScreen extends StatefulWidget {
 class _InitScreenState extends State<InitScreen> {
   Future _init() async {
     await native.init(root: await cross.root());
+    await initAndroidVersion();
+    await initAndroidDisplayMode();
     await initAutoClean();
     await initReaderControllerType();
     await initReaderDirection();

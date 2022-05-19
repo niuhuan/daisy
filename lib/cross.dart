@@ -27,6 +27,24 @@ class Cross {
     }
     throw "没有适配的平台";
   }
+
+  Future<int> androidGetVersion() async {
+    if (Platform.isAndroid) {
+      return await _channel.invokeMethod("androidGetVersion");
+    }
+    return 0;
+  }
+
+  Future<List<String>> loadAndroidModes() async {
+    return List.of(await _channel.invokeMethod("androidGetModes"))
+        .map((e) => "$e")
+    .toList();
+  }
+
+  Future setAndroidMode(String androidDisplayMode) {
+    return _channel
+        .invokeMethod("androidSetMode", {"mode": androidDisplayMode});
+  }
 }
 
 /// 打开web页面

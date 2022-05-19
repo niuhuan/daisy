@@ -1,3 +1,4 @@
+import 'package:daisy/configs/android_display_mode.dart';
 import 'package:daisy/configs/auto_clean.dart';
 import 'package:daisy/configs/themes.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,8 @@ class _AboutState extends State<AboutScreen> {
           const Divider(),
           lightThemeSetting(),
           darkThemeSetting(),
+          const Divider(),
+          androidDisplayModeSetting(),
           const Divider(),
         ],
       ),
