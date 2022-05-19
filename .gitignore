@@ -54,3 +54,4 @@ bridge_generated.dart
 bridge_generated.h
 version.txt
 libnative.a
+ci/target/

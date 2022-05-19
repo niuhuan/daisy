@@ -1,7 +1,7 @@
+use anyhow::Result;
 use serde_derive::Deserialize;
 use serde_derive::Serialize;
 use serde_json::Value;
-use anyhow::Result;
 
 const OWNER: &str = "niuhuan";
 const REPO: &str = "daisy";
@@ -15,27 +15,48 @@ async fn main() -> Result<()> {
     }
 
     let target = std::env::var("TARGET")?;
+    let flutter_version = std::env::var("flutter_version")?;
 
     let vs_code_txt = tokio::fs::read_to_string("version.code.txt").await?;
 
     let code = vs_code_txt.trim();
 
     let release_file_name = match target.as_str() {
-        "macos" => format!("daisy-{}-macos-intel.dmg", code),
-        "ios" => format!("daisy-{}-ios-nosign.ipa", code),
-        "windows" => format!("daisy-{}-windows-x86_64.zip", code),
-        "linux" => format!("daisy-{}-linux-x86_64.AppImage", code),
-        "android-arm32" => format!("daisy-{}-android-arm32.apk", code),
-        "android-arm64" => format!("daisy-{}-android-arm64.apk", code),
-        "android-x86_64" => format!("daisy-{}-android-x86_64.apk", code),
-        un => panic!("unknown target : {}", un),
+        "macos" => format!("daisy-{}-flutter_{}-macos-intel.dmg", code, flutter_version),
+        "ios" => format!("daisy-{}-flutter_{}-ios-nosign.ipa", code, flutter_version),
+        "windows" => format!(
+            "daisy-{}-flutter_{}-windows-x86_64.zip",
+            code, flutter_version
+        ),
+        "linux" => format!(
+            "daisy-{}-flutter_{}-linux-x86_64.AppImage",
+            code, flutter_version
+        ),
+        "android-arm32" => format!(
+            "daisy-{}-flutter_{}-android-arm32.apk",
+            code, flutter_version
+        ),
+        "android-arm64" => format!(
+            "daisy-{}-flutter_{}-android-arm64.apk",
+            code, flutter_version
+        ),
+        "android-x86_64" => format!(
+            "daisy-{}-flutter_{}-android-x86_64.apk",
+            code, flutter_version
+        ),
+        un => panic!("unknown target : {}-flutter_{}", un, flutter_version),
     };
 
     let client = reqwest::ClientBuilder::new().user_agent(UA).build()?;
 
-    let check_response = client.get(format!("https://api.github.com/repos/{}/{}/releases/tags/{}", OWNER, REPO, code))
+    let check_response = client
+        .get(format!(
+            "https://api.github.com/repos/{}/{}/releases/tags/{}",
+            OWNER, REPO, code
+        ))
         .header("Authorization", format!("token {}", gh_token))
-        .send().await?;
+        .send()
+        .await?;
 
     match check_response.status().as_u16() {
         200 => (),
@@ -48,7 +69,10 @@ async fn main() -> Result<()> {
     let release: Release = check_response.json().await?;
 
     let ass_names: Vec<String> = release.assets.iter().map(|a| a.name.clone()).collect();
-    println!("::set-output name=skip_build::{}", ass_names.contains(&release_file_name));
+    println!(
+        "::set-output name=skip_build::{}",
+        ass_names.contains(&release_file_name)
+    );
     Ok(())
 }
 

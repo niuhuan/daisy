@@ -12,20 +12,36 @@ async fn main() -> Result<()> {
     // get ghToken
     let gh_token = std::env::var("GH_TOKEN")?;
     let target = std::env::var("TARGET")?;
+    let flutter_version = std::env::var("flutter_version")?;
 
     let vs_code_txt = tokio::fs::read_to_string("version.code.txt").await?;
 
     let code = vs_code_txt.trim();
 
     let release_file_name = match target.as_str() {
-        "macos" => format!("daisy-{}-macos-intel.dmg", code),
-        "ios" => format!("daisy-{}-ios-nosign.ipa", code),
-        "windows" => format!("daisy-{}-windows-x86_64.zip", code),
-        "linux" => format!("daisy-{}-linux-x86_64.AppImage", code),
-        "android-arm32" => format!("daisy-{}-android-arm32.apk", code),
-        "android-arm64" => format!("daisy-{}-android-arm64.apk", code),
-        "android-x86_64" => format!("daisy-{}-android-x86_64.apk", code),
-        un => panic!("unknown target : {}", un),
+        "macos" => format!("daisy-{}-flutter_{}-macos-intel.dmg", code, flutter_version),
+        "ios" => format!("daisy-{}-flutter_{}-ios-nosign.ipa", code, flutter_version),
+        "windows" => format!(
+            "daisy-{}-flutter_{}-windows-x86_64.zip",
+            code, flutter_version
+        ),
+        "linux" => format!(
+            "daisy-{}-flutter_{}-linux-x86_64.AppImage",
+            code, flutter_version
+        ),
+        "android-arm32" => format!(
+            "daisy-{}-flutter_{}-android-arm32.apk",
+            code, flutter_version
+        ),
+        "android-arm64" => format!(
+            "daisy-{}-flutter_{}-android-arm64.apk",
+            code, flutter_version
+        ),
+        "android-x86_64" => format!(
+            "daisy-{}-flutter_{}-android-x86_64.apk",
+            code, flutter_version
+        ),
+        un => panic!("unknown target : {}-flutter_{}", un, flutter_version),
     };
 
     let local_path = match target.as_str() {
