@@ -44,10 +44,17 @@ jobs:
           repository: ${{ github.event.inputs.repo }}
           path: 'daisy'
 
+      - name: Cargo ci build cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ci/target/
+          key: ${{ runner.os }}-cargo-ci_target
+
       - name: Check release
         run: |
           cd daisy/ci
-          cargo run --bin check-release
+          cargo run --release --bin check-release
 
   build_release_assets:
     name: Build release assets
@@ -115,11 +122,18 @@ jobs:
         with:
           toolchain: stable
 
+      - name: Cargo ci build cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            daisy/ci/target/
+          key: ${{ runner.os }}-cargo-ci_target
+
       - id: check_asset
         name: Check asset
         run: |
           cd daisy/ci
-          cargo run --bin check-asset
+          cargo run --release --bin check-asset
 
       - name: Check core
         if: steps.check_asset.outputs.skip_build != 'true'
@@ -200,6 +214,14 @@ jobs:
         run: |
           cd daisy/ci
           cp version.code.txt ../lib/assets/version.txt
+
+      - name: Cargo native build cache
+        if: steps.check_asset.outputs.skip_build != 'true'
+        uses: actions/cache@v3
+        with:
+          path: |
+            daisy/native/target/
+          key: ${{ runner.os }}-cargo-native_target-${{ matrix.config.target }}
 
       - name: Install rust target and build (ios)
         if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'ios')
@@ -325,9 +347,17 @@ jobs:
           base64 -d key.jks.base64 > key.jks
           echo $KEY_PASSWORD | $ANDROID_HOME/build-tools/30.0.2/apksigner sign --ks key.jks build/app/outputs/flutter-apk/app-release.apk
 
+      - name: Cargo ci build cache
+        if: steps.check_asset.outputs.skip_build != 'true'
+        uses: actions/cache@v3
+        with:
+          path: |
+            daisy/ci/target/
+          key: ${{ runner.os }}-cargo-ci_target
+
       - name: Upload Asset (All)
         if: steps.check_asset.outputs.skip_build != 'true'
         run: |
           cd daisy/ci
-          cargo run --bin upload-asset
+          cargo run --release --bin upload-asset
 
