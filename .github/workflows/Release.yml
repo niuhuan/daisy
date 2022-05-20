@@ -309,7 +309,7 @@ jobs:
           cd build
           mkdir appimage
           mv macos/Build/Products/Release/daisy.app appimage/
-          mv native/target/x86_64-apple-darwin/release/libnative.dylib appimage/daisy.app/Contents/Frameworks/
+          mv ../native/target/x86_64-apple-darwin/release/libnative.dylib appimage/daisy.app/Contents/Frameworks/
           ln -sf /Applications appimage/
           hdiutil create -volname daisy -srcfolder appimage -ov -format UDBZ macos.dmg
           cd ..
