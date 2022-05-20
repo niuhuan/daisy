@@ -48,7 +48,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ci/target/
+            daisy/ci/target/
           key: ${{ runner.os }}-cargo-ci_target
 
       - name: Check release
