@@ -239,6 +239,7 @@ jobs:
             --class-name Native
           cargo build --manifest-path native/Cargo.toml --features= --lib --release --target=aarch64-apple-ios
           cp native/target/aarch64-apple-ios/release/libnative.a ios/Runner/
+          /usr/libexec/PlistBuddy -c 'Add :application-identifier string niuhuan.daisy' ios/Runner/Info.plist
           flutter build ios --no-simulator --no-codesign --release
           cd build
           rm -rf Payload
