@@ -37,6 +37,16 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
 
   @override
   void initState() {
+    native.novelViewPage(
+      novelId: widget.novel.id,
+      volumeId: widget.volume.id,
+      volumeTitle: widget.volume.title,
+      volumeOrder: widget.volume.rank,
+      chapterId: widget.chapter.chapterId,
+      chapterTitle: widget.chapter.chapterName,
+      chapterOrder: widget.chapter.chapterOrder,
+      progress: 0,
+    );
     _contentFuture = native.novelContent(
       volumeId: widget.volume.id,
       chapterId: widget.chapter.chapterId,
@@ -274,7 +284,7 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
 
   Future onChangeEp(NovelDetail n, NovelVolume v, NovelChapter c) async {
     Navigator.of(context).pushReplacement(MaterialPageRoute(
-      builder: (BuildContext context)=> NovelReaderScreen(
+      builder: (BuildContext context) => NovelReaderScreen(
         novel: n,
         volume: v,
         chapter: c,

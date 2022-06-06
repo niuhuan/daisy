@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../commons.dart';
@@ -29,7 +28,7 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
   late List<NovelVolume> _volumes;
   late Future _load;
 
-  //late Future<ComicViewLog?> _viewLog;
+  late Future<NovelViewLog?> _viewLog;
   int _tabIndex = 0;
 
   void _reload() {
@@ -41,7 +40,7 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
   }
 
   void _loadViewLog() {
-    //_viewLog = native.viewLogByNovelId(novelId: widget.novelId);
+    _viewLog = native.viewLogByNovelId(novelId: widget.novelId);
   }
 
   @override
@@ -102,7 +101,7 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
         var _views = <Widget>[
           Column(children: [
             Container(height: 20),
-            //_buildContinueButton(novel),
+            _buildContinueButton(),
             ..._buildChapters(),
           ]),
           CommentPager(ObjType.novel, widget.novelId, false),
@@ -147,68 +146,77 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
     );
   }
 
-  // Widget _buildContinueButton(NovelDetail novel) {
-  //   return FutureBuilder(
-  //     future: _viewLog,
-  //     builder: (BuildContext context, AsyncSnapshot<ComicViewLog?> snapshot) {
-  //       if (snapshot.hasError) {
-  //         return _continueButton(
-  //             text: "加载失败,点击重试",
-  //             onPressed: () {
-  //               setState(() {
-  //                 _loadViewLog();
-  //               });
-  //             });
-  //       }
-  //       if (snapshot.connectionState != ConnectionState.done) {
-  //         return _continueButton(text: "加载中", onPressed: () {});
-  //       }
-  //       final viewLog = snapshot.data;
-  //       if (viewLog != null) {
-  //         if (viewLog.chapterId != 0) {
-  //           return _continueButton(
-  //               onPressed: () {
-  //                 Navigator.push(
-  //                   context,
-  //                   MaterialPageRoute(
-  //                     builder: (context) => NovelReaderScreen(
-  //                       novel: novel,
-  //                       chapterId: viewLog.chapterId,
-  //                       loadChapter: _loadChapterF(novel),
-  //                       initRank: viewLog.pageRank,
-  //                     ),
-  //                   ),
-  //                 );
-  //               },
-  //               text:
-  //               "继续阅读 ${viewLog.chapterTitle} - P.${viewLog.pageRank + 1}");
-  //         }
-  //       }
-  //       if (novel.chapters.isNotEmpty) {
-  //         if (novel.chapters[0].data.isNotEmpty) {
-  //           final f = novel.chapters[0].data.reduce(
-  //                   (o1, o2) => o1.chapterOrder < o2.chapterOrder ? o1 : o2);
-  //           return _continueButton(
-  //               onPressed: () {
-  //                 Navigator.push(
-  //                   context,
-  //                   MaterialPageRoute(
-  //                     builder: (context) => NovelReaderScreen(
-  //                       novel: novel,
-  //                       chapterId: f.chapterId,
-  //                       loadChapter: _loadChapterF(novel),
-  //                       initRank: 0,
-  //                     ),
-  //                   ),
-  //                 );
-  //               },
-  //               text: "从头开始 ${f.chapterTitle}");
-  //         }
-  //       }
-  //       return Container();
-  //     },
-  //   );
-  // }
+  Widget _buildContinueButton() {
+    return FutureBuilder(
+      future: _viewLog,
+      builder: (BuildContext context, AsyncSnapshot<NovelViewLog?> snapshot) {
+        if (snapshot.hasError) {
+          return _continueButton(
+              text: "加载失败,点击重试",
+              onPressed: () {
+                setState(() {
+                  _loadViewLog();
+                });
+              });
+        }
+        if (snapshot.connectionState != ConnectionState.done) {
+          return _continueButton(text: "加载中", onPressed: () {});
+        }
+        final viewLog = snapshot.data;
+        if (viewLog != null) {
+          if (viewLog.chapterId != 0) {
+            for (var volume in _volumes) {
+              if (volume.id == viewLog.volumeId) {
+                for (var chapter in volume.chapters) {
+                  if (chapter.chapterId == viewLog.chapterId) {
+                    return _continueButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NovelReaderScreen(
+                                novel: _detail,
+                                volumes: _volumes,
+                                chapter: chapter,
+                                volume: volume,
+                              ),
+                            ),
+                          );
+                        },
+                        text:
+                            "继续阅读 ${viewLog.chapterTitle}"); // - P.${viewLog.pageRank + 1}
+                  }
+                }
+              }
+            }
+          }
+        }
+        if (_volumes.isNotEmpty) {
+          final volume = _volumes.reduce((o1, o2) => o1.rank < o2.rank ? o1 : o2);
+          if (volume.chapters.isNotEmpty) {
+            final chapter = _volumes[0].chapters.reduce(
+                (o1, o2) => o1.chapterOrder < o2.chapterOrder ? o1 : o2);
+            return _continueButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NovelReaderScreen(
+                        novel: _detail,
+                        volumes: _volumes,
+                        chapter: chapter,
+                        volume: volume,
+                      ),
+                    ),
+                  );
+                },
+                text: "从头开始 ${chapter.chapterName}");
+          }
+        }
+        return Container();
+      },
+    );
+  }
 
   List<Widget> _buildChapters() {
     return _volumes
