@@ -175,7 +175,7 @@ jobs:
       - name: Setup ffigen
         if: steps.check_asset.outputs.skip_build != 'true'
         run: |
-          dart pub global activate ffigen
+          dart pub global activate ffigen 5.0.1
 
       - name: Install LLVM and Clang (Linux/Android)
         if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' || matrix.config.target == 'linux' )
