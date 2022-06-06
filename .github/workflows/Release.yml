@@ -149,7 +149,6 @@ jobs:
         with:
           repository: 'fzyzcjy/flutter_rust_bridge'
           path: 'flutter_rust_bridge'
-          ref: 'f62c8aaffac9191c5280d0648e2ba5d4951eacbf'
 
       - name: Install flutter_rust_bridge
         if: steps.check_asset.outputs.skip_build != 'true'
@@ -175,7 +174,7 @@ jobs:
       - name: Setup ffigen
         if: steps.check_asset.outputs.skip_build != 'true'
         run: |
-          dart pub global activate ffigen 5.0.1
+          dart pub global activate ffigen 4.1.3
 
       - name: Install LLVM and Clang (Linux/Android)
         if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' || matrix.config.target == 'linux' )
