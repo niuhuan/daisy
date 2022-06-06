@@ -8,6 +8,7 @@ import 'components/comment_pager.dart';
 import 'components/content_error.dart';
 import 'components/content_loading.dart';
 import 'components/images.dart';
+import 'components/subscribed_icon.dart';
 import 'novel_reader_screen.dart';
 
 class NovelDetailScreen extends StatefulWidget {
@@ -112,6 +113,9 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
           child: Scaffold(
             appBar: AppBar(
               title: Text(_detail.name),
+              actions: [
+                SubscribedIcon(objType: 1, objId: widget.novelId),
+              ],
             ),
             body: ListView(
               children: [
