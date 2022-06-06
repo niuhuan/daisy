@@ -149,6 +149,7 @@ jobs:
         with:
           repository: 'fzyzcjy/flutter_rust_bridge'
           path: 'flutter_rust_bridge'
+          ref: 'f62c8aaffac9191c5280d0648e2ba5d4951eacbf'
 
       - name: Install flutter_rust_bridge
         if: steps.check_asset.outputs.skip_build != 'true'
