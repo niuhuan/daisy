@@ -2,16 +2,16 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:another_xlider/another_xlider.dart';
-import 'package:daisy/ffi.dart';
-import 'package:event/event.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:daisy/configs/reader_controller_type.dart';
 import 'package:daisy/configs/reader_direction.dart';
 import 'package:daisy/configs/reader_slider_position.dart';
 import 'package:daisy/configs/reader_type.dart';
+import 'package:daisy/ffi.dart';
 import 'package:daisy/screens/components/content_error.dart';
 import 'package:daisy/screens/components/content_loading.dart';
+import 'package:event/event.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -45,6 +45,8 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
   late ReaderDirection _readerDirection;
   late Future<ChapterDetail> _chapterFuture;
   bool _loaded = false;
+  late bool _fullScreen;
+  var _replace = false;
 
   void _load() {
     // todo multiple used setState and FutureBuilder, it is not good.
@@ -71,6 +73,23 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
   void initState() {
     _load();
     super.initState();
+    _fullScreen = widget.fullScreenOnInit;
+    if (_fullScreen) {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+    }
+  }
+
+  @override
+  void dispose() {
+    if (Platform.isAndroid || Platform.isIOS) {
+      if (!_replace) {
+        SystemChrome.setEnabledSystemUIMode(
+          SystemUiMode.manual,
+          overlays: SystemUiOverlay.values,
+        );
+      }
+    }
+    super.dispose();
   }
 
   @override
@@ -102,8 +121,9 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
             comic: widget.comic,
             chapter: chapter,
             startIndex: widget.initRank,
-            fullScreenOnInit: widget.fullScreenOnInit,
-            reload: (int index, bool fullScreenOnInit) async {
+            fullScreen: _fullScreen,
+            reload: (int index) async {
+              _replace = true;
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (BuildContext context) {
                   return ComicReaderScreen(
@@ -111,12 +131,13 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
                     chapterId: widget.chapterId,
                     initRank: index,
                     loadChapter: widget.loadChapter,
-                    fullScreenOnInit: fullScreenOnInit,
+                    fullScreenOnInit: _fullScreen,
                   );
                 }),
               );
             },
-            onChangeEp: (int chapterId, bool fullScreenOnInit) async {
+            onChangeEp: (int chapterId) async {
+              _replace = true;
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (BuildContext context) {
                   return ComicReaderScreen(
@@ -124,18 +145,29 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
                     chapterId: chapterId,
                     initRank: 0,
                     loadChapter: widget.loadChapter,
-                    fullScreenOnInit: fullScreenOnInit,
+                    fullScreenOnInit: _fullScreen,
                   );
                 }),
               );
             },
             readerType: _readerType,
             readerDirection: _readerDirection,
+            onFullScreenChange: _onFullScreenChange,
           );
           return readerKeyboardHolder(screen);
         },
       ),
     );
+  }
+
+  Future _onFullScreenChange(bool fullScreen) async {
+    setState(() {
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: fullScreen ? [] : SystemUiOverlay.values,
+      );
+      _fullScreen = fullScreen;
+    });
   }
 }
 
@@ -208,12 +240,13 @@ class _ReaderControllerEventArgs extends EventArgs {
 class _ComicReader extends StatefulWidget {
   final ComicDetail comic;
   final ChapterDetail chapter;
-  final FutureOr Function(int, bool) reload;
-  final FutureOr Function(int, bool) onChangeEp;
+  final FutureOr Function(int) reload;
+  final FutureOr Function(int) onChangeEp;
   final int startIndex;
   final ReaderType readerType;
   final ReaderDirection readerDirection;
-  final bool fullScreenOnInit;
+  final bool fullScreen;
+  final Function(bool) onFullScreenChange;
 
   const _ComicReader({
     required this.comic,
@@ -223,7 +256,8 @@ class _ComicReader extends StatefulWidget {
     required this.startIndex,
     required this.readerType,
     required this.readerDirection,
-    required this.fullScreenOnInit,
+    required this.fullScreen,
+    required this.onFullScreenChange,
     Key? key,
   }) : super(key: key);
 
@@ -246,19 +280,8 @@ abstract class _ComicReaderState extends State<_ComicReader> {
 
   _needJumpTo(int pageIndex, bool animation);
 
-  late bool _fullScreen;
   late int _current;
   late int _slider;
-
-  Future _onFullScreenChange(bool fullScreen) async {
-    setState(() {
-      SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.manual,
-        overlays: fullScreen ? [] : SystemUiOverlay.values,
-      );
-      _fullScreen = fullScreen;
-    });
-  }
 
   void _onCurrentChange(int index) {
     if (index != _current) {
@@ -279,10 +302,6 @@ abstract class _ComicReaderState extends State<_ComicReader> {
 
   @override
   void initState() {
-    _fullScreen = widget.fullScreenOnInit;
-    if (_fullScreen) {
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-    }
     _current = widget.startIndex;
     _slider = widget.startIndex;
     _readerControllerEvent.subscribe(_onPageControl);
@@ -297,12 +316,6 @@ abstract class _ComicReaderState extends State<_ComicReader> {
     _readerControllerEvent.unsubscribe(_onPageControl);
     if (_listVolume) {
       delVolumeListen();
-    }
-    if (Platform.isAndroid || Platform.isIOS) {
-      SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.manual,
-        overlays: SystemUiOverlay.values,
-      );
     }
     super.dispose();
   }
@@ -369,7 +382,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
 
   Widget _buildFullScreenControllerStackItem() {
     if (currentReaderSliderPosition == ReaderSliderPosition.bottom &&
-        !_fullScreen) {
+        !widget.fullScreen) {
       return Container();
     }
     return Align(
@@ -389,10 +402,12 @@ abstract class _ComicReaderState extends State<_ComicReader> {
           ),
           child: GestureDetector(
             onTap: () {
-              _onFullScreenChange(!_fullScreen);
+              widget.onFullScreenChange(!widget.fullScreen);
             },
             child: Icon(
-              _fullScreen ? Icons.fullscreen_exit : Icons.fullscreen_outlined,
+              widget.fullScreen
+                  ? Icons.fullscreen_exit
+                  : Icons.fullscreen_outlined,
               size: 30,
               color: Colors.white,
             ),
@@ -406,7 +421,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
-        _onFullScreenChange(!_fullScreen);
+        widget.onFullScreenChange(!widget.fullScreen);
       },
       child: child,
     );
@@ -416,7 +431,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onDoubleTap: () {
-        _onFullScreenChange(!_fullScreen);
+        widget.onFullScreenChange(!widget.fullScreen);
       },
       child: child,
     );
@@ -429,7 +444,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
         _readerControllerEvent.broadcast(_ReaderControllerEventArgs("DOWN"));
       },
       onDoubleTap: () {
-        _onFullScreenChange(!_fullScreen);
+        widget.onFullScreenChange(!widget.fullScreen);
       },
       child: child,
     );
@@ -461,7 +476,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
         var fullScreen = Expanded(
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
-            onTap: () => _onFullScreenChange(!_fullScreen),
+            onTap: () => widget.onFullScreenChange(!widget.fullScreen),
             child: Container(),
           ),
         );
@@ -505,7 +520,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
           children: [
             _buildAppBar(),
             Expanded(child: child),
-            _fullScreen
+            widget.fullScreen
                 ? Container()
                 : Container(
                     height: 45,
@@ -518,7 +533,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
                           icon: const Icon(Icons.fullscreen),
                           color: Colors.white,
                           onPressed: () {
-                            _onFullScreenChange(!_fullScreen);
+                            widget.onFullScreenChange(!widget.fullScreen);
                           },
                         ),
                         Container(width: 10),
@@ -537,15 +552,15 @@ abstract class _ComicReaderState extends State<_ComicReader> {
                       ],
                     ),
                   ),
-            _fullScreen
+            widget.fullScreen
                 ? Container()
                 : Container(
-              color: const Color(0x88000000),
-              child: SafeArea(
-                top: false,
-                child: Container(),
-              ),
-            ),
+                    color: const Color(0x88000000),
+                    child: SafeArea(
+                      top: false,
+                      child: Container(),
+                    ),
+                  ),
           ],
         );
       case ReaderSliderPosition.right:
@@ -579,7 +594,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
     }
   }
 
-  Widget _buildAppBar() => _fullScreen
+  Widget _buildAppBar() => widget.fullScreen
       ? Container()
       : AppBar(
           backgroundColor: Colors.black.withOpacity(.5),
@@ -609,7 +624,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
     );
   }
 
-  Widget _buildSliderLeft() => _fullScreen
+  Widget _buildSliderLeft() => widget.fullScreen
       ? Container()
       : Align(
           alignment: Alignment.centerLeft,
@@ -634,7 +649,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
           ),
         );
 
-  Widget _buildSliderRight() => _fullScreen
+  Widget _buildSliderRight() => widget.fullScreen
       ? Container()
       : Align(
           alignment: Alignment.centerRight,
@@ -736,7 +751,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
     );
     if (widget.readerDirection != currentReaderDirection ||
         widget.readerType != currentReaderType) {
-      widget.reload(_current, _fullScreen);
+      widget.reload(_current);
     } else {
       setState(() {});
     }
@@ -818,7 +833,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
       int newEpOrder = orders[orders.indexOf(_c.chapterOrder) + 1];
       for (var i = 0; i < _v.data.length; i++) {
         if (_v.data[i].chapterOrder == newEpOrder) {
-          widget.onChangeEp(_v.data[i].chapterId, _fullScreen);
+          widget.onChangeEp(_v.data[i].chapterId);
         }
       }
     } else {
@@ -830,7 +845,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
 class _EpChooser extends StatefulWidget {
   final ComicDetail comicDetail;
   final ChapterDetail chapter;
-  final FutureOr Function(int, bool) onChangeEp;
+  final FutureOr Function(int) onChangeEp;
 
   const _EpChooser(this.comicDetail, this.chapter, this.onChangeEp);
 
@@ -876,7 +891,7 @@ class _EpChooserState extends State<_EpChooser> {
           child: MaterialButton(
             onPressed: () {
               Navigator.of(context).pop();
-              widget.onChangeEp(ci.chapterId, false);
+              widget.onChangeEp(ci.chapterId);
             },
             textColor: Colors.white,
             child: Text(ci.chapterTitle),
@@ -1062,7 +1077,7 @@ class _ComicReaderWebToonState extends _ComicReaderState {
             } else {
               var maxHeight = constraints.maxHeight -
                   super._appBarHeight() -
-                  (super._fullScreen
+                  (widget.fullScreen
                       ? super._appBarHeight()
                       : super._bottomBarHeight());
               renderSize = Size(
@@ -1114,7 +1129,7 @@ class _ComicReaderWebToonState extends _ComicReaderState {
             bottom: widget.readerDirection == ReaderDirection.topToBottom
                 ? 130 // 纵向滚动 底部永远都是130的空白
                 : ( // 横向滚动
-                    super._fullScreen
+                widget.fullScreen
                         ? super._appBarHeight() // 全屏时底部和顶部到屏幕边框距离一样保持美观
                         : super._bottomBarHeight())
             // 非全屏时, 顶部去掉顶部BAR的高度, 底部去掉底部BAR的高度, 形成看似填充的效果
@@ -1212,7 +1227,7 @@ class _ComicReaderGalleryState extends _ComicReaderState {
   Widget _buildViewer() {
     return Column(
       children: [
-        Container(height: _fullScreen ? 0 : super._appBarHeight()),
+        Container(height: widget.fullScreen ? 0 : super._appBarHeight()),
         Expanded(
           child: Stack(
             children: [
@@ -1221,7 +1236,7 @@ class _ComicReaderGalleryState extends _ComicReaderState {
             ],
           ),
         ),
-        Container(height: _fullScreen ? 0 : super._bottomBarHeight()),
+        Container(height: widget.fullScreen ? 0 : super._bottomBarHeight()),
       ],
     );
   }
@@ -1336,7 +1351,7 @@ class _ListViewReaderState extends _ComicReaderState
             } else {
               var maxHeight = constraints.maxHeight -
                   super._appBarHeight() -
-                  (super._fullScreen
+                  (widget.fullScreen
                       ? super._appBarHeight()
                       : super._bottomBarHeight());
               renderSize = Size(
@@ -1387,7 +1402,7 @@ class _ListViewReaderState extends _ComicReaderState
             bottom: currentReaderDirection == ReaderDirection.topToBottom
                 ? 130 // 纵向滚动 底部永远都是130的空白
                 : ( // 横向滚动
-                    super._fullScreen
+                widget.fullScreen
                         ? super._appBarHeight() // 全屏时底部和顶部到屏幕边框距离一样保持美观
                         : super._bottomBarHeight())
             // 非全屏时, 顶部去掉顶部BAR的高度, 底部去掉底部BAR的高度, 形成看似填充的效果
