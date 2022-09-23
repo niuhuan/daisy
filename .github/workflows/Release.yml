@@ -179,7 +179,7 @@ jobs:
         with:
           channel: ${{ env.flutter_channel }}
           flutter-version: ${{ env.flutter_version }}
-          architecture: x64
+          architecture: arm64
 
       - name: Setup flutter (other)
         if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.host != 'macos'
