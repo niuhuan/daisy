@@ -71,10 +71,10 @@ jobs:
             host: windows-latest
             flutter_version: '3.3.2'
           - target: macos
-            host: macos-latest
+            host: macos-11
             flutter_version: '3.3.2'
           - target: ios
-            host: macos-latest
+            host: macos-11
             flutter_version: '3.3.2'
           - target: android-arm32
             host: ubuntu-latest
