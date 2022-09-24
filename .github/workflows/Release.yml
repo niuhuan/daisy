@@ -100,6 +100,7 @@ jobs:
     env:
       TARGET: ${{ matrix.config.target }}
       flutter_version: ${{ matrix.config.flutter_version }}
+      flutter_channel: ${{ matrix.config.flutter_channel }}
 
     steps:
       - name: Checkout
@@ -157,7 +158,7 @@ jobs:
         with:
           repository: 'fzyzcjy/flutter_rust_bridge'
           path: 'flutter_rust_bridge'
-          ref: 'f02dbf878160ee7e8e9affdbed73a6ed90792da3'
+          ref: 'v1.22.0'
 
       - name: Install flutter_rust_bridge
         if: steps.check_asset.outputs.skip_build != 'true'
@@ -173,17 +174,9 @@ jobs:
           path: /opt/hostedtoolcache/flutter
           key: ${{ runner.os }}-flutter
 
-      - name: Setup flutter (macos)
-        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.host == 'macos-latest'
-        uses: subosito/flutter-action@v2.3.0
-        with:
-          channel: ${{ env.flutter_channel }}
-          flutter-version: ${{ env.flutter_version }}
-          architecture: arm64
-
-      - name: Setup flutter (other)
-        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.host != 'macos-latest'
-        uses: subosito/flutter-action@v2.3.0
+      - name: Setup flutter
+        if: steps.check_asset.outputs.skip_build != 'true'
+        uses: subosito/flutter-action@v2
         with:
           channel: ${{ env.flutter_channel }}
           flutter-version: ${{ env.flutter_version }}
