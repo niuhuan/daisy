@@ -174,7 +174,7 @@ jobs:
           key: ${{ runner.os }}-flutter
 
       - name: Setup flutter (macos)
-        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.host == 'macos'
+        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.host == 'macos-latest'
         uses: subosito/flutter-action@v2.3.0
         with:
           channel: ${{ env.flutter_channel }}
@@ -182,7 +182,7 @@ jobs:
           architecture: arm64
 
       - name: Setup flutter (other)
-        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.host != 'macos'
+        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.host != 'macos-latest'
         uses: subosito/flutter-action@v2.3.0
         with:
           channel: ${{ env.flutter_channel }}
