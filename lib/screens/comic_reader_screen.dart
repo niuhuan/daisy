@@ -24,7 +24,7 @@ class ComicReaderScreen extends StatefulWidget {
   final ComicDetail comic;
   final int chapterId;
   final int initRank;
-  final Future<ChapterDetail> Function(int chapterId) loadChapter;
+  final Future<ComicChapterDetail> Function(int chapterId) loadChapter;
   final bool fullScreenOnInit;
 
   const ComicReaderScreen({
@@ -43,7 +43,7 @@ class ComicReaderScreen extends StatefulWidget {
 class _ComicReaderScreenState extends State<ComicReaderScreen> {
   late ReaderType _readerType;
   late ReaderDirection _readerDirection;
-  late Future<ChapterDetail> _chapterFuture;
+  late Future<ComicChapterDetail> _chapterFuture;
   bool _loaded = false;
   late bool _fullScreen;
   var _replace = false;
@@ -98,7 +98,7 @@ class _ComicReaderScreenState extends State<ComicReaderScreen> {
       appBar: _loaded ? null : AppBar(),
       body: FutureBuilder(
         future: _chapterFuture,
-        builder: (BuildContext context, AsyncSnapshot<ChapterDetail> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<ComicChapterDetail> snapshot) {
           if (snapshot.hasError) {
             return ContentError(
               onRefresh: () async {
@@ -239,7 +239,7 @@ class _ReaderControllerEventArgs extends EventArgs {
 
 class _ComicReader extends StatefulWidget {
   final ComicDetail comic;
-  final ChapterDetail chapter;
+  final ComicChapterDetail chapter;
   final FutureOr Function(int) reload;
   final FutureOr Function(int) onChangeEp;
   final int startIndex;
@@ -844,7 +844,7 @@ abstract class _ComicReaderState extends State<_ComicReader> {
 
 class _EpChooser extends StatefulWidget {
   final ComicDetail comicDetail;
-  final ChapterDetail chapter;
+  final ComicChapterDetail chapter;
   final FutureOr Function(int) onChangeEp;
 
   const _EpChooser(this.comicDetail, this.chapter, this.onChangeEp);

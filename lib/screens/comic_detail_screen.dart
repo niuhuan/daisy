@@ -302,7 +302,7 @@ class _ComicDetailScreenState extends State<ComicDetailScreen> with RouteAware {
     );
   }
 
-  Future<ChapterDetail> Function(int) _loadChapterF(ComicDetail comic) {
+  Future<ComicChapterDetail> Function(int) _loadChapterF(ComicDetail comic) {
     return (int chapterId) {
       return native.comicChapterDetail(comicId: comic.id, chapterId: chapterId);
     };
