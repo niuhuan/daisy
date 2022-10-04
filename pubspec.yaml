@@ -27,7 +27,7 @@ dependencies:
   flutter_svg: ^1.0.3
   flutter_search_bar: ^3.0.0-dev.1
   url_launcher: ^6.1.2
-  flutter_html: ^3.0.0-alpha.3
+  flutter_html: 3.0.0-alpha.3
   flutter_colorpicker: ^1.0.3
   crypto: ^3.0.2
   ffi: 2.0.1
