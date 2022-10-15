@@ -1,12 +1,11 @@
 import 'package:daisy/screens/about_screen.dart';
 import 'package:daisy/screens/components/badged.dart';
 import 'package:daisy/screens/novel_bookshelf_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:daisy/screens/novel_browser_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
 
 import 'app_screen.dart';
-import 'novel_history_screen.dart';
 import 'novel_search_screen.dart';
 
 class NovelsScreen extends StatefulWidget {
@@ -86,24 +85,6 @@ class _NovelsScreenState extends State<NovelsScreen>
       ]),
       minWidth: 50,
     ));
-    actions.add(MaterialButton(
-      onPressed: () {
-        appScreenEvent.broadcast(jumpToComic);
-      },
-      child: Column(children: [
-        Expanded(child: Container()),
-        Icon(Icons.loop, color: Colors.white70.withAlpha(150)),
-        Text(
-          "切换",
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.white70.withAlpha(150),
-          ),
-        ),
-        Expanded(child: Container()),
-      ]),
-      minWidth: 50,
-    ));
     for (var i = 0; i < _navPages.length; i++) {
       var index = i;
       final color =
@@ -151,7 +132,16 @@ class _NovelsScreenState extends State<NovelsScreen>
       minWidth: 50,
     ));
     return AppBar(
-      title: const Text("小说"),
+      leading: IconButton(
+        onPressed: () {
+          appScreenEvent.broadcast(jumpToComic);
+        },
+        icon: Icon(Icons.cameraswitch_sharp, color: Colors.white70.withAlpha(150)),
+      ),
+      title: Transform.translate(
+        offset: const Offset(-20, 0),
+        child: const Text("小说"),
+      ),
       actions: actions,
     );
   }

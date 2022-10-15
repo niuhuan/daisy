@@ -86,24 +86,6 @@ class _ComicsScreenState extends State<ComicsScreen>
       ]),
       minWidth: 50,
     ));
-    actions.add(MaterialButton(
-      onPressed: () {
-        appScreenEvent.broadcast(jumpToNovel);
-      },
-      child: Column(children: [
-        Expanded(child: Container()),
-        Icon(Icons.loop, color: Colors.white70.withAlpha(150)),
-        Text(
-          "切换",
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.white70.withAlpha(150),
-          ),
-        ),
-        Expanded(child: Container()),
-      ]),
-      minWidth: 50,
-    ));
     for (var i = 0; i < _navPages.length; i++) {
       var index = i;
       final color =
@@ -151,7 +133,16 @@ class _ComicsScreenState extends State<ComicsScreen>
       minWidth: 50,
     ));
     return AppBar(
-      title: const Text("漫画"),
+      leading: IconButton(
+        onPressed: () {
+          appScreenEvent.broadcast(jumpToNovel);
+        },
+        icon: Icon(Icons.cameraswitch_sharp, color: Colors.white70.withAlpha(150)),
+      ),
+      title: Transform.translate(
+        offset: const Offset(-20, 0),
+        child: const Text("漫画"),
+      ),
       actions: actions,
     );
   }

@@ -1,11 +1,13 @@
 import 'package:daisy/configs/android_display_mode.dart';
 import 'package:daisy/configs/auto_clean.dart';
+import 'package:daisy/configs/login.dart';
 import 'package:daisy/configs/themes.dart';
-import 'package:flutter/material.dart';
 import 'package:daisy/configs/versions.dart';
+import 'package:flutter/material.dart';
 
 import '../cross.dart';
 import 'components/badged.dart';
+import 'login_screen.dart';
 
 const _releaseUrl = "https://github.com/niuhuan/daisy/releases/";
 
@@ -19,6 +21,25 @@ class AboutScreen extends StatefulWidget {
 }
 
 class _AboutState extends State<AboutScreen> {
+
+  @override
+  void initState() {
+    loginEvent.subscribe(_l);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    loginEvent.unsubscribe(_l);
+    super.dispose();
+  }
+
+  _l(_){
+    setState(() {
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,6 +50,8 @@ class _AboutState extends State<AboutScreen> {
         children: [
           const Divider(),
           _buildLogo(),
+          const Divider(),
+          ..._loginInfo(),
           const Divider(),
           _buildCurrentVersion(),
           const Divider(),
@@ -149,5 +172,42 @@ class _AboutState extends State<AboutScreen> {
       );
     }
     return Container();
+  }
+
+  List<Widget> _loginInfo() {
+    if (loginInfo.status == 0) {
+      return [
+        ListTile(
+          title: Text("已登录 : ${loginInfo.data?.nickname}"),
+        ),
+      ];
+    } else if (loginInfo.status == 1) {
+      return [
+         ListTile(
+           onTap: (){
+             Navigator.of(context).push(MaterialPageRoute(
+               builder: (BuildContext context) {
+                 return const LoginScreen();
+               },
+             ));
+           },
+          title: const Text("未登录"),
+        ),
+      ];
+    } else if (loginInfo.status == 2) {
+      return [
+        ListTile(
+          onTap: (){
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) {
+                return const LoginScreen();
+              },
+            ));
+          },
+          title: Text("登录失败 : ${loginInfo.message}"),
+        ),
+      ];
+    }
+    return [];
   }
 }

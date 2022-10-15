@@ -1,3 +1,4 @@
+import 'package:daisy/cross.dart';
 import 'package:daisy/ffi.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -110,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        // todo
+                        openUrl("https://m.dmzj.com/register.html");
                       },
                   )),
                 ),
