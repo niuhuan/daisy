@@ -22,29 +22,20 @@ async fn main() -> Result<()> {
     let code = vs_code_txt.trim();
 
     let release_file_name = match target.as_str() {
-        "macos" => format!("daisy-{}-flutter_{}-macos-intel.dmg", code, flutter_version),
-        "ios" => format!("daisy-{}-flutter_{}-ios-nosign.ipa", code, flutter_version),
-        "windows" => format!(
-            "daisy-{}-flutter_{}-windows-x86_64.zip",
-            code, flutter_version
-        ),
-        "linux" => format!(
-            "daisy-{}-flutter_{}-linux-x86_64.AppImage",
-            code, flutter_version
-        ),
-        "android-arm32" => format!(
-            "daisy-{}-flutter_{}-android-arm32.apk",
-            code, flutter_version
-        ),
-        "android-arm64" => format!(
-            "daisy-{}-flutter_{}-android-arm64.apk",
-            code, flutter_version
-        ),
-        "android-x86_64" => format!(
-            "daisy-{}-flutter_{}-android-x86_64.apk",
-            code, flutter_version
-        ),
+        "macos" => format!("daisy-{}.dmg", code),
+        "ios" => format!("daisy-{}-nosign.ipa", code),
+        "windows" => format!("daisy-{}-windows-x86_64.zip", code),
+        "linux" => format!("daisy-{}-linux-x86_64.AppImage", code),
+        "android-arm32" => format!("daisy-{}-arm32.apk", code),
+        "android-arm64" => format!("daisy-{}-arm64.apk", code),
+        "android-x86_64" => format!("daisy-{}-x86_64.apk", code),
         un => panic!("unknown target : {}-flutter_{}", un, flutter_version),
+    };
+
+    let release_file_name = if flutter_version.starts_with("2.") {
+        format!("of-{}",let release_file_name)
+    } else {
+        release_file_name
     };
 
     let client = reqwest::ClientBuilder::new().user_agent(UA).build()?;
