@@ -66,16 +66,16 @@ jobs:
         config:
           - target: linux
             host: ubuntu-latest
-            flutter_version: '3.3.4'
+            flutter_version: '3.3.5'
           - target: windows
             host: windows-latest
-            flutter_version: '3.3.4'
+            flutter_version: '3.3.5'
           - target: macos
             host: macos-11
-            flutter_version: '3.3.4'
+            flutter_version: '3.3.5'
           - target: ios
             host: macos-11
-            flutter_version: '3.3.4'
+            flutter_version: '3.3.5'
           - target: android-arm32
             host: ubuntu-latest
             flutter_version: '2.10.5'
@@ -87,13 +87,13 @@ jobs:
             flutter_version: '2.10.5'
           - target: android-arm32
             host: ubuntu-latest
-            flutter_version: '3.3.4'
+            flutter_version: '3.3.5'
           - target: android-arm64
             host: ubuntu-latest
-            flutter_version: '3.3.4'
+            flutter_version: '3.3.5'
           - target: android-x86_64
             host: ubuntu-latest
-            flutter_version: '3.3.4'
+            flutter_version: '3.3.5'
 
     runs-on: ${{ matrix.config.host }}
 
@@ -369,13 +369,16 @@ jobs:
               --c-output macos/Runner/bridge_generated.h \
               --rust-crate-dir native \
               --class-name Native
+          rustup target install x86_64-apple-darwin
+          rustup target install aarch64-apple-darwin
           cargo build --manifest-path native/Cargo.toml --release --target x86_64-apple-darwin
+          cargo build --manifest-path native/Cargo.toml --release --target aarch64-apple-darwin
           flutter config --enable-macos-desktop
           flutter build macos
           cd build
           mkdir appimage
           mv macos/Build/Products/Release/daisy.app appimage/
-          mv ../native/target/x86_64-apple-darwin/release/libnative.dylib appimage/daisy.app/Contents/Frameworks/
+          lipo -create -output appimage/daisy.app/Contents/Frameworks/libnative.dylib ../native/target/x86_64-apple-darwin/release/libnative.dylib ../native/target/aarch64-apple-darwin/release/libnative.dylib
           ln -sf /Applications appimage/
           hdiutil create -volname daisy -srcfolder appimage -ov -format UDBZ macos.dmg
           cd ..
