@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:daisy/configs/novel_background_color.dart';
 import 'package:daisy/ffi.dart';
@@ -14,15 +13,14 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../configs/novel_font_color.dart';
 import '../configs/novel_font_size.dart';
 import 'components/content_loading.dart';
-import 'components/novel_fan_component.dart';
 
-class NovelReaderScreen extends StatefulWidget {
+class NovelHtmlReaderScreen extends StatefulWidget {
   final NovelDetail novel;
   final NovelVolume volume;
   final NovelChapter chapter;
   final List<NovelVolume> volumes;
 
-  const NovelReaderScreen({
+  const NovelHtmlReaderScreen({
     required this.novel,
     required this.volume,
     required this.chapter,
@@ -31,108 +29,11 @@ class NovelReaderScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _NovelReaderScreenState();
+  State<StatefulWidget> createState() => _NovelHtmlReaderScreenState();
 }
 
-class _NovelReaderScreenState extends State<NovelReaderScreen> {
+class _NovelHtmlReaderScreenState extends State<NovelHtmlReaderScreen> {
   late Future<String> _contentFuture;
-  late String texts = "";
-  List<String> chapterTexts = [];
-  late int fIndex = 0;
-
-  List<String> _reRenderTextIn(String bookText) {
-    bookText = bookText.replaceAll("<br />\n", "\n");
-    bookText = bookText.replaceAll("<br />\n", "\n");
-    bookText = bookText.replaceAll("<br />", "\n");
-    bookText = bookText.replaceAll("<br/>", "\n");
-    bookText = bookText.replaceAll("&nbsp;", " ");
-    bookText = bookText.replaceAll("&amp;", "&");
-    bookText = bookText.replaceAll("&hellip;", "…");
-    bookText = bookText.replaceAll("&bull;", "·");
-    bookText = bookText.replaceAll("&lt;", "<");
-    bookText = bookText.replaceAll("&gt;", ">");
-    bookText = bookText.replaceAll("&quot;", "\"");
-    bookText = bookText.replaceAll("&copy;", "©");
-    bookText = bookText.replaceAll("&reg;", "®");
-    bookText = bookText.replaceAll("&times;", "×");
-    bookText = bookText.replaceAll("&pide;", "÷");
-    bookText = bookText.replaceAll("&emsp;", " ");
-    bookText = bookText.replaceAll("&ensp;", " ");
-    bookText = bookText.replaceAll("&ldquo;", "“");
-    bookText = bookText.replaceAll("&rdquo;", "”");
-    bookText = bookText.replaceAll("&mdash;", "—");
-    bookText = bookText.replaceAll("&middot;", "·");
-    bookText = bookText.replaceAll("&lsquo;", "‘");
-    bookText = bookText.replaceAll("&rsquo;", "’");
-
-    bookText = bookText.trim();
-    // 切割文字????s
-    final _mq = MediaQuery.of(context);
-    final _width = _mq.size.width
-        // 左右间距15
-        -
-        30;
-    final _height = _mq.size.height
-        // edge 间距
-        // 顶部章节名称间距
-        -
-        50
-        // 底部时间间距
-        -
-        50;
-
-    List<String> texts = [];
-    while (true) {
-      final tryRender = bookText.substring(
-        0,
-        min(1000, bookText.length),
-      );
-      final span = TextSpan(
-        text: tryRender,
-        style: TextStyle(
-          fontSize: 14 * novelFontSize,
-          height: 1.2,
-        ),
-      );
-      final max = TextPainter(
-        text: span,
-        textDirection: TextDirection.ltr,
-      );
-      max.layout(maxWidth: _width);
-      int endOffset = max
-          .getPositionForOffset(
-              Offset(_width, _height - 14 * novelFontSize * 1.2))
-          .offset;
-      texts.add(
-        bookText.substring(
-          0,
-          endOffset,
-        ),
-      );
-      bookText = bookText.substring(endOffset).trim();
-      if (bookText.isEmpty) {
-        break;
-      }
-    }
-    return texts;
-  }
-
-  resetFont() {
-    var z = 0;
-    for (var i = 0; i < fIndex; i++) {
-      z += chapterTexts[i].length;
-    }
-    chapterTexts = _reRenderTextIn(texts);
-    fIndex = 0;
-    var y = 0;
-    for (var i = 0; i < chapterTexts.length; i++) {
-      if (y >= z) {
-        fIndex = i;
-        break;
-      }
-      y += chapterTexts[i].length;
-    }
-  }
 
   @override
   void initState() {
@@ -146,16 +47,10 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
       chapterOrder: widget.chapter.chapterOrder,
       progress: 0,
     );
-    _contentFuture = native
-        .novelContent(
+    _contentFuture = native.novelContent(
       volumeId: widget.volume.id,
       chapterId: widget.chapter.chapterId,
-    )
-        .then((value) {
-          texts = value;
-      chapterTexts = _reRenderTextIn(value);
-      return value;
-    });
+    );
     super.initState();
   }
 
@@ -174,16 +69,10 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
               stackTrace: snapshot.stackTrace,
               onRefresh: () async {
                 setState(() {
-                  _contentFuture = native
-                      .novelContent(
+                  _contentFuture = native.novelContent(
                     volumeId: widget.volume.id,
                     chapterId: widget.chapter.chapterId,
-                  )
-                      .then((value) {
-                    texts = value;
-                    chapterTexts = _reRenderTextIn(value);
-                    return value;
-                  });
+                  );
                 });
               },
             ),
@@ -229,9 +118,9 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
     return Scaffold(
       body: StatefulBuilder(
         builder: (
-          BuildContext context,
-          void Function(void Function()) setState,
-        ) {
+            BuildContext context,
+            void Function(void Function()) setState,
+            ) {
           return Stack(
             children: [
               GestureDetector(
@@ -242,32 +131,50 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
                 },
                 child: Container(
                   color: getNovelBackgroundColor(context),
-                  child: move(), //_buildHtmlViewer(text),
+                  child: ListView(
+                    padding: EdgeInsets.only(
+                      left: 10,
+                      right: 10,
+                      top: 15 + (Scaffold.of(context).appBarMaxHeight ?? 0),
+                      bottom: 15 + (Scaffold.of(context).appBarMaxHeight ?? 0),
+                    ),
+                    children: [
+                      Html(
+                        data: text,
+                        style: {
+                          "body": Style(
+                            fontSize: FontSize.em(novelFontSize),
+                            color: getNovelFontColor(context),
+                          ),
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
               ..._fullScreen
                   ? []
                   : [
-                      Column(
-                        children: [
-                          AppBar(
-                            backgroundColor: Colors.black.withOpacity(.5),
-                            title: Text(widget.chapter.chapterName),
-                            actions: [
-                              IconButton(
-                                onPressed: _onChooseEp,
-                                icon: const Icon(Icons.menu_open),
-                              ),
-                              IconButton(
-                                onPressed: _bottomMenu,
-                                icon: const Icon(Icons.more_horiz),
-                              )
-                            ],
-                          ),
-                          Expanded(child: Container()),
-                        ],
-                      ),
-                    ],
+                Column(
+                  children: [
+                    AppBar(
+                      backgroundColor: Colors.black.withOpacity(.5),
+                      title: Text(widget.chapter.chapterName),
+                      actions: [
+                        IconButton(
+                          onPressed: _onChooseEp,
+                          icon: const Icon(Icons.menu_open),
+                        ),
+                        IconButton(
+                          onPressed: _bottomMenu,
+                          icon: const Icon(Icons.more_horiz),
+                        )
+                      ],
+                    ),
+                    Expanded(child: Container()),
+                  ],
+                ),
+              ],
             ],
           );
         },
@@ -310,7 +217,6 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
                     title: novelFontSize.toString(),
                     onPressed: () async {
                       await modifyNovelFontSize(context);
-                      resetFont();
                       setState(() => {});
                     },
                   ),
@@ -378,101 +284,13 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
 
   Future onChangeEp(NovelDetail n, NovelVolume v, NovelChapter c) async {
     Navigator.of(context).pushReplacement(MaterialPageRoute(
-      builder: (BuildContext context) => NovelReaderScreen(
+      builder: (BuildContext context) => NovelHtmlReaderScreen(
         novel: n,
         volume: v,
         chapter: c,
         volumes: widget.volumes,
       ),
     ));
-  }
-
-  final _nfController = NovelFanComponentController();
-
-  Widget move() {
-    return NovelFanComponent(
-      controller: _nfController,
-      previous: _movePrevious(),
-      current: _moveCurrent(),
-      next: _moveNext(),
-      onNextSetState: _moveOnNextSetState,
-      onPreviousSetState: _moveOnPreviousSetState,
-    );
-  }
-
-  void _moveOnPreviousSetState() {
-    if (fIndex > 0) {
-      fIndex--;
-    }
-    print(fIndex);
-    setState(() {});
-  }
-
-  void _moveOnNextSetState() {
-    if (fIndex < chapterTexts.length - 1) {
-      fIndex++;
-    }
-    print(fIndex);
-    setState(() {});
-  }
-
-  Widget? _movePrevious() {
-    if (fIndex != 0) {
-      return page(
-        chapterTexts[fIndex - 1],
-      );
-    }
-    return null;
-  }
-
-  Widget _moveCurrent() {
-    return page(
-      chapterTexts[fIndex],
-    );
-  }
-
-  Widget? _moveNext() {
-    if (fIndex >= chapterTexts.length - 1) {
-      return null;
-    }
-    return page(
-      chapterTexts[fIndex + 1],
-    );
-  }
-
-  Widget page(String text) {
-    final _mq = MediaQuery.of(context);
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      decoration: BoxDecoration(
-        color: getNovelBackgroundColor(context),
-        boxShadow: const [
-          BoxShadow(
-              color: Colors.black12,
-              offset: Offset(0.0, 15.0), //阴影xy轴偏移量
-              blurRadius: 15.0, //阴影模糊程度
-              spreadRadius: 1.0 //阴影扩散程度
-              ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(
-          top: 50 + 36,
-          bottom: 50,
-          left: 15,
-          right: 15,
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: 14 * novelFontSize,
-            height: 1.2,
-            color: getNovelFontColor(context),
-          ),
-        ),
-      ),
-    );
   }
 }
 
@@ -484,12 +302,12 @@ class _EpChooser extends StatefulWidget {
   final FutureOr Function(NovelDetail, NovelVolume, NovelChapter) onChangeEp;
 
   const _EpChooser(
-    this.novel,
-    this.volume,
-    this.chapter,
-    this.volumes,
-    this.onChangeEp,
-  );
+      this.novel,
+      this.volume,
+      this.chapter,
+      this.volumes,
+      this.onChangeEp,
+      );
 
   @override
   State<StatefulWidget> createState() => _EpChooserState();

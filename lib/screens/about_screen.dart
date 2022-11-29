@@ -5,6 +5,7 @@ import 'package:daisy/configs/themes.dart';
 import 'package:daisy/configs/versions.dart';
 import 'package:flutter/material.dart';
 
+import '../configs/novel_reader_type.dart';
 import '../cross.dart';
 import 'components/badged.dart';
 import 'login_screen.dart';
@@ -68,6 +69,8 @@ class _AboutState extends State<AboutScreen> {
           darkThemeSetting(),
           const Divider(),
           androidDisplayModeSetting(),
+          const Divider(),
+          novelReaderTypeSetting(context),
           const Divider(),
         ],
       ),

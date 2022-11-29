@@ -3,6 +3,7 @@ import 'package:daisy/configs/android_version.dart';
 import 'package:daisy/configs/login.dart';
 import 'package:daisy/configs/novel_background_color.dart';
 import 'package:daisy/configs/novel_font_color.dart';
+import 'package:daisy/configs/novel_reader_type.dart';
 import 'package:daisy/configs/reader_controller_type.dart';
 import 'package:daisy/configs/reader_direction.dart';
 import 'package:daisy/configs/reader_slider_position.dart';
@@ -35,6 +36,7 @@ class _InitScreenState extends State<InitScreen> {
     await initReaderDirection();
     await initReaderSliderPosition();
     await initReaderType();
+    await initNovelReaderType();
     await initNovelFontSize();
     await initNovelFontColor();
     await initNovelBackgroundColor();

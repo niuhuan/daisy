@@ -1,3 +1,4 @@
+import 'package:daisy/configs/novel_reader_type.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../commons.dart';
@@ -9,6 +10,7 @@ import 'components/content_error.dart';
 import 'components/content_loading.dart';
 import 'components/images.dart';
 import 'components/subscribed_icon.dart';
+import 'novel_html_reader_screen.dart';
 import 'novel_reader_screen.dart';
 
 class NovelDetailScreen extends StatefulWidget {
@@ -175,17 +177,34 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                   if (chapter.chapterId == viewLog.chapterId) {
                     return _continueButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => NovelReaderScreen(
-                                novel: _detail,
-                                volumes: _volumes,
-                                chapter: chapter,
-                                volume: volume,
-                              ),
-                            ),
-                          );
+                          switch (currentNovelReaderType) {
+                            case NovelReaderType.move:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NovelReaderScreen(
+                                    novel: _detail,
+                                    volumes: _volumes,
+                                    chapter: chapter,
+                                    volume: volume,
+                                  ),
+                                ),
+                              );
+                              break;
+                            case NovelReaderType.html:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NovelHtmlReaderScreen(
+                                    novel: _detail,
+                                    volumes: _volumes,
+                                    chapter: chapter,
+                                    volume: volume,
+                                  ),
+                                ),
+                              );
+                              break;
+                          }
                         },
                         text:
                             "继续阅读 ${viewLog.chapterTitle}"); // - P.${viewLog.pageRank + 1}
@@ -196,23 +215,41 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
           }
         }
         if (_volumes.isNotEmpty) {
-          final volume = _volumes.reduce((o1, o2) => o1.rank < o2.rank ? o1 : o2);
+          final volume =
+              _volumes.reduce((o1, o2) => o1.rank < o2.rank ? o1 : o2);
           if (volume.chapters.isNotEmpty) {
             final chapter = _volumes[0].chapters.reduce(
                 (o1, o2) => o1.chapterOrder < o2.chapterOrder ? o1 : o2);
             return _continueButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NovelReaderScreen(
-                        novel: _detail,
-                        volumes: _volumes,
-                        chapter: chapter,
-                        volume: volume,
-                      ),
-                    ),
-                  );
+                  switch (currentNovelReaderType) {
+                    case NovelReaderType.move:
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NovelReaderScreen(
+                            novel: _detail,
+                            volumes: _volumes,
+                            chapter: chapter,
+                            volume: volume,
+                          ),
+                        ),
+                      );
+                      break;
+                    case NovelReaderType.html:
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NovelHtmlReaderScreen(
+                            novel: _detail,
+                            volumes: _volumes,
+                            chapter: chapter,
+                            volume: volume,
+                          ),
+                        ),
+                      );
+                      break;
+                  }
                 },
                 text: "从头开始 ${chapter.chapterName}");
           }
@@ -251,19 +288,39 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                               print(_detail.id);
                               print(volume.id);
                               print(e.chapterId);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => NovelReaderScreen(
-                                    novel: _detail,
-                                    volume: volume,
-                                    chapter: e,
-                                    volumes: _volumes,
-                                    // loadChapter: _loadChapterF(),
-                                    // initRank: 0,
-                                  ),
-                                ),
-                              );
+
+                              switch (currentNovelReaderType) {
+                                case NovelReaderType.move:
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => NovelReaderScreen(
+                                        novel: _detail,
+                                        volume: volume,
+                                        chapter: e,
+                                        volumes: _volumes,
+                                        // loadChapter: _loadChapterF(),
+                                        // initRank: 0,
+                                      ),
+                                    ),
+                                  );
+                                  break;
+                                case NovelReaderType.html:
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => NovelHtmlReaderScreen(
+                                        novel: _detail,
+                                        volume: volume,
+                                        chapter: e,
+                                        volumes: _volumes,
+                                        // loadChapter: _loadChapterF(),
+                                        // initRank: 0,
+                                      ),
+                                    ),
+                                  );
+                                  break;
+                              }
                             },
                             color: Colors.white,
                             child: Text(
