@@ -188,12 +188,18 @@ jobs:
           dart pub global activate ffigen 4.1.3
 
       - name: Install LLVM and Clang (Linux/Android)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' || matrix.config.target == 'linux' )
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' || matrix.config.target == 'linux' ) && !startsWith(matrix.config.flutter_version, '2')
         run: |
           sudo apt update
           sudo apt install -y libclang-dev
 
       - name: Install LLVM and Clang (Linux/Android)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' || matrix.config.target == 'linux' ) && startsWith(matrix.config.flutter_version, '2')
+        run: |
+          sudo apt update
+          sudo apt install -y libclang-13-dev
+
+      - name: Install libfuse2 (Linux)
         if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'linux'
         run: |
           sudo apt update
