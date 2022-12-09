@@ -185,8 +185,7 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                                   builder: (context) => NovelReaderScreen(
                                     novel: _detail,
                                     volumes: _volumes,
-                                    chapter: chapter,
-                                    volume: volume,
+                                    initChapterId: chapter.chapterId,
                                   ),
                                 ),
                               );
@@ -230,8 +229,7 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                           builder: (context) => NovelReaderScreen(
                             novel: _detail,
                             volumes: _volumes,
-                            chapter: chapter,
-                            volume: volume,
+                            initChapterId: chapter.chapterId,
                           ),
                         ),
                       );
@@ -296,8 +294,7 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                                     MaterialPageRoute(
                                       builder: (context) => NovelReaderScreen(
                                         novel: _detail,
-                                        volume: volume,
-                                        chapter: e,
+                                        initChapterId: e.chapterId,
                                         volumes: _volumes,
                                         // loadChapter: _loadChapterF(),
                                         // initRank: 0,

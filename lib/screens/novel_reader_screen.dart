@@ -7,7 +7,6 @@ import 'package:daisy/ffi.dart';
 import 'package:daisy/screens/components/content_error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -18,15 +17,13 @@ import 'components/novel_fan_component.dart';
 
 class NovelReaderScreen extends StatefulWidget {
   final NovelDetail novel;
-  final NovelVolume volume;
-  final NovelChapter chapter;
   final List<NovelVolume> volumes;
+  final int initChapterId;
 
   const NovelReaderScreen({
     required this.novel,
-    required this.volume,
-    required this.chapter,
     required this.volumes,
+    required this.initChapterId,
     Key? key,
   }) : super(key: key);
 
@@ -34,11 +31,22 @@ class NovelReaderScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _NovelReaderScreenState();
 }
 
+enum LoadingState {
+  loading,
+  success,
+  fail,
+}
+
 class _NovelReaderScreenState extends State<NovelReaderScreen> {
-  late Future<String> _contentFuture;
-  late String texts = "";
-  List<String> chapterTexts = [];
-  late int fIndex = 0;
+  final Map<int, String> _chapterTexts = {};
+  final Map<int, List<String>> _chapterTextsPages = {};
+  final Map<int, LoadingState> _chapterLoadingState = {};
+
+  late int _currentChapterId;
+  NovelChapter? _nc;
+  NovelChapter? _pc;
+
+  int _fIndex = 0;
 
   List<String> _reRenderTextIn(String bookText) {
     bookText = bookText.replaceAll("<br />\n", "\n");
@@ -68,18 +76,8 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
     bookText = bookText.trim();
     // 切割文字????s
     final _mq = MediaQuery.of(context);
-    final _width = _mq.size.width
-        // 左右间距15
-        -
-        30;
-    final _height = _mq.size.height
-        // edge 间距
-        // 顶部章节名称间距
-        -
-        50
-        // 底部时间间距
-        -
-        50;
+    final _width = _mq.size.width - 30;
+    final _height = _mq.size.height - 60;
 
     List<String> texts = [];
     while (true) {
@@ -118,114 +116,117 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
   }
 
   resetFont() {
-    var z = 0;
-    for (var i = 0; i < fIndex; i++) {
-      z += chapterTexts[i].length;
-    }
-    chapterTexts = _reRenderTextIn(texts);
-    fIndex = 0;
-    var y = 0;
-    for (var i = 0; i < chapterTexts.length; i++) {
-      if (y >= z) {
-        fIndex = i;
-        break;
+    if (_chapterLoadingState[_currentChapterId] == LoadingState.success) {
+      var z = 0;
+      for (var i = 0; i < _fIndex; i++) {
+        z += _chapterTextsPages[_currentChapterId]![i].length;
       }
-      y += chapterTexts[i].length;
+      _chapterTextsPages[_currentChapterId] =
+          _reRenderTextIn(_chapterTexts[_currentChapterId]!);
+      _fIndex = 0;
+      var y = 0;
+      for (var i = 0; i < _chapterTextsPages.length; i++) {
+        if (y >= z) {
+          _fIndex = i;
+          break;
+        }
+        y += _chapterTextsPages[_currentChapterId]![i].length;
+      }
     }
+    _chapterTexts.forEach((key, value) {
+      if (key != _currentChapterId) {
+        _chapterTextsPages[key] = _reRenderTextIn(value);
+      }
+    });
+  }
+
+  Future _loadChapter(int chapterId) async {
+    if (_chapterLoadingState[chapterId] != null &&
+        _chapterLoadingState[chapterId] != LoadingState.fail) {
+      setState(() {});
+      return;
+    }
+    _chapterLoadingState[chapterId] = LoadingState.loading;
+    setState(() {});
+    NovelVolume? volume;
+    NovelChapter? chapter;
+    VF:
+    for (var v in widget.volumes) {
+      for (var c in v.chapters) {
+        if (c.chapterId == chapterId) {
+          chapter = c;
+          volume = v;
+          break VF;
+        }
+      }
+    }
+    try {
+      _chapterTexts[chapterId] = await native.novelContent(
+        volumeId: volume!.id,
+        chapterId: chapter!.chapterId,
+      );
+      _chapterTextsPages[chapterId] =
+          _reRenderTextIn(_chapterTexts[chapterId]!);
+      _chapterLoadingState[chapterId] = LoadingState.success;
+    } catch (e) {
+      _chapterLoadingState[chapterId] = LoadingState.fail;
+    } finally {
+      setState(() {});
+    }
+  }
+
+  // 记录看到哪里
+  void saveRecord() {
+    NovelVolume? volume;
+    NovelChapter? chapter;
+    VF:
+    for (var v in widget.volumes) {
+      for (var c in v.chapters) {
+        if (c.chapterId == _currentChapterId) {
+          chapter = c;
+          volume = v;
+          break VF;
+        }
+      }
+    }
+    volume = volume!;
+    chapter = chapter!;
+    native.novelViewPage(
+      novelId: widget.novel.id,
+      volumeId: volume.id,
+      volumeTitle: volume.title,
+      volumeOrder: volume.rank,
+      chapterId: chapter.chapterId,
+      chapterTitle: chapter.chapterName,
+      chapterOrder: chapter.chapterOrder,
+      progress: 0,
+    );
+  }
+
+  void _init() async {
+    await _loadChapter(_currentChapterId);
   }
 
   @override
   void initState() {
-    native.novelViewPage(
-      novelId: widget.novel.id,
-      volumeId: widget.volume.id,
-      volumeTitle: widget.volume.title,
-      volumeOrder: widget.volume.rank,
-      chapterId: widget.chapter.chapterId,
-      chapterTitle: widget.chapter.chapterName,
-      chapterOrder: widget.chapter.chapterOrder,
-      progress: 0,
-    );
-    _contentFuture = native
-        .novelContent(
-      volumeId: widget.volume.id,
-      chapterId: widget.chapter.chapterId,
-    )
-        .then((value) {
-          texts = value;
-      chapterTexts = _reRenderTextIn(value);
-      return value;
-    });
+    _currentChapterId = widget.initChapterId;
+    _nc = _nextChapter();
+    _pc = _previousChapter();
+    saveRecord();
+    _init();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _contentFuture,
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-        if (snapshot.hasError) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(widget.chapter.chapterName),
-            ),
-            body: ContentError(
-              error: snapshot.error,
-              stackTrace: snapshot.stackTrace,
-              onRefresh: () async {
-                setState(() {
-                  _contentFuture = native
-                      .novelContent(
-                    volumeId: widget.volume.id,
-                    chapterId: widget.chapter.chapterId,
-                  )
-                      .then((value) {
-                    texts = value;
-                    chapterTexts = _reRenderTextIn(value);
-                    return value;
-                  });
-                });
-              },
-            ),
-          );
+    late NovelChapter chapter;
+    for (var v in widget.volumes) {
+      for (var c in v.chapters) {
+        if (c.chapterId == _currentChapterId) {
+          chapter = c;
         }
-
-        if (snapshot.connectionState != ConnectionState.done) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(widget.chapter.chapterName),
-            ),
-            body: const ContentLoading(),
-          );
-        }
-
-        return _buildReader(snapshot.requireData);
-      },
-    );
-  }
-
-  bool _inFullScreen = false;
-
-  bool get _fullScreen => _inFullScreen;
-
-  set _fullScreen(bool val) {
-    _inFullScreen = val;
-    if (Platform.isIOS || Platform.isAndroid) {
-      if (val) {
-        SystemChrome.setEnabledSystemUIMode(
-          SystemUiMode.manual,
-          overlays: [],
-        );
-      } else {
-        SystemChrome.setEnabledSystemUIMode(
-          SystemUiMode.manual,
-          overlays: SystemUiOverlay.values,
-        );
       }
     }
-  }
-
-  Widget _buildReader(String text) {
     return Scaffold(
       body: StatefulBuilder(
         builder: (
@@ -252,7 +253,7 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
                         children: [
                           AppBar(
                             backgroundColor: Colors.black.withOpacity(.5),
-                            title: Text(widget.chapter.chapterName),
+                            title: Text(chapter.chapterName),
                             actions: [
                               IconButton(
                                 onPressed: _onChooseEp,
@@ -275,6 +276,27 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
     );
   }
 
+  bool _inFullScreen = false;
+
+  bool get _fullScreen => _inFullScreen;
+
+  set _fullScreen(bool val) {
+    _inFullScreen = val;
+    if (Platform.isIOS || Platform.isAndroid) {
+      if (val) {
+        SystemChrome.setEnabledSystemUIMode(
+          SystemUiMode.manual,
+          overlays: [],
+        );
+      } else {
+        SystemChrome.setEnabledSystemUIMode(
+          SystemUiMode.manual,
+          overlays: SystemUiOverlay.values,
+        );
+      }
+    }
+  }
+
   Future _onChooseEp() async {
     showMaterialModalBottomSheet(
       context: context,
@@ -284,9 +306,8 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
           height: MediaQuery.of(context).size.height * (.45),
           child: _EpChooser(
             widget.novel,
-            widget.volume,
-            widget.chapter,
             widget.volumes,
+            _currentChapterId,
             onChangeEp,
           ),
         );
@@ -380,9 +401,8 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
     Navigator.of(context).pushReplacement(MaterialPageRoute(
       builder: (BuildContext context) => NovelReaderScreen(
         novel: n,
-        volume: v,
-        chapter: c,
         volumes: widget.volumes,
+        initChapterId: c.chapterId,
       ),
     ));
   }
@@ -401,47 +421,128 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
   }
 
   void _moveOnPreviousSetState() {
-    if (fIndex > 0) {
-      fIndex--;
+    if (_fIndex > 0) {
+      _fIndex--;
+      if (_fIndex == 0) {
+        if (_pc != null) {
+          // 如果为0预先加载上一章
+          _loadChapter(_pc!.chapterId);
+        }
+      }
+    } else if (_pc != null) {
+      if (_chapterLoadingState[_pc!.chapterId] == LoadingState.success) {
+        //  如果上一章加载好了跳到最后一页
+        _currentChapterId = _pc!.chapterId;
+        _nc = _nextChapter();
+        _pc = _previousChapter();
+        _fIndex = _chapterTextsPages[_currentChapterId]!.length - 1;
+        saveRecord();
+      } else {
+        // todo 加载完成后跳到最后一页, 似乎不是很好实现
+        _currentChapterId = _pc!.chapterId;
+        _nc = _nextChapter();
+        _pc = _previousChapter();
+        _fIndex = 0;
+        saveRecord();
+        // note 如果只有一页 或者是第一页往前翻 可能不加载前后页 这里进行补偿
+        if (_chapterLoadingState[_currentChapterId] == null) {
+          _loadChapter(_currentChapterId);
+        }
+      }
     }
-    print(fIndex);
     setState(() {});
   }
 
   void _moveOnNextSetState() {
-    if (fIndex < chapterTexts.length - 1) {
-      fIndex++;
+    if (_fIndex < _chapterTextsPages[_currentChapterId]!.length - 1) {
+      _fIndex++;
+      // 预先加载下一章内容
+      if (_fIndex == _chapterTextsPages[_currentChapterId]!.length - 1) {
+        if (_nc != null) {
+          // note: 状态判断在_loadChapter里
+          _loadChapter(_nc!.chapterId);
+        }
+      }
+    } else if (_nc != null) {
+      // note 跳到下一章第一页
+      _currentChapterId = _nc!.chapterId;
+      _nc = _nextChapter();
+      _pc = _previousChapter();
+      _fIndex = 0;
+      saveRecord();
+      // note 如果只有一页 或者是第一页往前翻 可能不加载前后页 这里进行补偿
+      if (_chapterLoadingState[_currentChapterId] == null) {
+        _loadChapter(_currentChapterId);
+      }
     }
-    print(fIndex);
     setState(() {});
   }
 
   Widget? _movePrevious() {
-    if (fIndex != 0) {
+    // 没有加载成功不能前后章移动
+    if (_chapterLoadingState[_currentChapterId] != LoadingState.success) {
+      return null;
+    }
+    //
+    if (_fIndex != 0) {
       return page(
-        chapterTexts[fIndex - 1],
+        _chapterTextsPages[_currentChapterId]![_fIndex - 1],
       );
     }
-    return null;
+    if (_pc == null) {
+      return null;
+    }
+    // 上一章最后一页
+    if (_chapterLoadingState[_pc!.chapterId] == LoadingState.success) {
+      //  如果上一章加载好了跳到最后一页
+      return page(_chapterTextsPages[_pc!.chapterId]![
+          _chapterTextsPages[_pc!.chapterId]!.length - 1]);
+    } else {
+      // todo 失败没有特别显示
+      return const ContentLoading();
+    }
   }
 
   Widget _moveCurrent() {
-    return page(
-      chapterTexts[fIndex],
-    );
+    if (_chapterLoadingState[_currentChapterId] == LoadingState.fail) {
+      // todo 更明确错误信息(用map预先保存)
+      return ContentError(error: "e", stackTrace: null, onRefresh: () async {});
+    }
+    if (_chapterLoadingState[_currentChapterId] == LoadingState.loading) {
+      return const ContentLoading();
+    }
+    if (_chapterLoadingState[_currentChapterId] == LoadingState.success) {
+      return page(
+        _chapterTextsPages[_currentChapterId]![_fIndex],
+      );
+    }
+    // null
+    return Container();
   }
 
   Widget? _moveNext() {
-    if (fIndex >= chapterTexts.length - 1) {
+    // 没有加载成功不能前后章移动
+    if (_chapterLoadingState[_currentChapterId] != LoadingState.success) {
       return null;
     }
+    if (_nc == null) {
+      return null;
+    }
+    if (_fIndex >= _chapterTextsPages[_currentChapterId]!.length - 1) {
+      if (_chapterLoadingState[_nc!.chapterId] == LoadingState.success) {
+        //  如果下一章加载好了显示第一页
+        return page(_chapterTextsPages[_nc!.chapterId]![0]);
+      } else {
+        // todo 失败没有特别显示
+        return const ContentLoading();
+      }
+    }
     return page(
-      chapterTexts[fIndex + 1],
+      _chapterTextsPages[_currentChapterId]![_fIndex + 1],
     );
   }
 
   Widget page(String text) {
-    final _mq = MediaQuery.of(context);
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
@@ -458,8 +559,8 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
       ),
       child: Padding(
         padding: const EdgeInsets.only(
-          top: 50 + 36,
-          bottom: 50,
+          top: 35,
+          bottom: 25,
           left: 15,
           right: 15,
         ),
@@ -474,20 +575,48 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
       ),
     );
   }
+
+  NovelChapter? _nextChapter() {
+    bool flag = false;
+    for (var v in widget.volumes) {
+      for (var c in v.chapters) {
+        if (flag) {
+          return c;
+        }
+        if (c.chapterId == _currentChapterId) {
+          flag = true;
+        }
+      }
+    }
+    return null;
+  }
+
+  _previousChapter() {
+    bool flag = false;
+    for (var v in widget.volumes.reversed) {
+      for (var c in v.chapters.reversed) {
+        if (flag) {
+          return c;
+        }
+        if (c.chapterId == _currentChapterId) {
+          flag = true;
+        }
+      }
+    }
+    return null;
+  }
 }
 
 class _EpChooser extends StatefulWidget {
   final NovelDetail novel;
-  final NovelVolume volume;
-  final NovelChapter chapter;
   final List<NovelVolume> volumes;
+  final int chapterId;
   final FutureOr Function(NovelDetail, NovelVolume, NovelChapter) onChangeEp;
 
   const _EpChooser(
     this.novel,
-    this.volume,
-    this.chapter,
     this.volumes,
+    this.chapterId,
     this.onChangeEp,
   );
 
@@ -515,13 +644,13 @@ class _EpChooserState extends State<_EpChooser> {
       final cd = [...c.chapters];
       cd.sort((o1, o2) => o1.chapterOrder - o2.chapterOrder);
       for (var ci in c.chapters) {
-        if (widget.chapter.chapterId == ci.chapterId) {
+        if (widget.chapterId == ci.chapterId) {
           position = widgets.length > 2 ? widgets.length - 2 : 0;
         }
         widgets.add(Container(
           margin: const EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5),
           decoration: BoxDecoration(
-            color: widget.chapter.chapterId == ci.chapterId
+            color: widget.chapterId == ci.chapterId
                 ? Colors.grey.withAlpha(100)
                 : null,
             border: Border.all(
@@ -541,6 +670,7 @@ class _EpChooserState extends State<_EpChooser> {
         ));
       }
     }
+    // todo 对上一章进行提前加载
     super.initState();
   }
 
