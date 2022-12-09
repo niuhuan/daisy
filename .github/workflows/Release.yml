@@ -293,15 +293,29 @@ jobs:
           zip -r -9 nosign.ipa Payload
           cd ..
 
-      - name: Install rust target and build (Android-arm64)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm64')
+      - name: Install LLVM and Clang (Linux/Android)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' ) && !startsWith(matrix.config.flutter_version, '2')
         run: |
-          rustup target install aarch64-linux-android
           cd daisy
           flutter pub get
           echo > native/src/bridge_generated.rs
           echo > native/src/bridge_generated.io.rs
           flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart
+
+      - name: Install LLVM and Clang (Linux/Android)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' ) && startsWith(matrix.config.flutter_version, '2')
+        run: |
+          cd daisy
+          flutter pub get
+          echo > native/src/bridge_generated.rs
+          echo > native/src/bridge_generated.io.rs
+          flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart --llvm-path=/usr/lib/llvm-13
+
+      - name: Install rust target and build (Android-arm64)
+        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm64')
+        run: |
+          rustup target install aarch64-linux-android
+          cd daisy
           cd native
           cargo ndk -o ../android/app/src/main/jniLibs -t arm64-v8a build --release
           cd ..
@@ -312,10 +326,6 @@ jobs:
         run: |
           rustup target install armv7-linux-androideabi
           cd daisy
-          flutter pub get
-          echo > native/src/bridge_generated.rs
-          echo > native/src/bridge_generated.io.rs
-          flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart
           cd native
           cargo ndk -o ../android/app/src/main/jniLibs -t armeabi-v7a build --release
           cd ..
@@ -326,10 +336,6 @@ jobs:
         run: |
           rustup target install x86_64-linux-android
           cd daisy
-          flutter pub get
-          echo > native/src/bridge_generated.rs
-          echo > native/src/bridge_generated.io.rs
-          flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart
           cd native
           cargo ndk -o ../android/app/src/main/jniLibs -t x86_64 build --release
           cd ..
