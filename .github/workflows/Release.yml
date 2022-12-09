@@ -150,7 +150,7 @@ jobs:
         with:
           repository: 'fzyzcjy/flutter_rust_bridge'
           path: 'flutter_rust_bridge'
-          ref: 'v1.49.1'
+          ref: 'v1.54.0'
 
       - name: Check bridge
         if: steps.check_asset.outputs.skip_build != 'true' && startsWith(matrix.config.flutter_version, '2')
@@ -192,6 +192,12 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y libclang-dev
+
+      - name: Install LLVM and Clang (Linux/Android)
+        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'linux'
+        run: |
+          sudo apt update
+          sudo apt install -y libfuse2
 
       - name: Install cargo tools (non-android)
         if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'macos' || matrix.config.target == 'windows' || matrix.config.target == 'linux' )
