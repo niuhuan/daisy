@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import '../commons.dart';
 import '../const.dart';
 import '../utils.dart';
+import 'comic_create_download_screen.dart';
 import 'comic_reader_screen.dart';
 import 'components/comment_pager.dart';
 import 'components/content_loading.dart';
@@ -110,6 +111,19 @@ class _ComicDetailScreenState extends State<ComicDetailScreen> with RouteAware {
             appBar: AppBar(
               title: Text(comic.title),
               actions: [
+                IconButton(
+                  icon: const Icon(Icons.download),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ComicCreateDownloadScreen(
+                          comic: comic,
+                        ),
+                      ),
+                    );
+                  },
+                ),
                 SubscribedIcon(objType: 0, objId: widget.comicId),
               ],
             ),
@@ -234,9 +248,6 @@ class _ComicDetailScreenState extends State<ComicDetailScreen> with RouteAware {
                           margin: EdgeInsets.all(3),
                           child: MaterialButton(
                             onPressed: () {
-                              print("=========");
-                              print(comic.id);
-                              print(e.chapterId);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

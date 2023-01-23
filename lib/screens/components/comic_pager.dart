@@ -14,6 +14,9 @@ class ComicInListCard {
   final String authors;
   final int? lastUpdateTime;
   final int? addtime;
+  final int? downloadStatus;
+  final int imageCountDownload;
+  final int imageCount;
 
   ComicInListCard({
     required this.id,
@@ -25,6 +28,9 @@ class ComicInListCard {
     required this.authors,
     this.lastUpdateTime,
     this.addtime,
+    this.downloadStatus,
+    this.imageCountDownload = 0,
+    this.imageCount = 0,
   });
 }
 
@@ -282,6 +288,29 @@ class ComicCardInPager extends StatelessWidget {
                             fontSize: 12,
                           ),
                         ),
+                      ]
+                    : [],
+                ...comic.downloadStatus != null
+                    ? [
+                        Container(height: 10),
+                        Text(
+                          (comic.downloadStatus == 0
+                                  ? "未完成"
+                                  : comic.downloadStatus == 1
+                                      ? "成功"
+                                      : comic.downloadStatus == 2
+                                          ? "成功"
+                                          : "其他") +
+                              " : ${comic.imageCountDownload} / ${comic.imageCount}",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: comic.downloadStatus == 0
+                                ? Colors.blue
+                                : comic.downloadStatus == 1
+                                    ? Colors.green
+                                    : Colors.red,
+                          ),
+                        )
                       ]
                     : [],
               ],

@@ -91,14 +91,14 @@ const _navPages = [
     title: "历史",
     icon: Icons.history,
   ),
-  // NavPage(
-  //   screen: ComicDownloadsScreen(),
-  //   title: "下载",
-  //   icon: Icons.download,
-  // ),
   NavPage(
     screen: ComicSubscribedScreen(),
     title: "订阅",
     icon: Icons.subscriptions,
+  ),
+  NavPage(
+    screen: ComicDownloadsScreen(),
+    title: "下载",
+    icon: Icons.download,
   ),
 ];

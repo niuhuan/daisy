@@ -1,4 +1,3 @@
-import 'package:daisy/bridge_generated.dart';
 import 'package:flutter/material.dart';
 
 import '../commons.dart';
