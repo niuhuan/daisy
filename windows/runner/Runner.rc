@@ -89,7 +89,7 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "niuhuan" "\0"
+            VALUE "CompanyName", "opensource" "\0"
             VALUE "FileDescription", "daisy" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "daisy" "\0"

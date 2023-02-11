@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(runner LANGUAGES CXX)
 
 set(BINARY_NAME "daisy")
-set(APPLICATION_ID "niuhuan.daisy")
+set(APPLICATION_ID "opensource.daisy")
 
 cmake_policy(SET CMP0063 NEW)
 

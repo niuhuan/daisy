@@ -66,16 +66,16 @@ jobs:
         config:
           - target: linux
             host: ubuntu-latest
-            flutter_version: '3.3.10'
+            flutter_version: '3.7.3'
           - target: windows
             host: windows-latest
-            flutter_version: '3.3.10'
+            flutter_version: '3.7.3'
           - target: macos
             host: macos-11
-            flutter_version: '3.3.10'
+            flutter_version: '3.7.3'
           - target: ios
             host: macos-11
-            flutter_version: '3.3.10'
+            flutter_version: '3.7.3'
           - target: android-arm32
             host: ubuntu-latest
             flutter_version: '2.10.5'
@@ -87,13 +87,13 @@ jobs:
             flutter_version: '2.10.5'
           - target: android-arm32
             host: ubuntu-latest
-            flutter_version: '3.3.10'
+            flutter_version: '3.7.3'
           - target: android-arm64
             host: ubuntu-latest
-            flutter_version: '3.3.10'
+            flutter_version: '3.7.3'
           - target: android-x86_64
             host: ubuntu-latest
-            flutter_version: '3.3.10'
+            flutter_version: '3.7.3'
 
     runs-on: ${{ matrix.config.host }}
 
@@ -246,6 +246,8 @@ jobs:
           sed -i "s/flutter_styled_toast: ^2.1.3/flutter_styled_toast: 2.0.0/g" pubspec.yaml
           sed -i "s/ffi: 2.0.1/ffi: 1.1.0/g" pubspec.yaml
           sed -i "s/ffigen: 6.0.1/ffigen: 4.1.3/g" pubspec.yaml
+          sed -i "s/modal_bottom_sheet: ^3.0.0-pre/modal_bottom_sheet: 2.0.1/g" pubspec.yaml
+          sed -i "s/permission_handler ^10.2.0/permission_handler 9.2.0/g" pubspec.yaml
 
       - name: Upgrade deps version (iOS)
         if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.host == 'macos-11' && startsWith(matrix.config.flutter_version, '2')
@@ -256,6 +258,8 @@ jobs:
           gsed -i "s/flutter_styled_toast: ^2.1.3/flutter_styled_toast: 2.0.0/g" pubspec.yaml
           gsed -i "s/ffi: 2.0.1/ffi: 1.1.0/g" pubspec.yaml
           gsed -i "s/ffigen: 6.0.1/ffigen: 4.1.3/g" pubspec.yaml
+          gsed -i "s/modal_bottom_sheet: ^3.0.0-pre/modal_bottom_sheet: 2.0.1/g" pubspec.yaml
+          gsed -i "s/permission_handler ^10.2.0/permission_handler 9.2.0/g" pubspec.yaml
 
       - name: Cargo native build cache
         if: steps.check_asset.outputs.skip_build != 'true'
