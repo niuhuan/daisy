@@ -228,9 +228,9 @@ jobs:
         with:
           packages: |
             platform-tools
-            platforms;android-32
-            build-tools;30.0.2
-            ndk;22.1.7171670
+            platforms;android-33
+            build-tools;33.0.2
+            ndk;25.1.8937393
 
       - name: Set-Version (All)
         if: steps.check_asset.outputs.skip_build != 'true'
