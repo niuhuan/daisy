@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 const _propertyKeyLight = "novel_background_color_light";
 const _propertyKeyDark = "novel_background_color_dark";
 
-const _defaultValueLight = 0x0;
-const _defaultValueDark = 0x0;
+const _defaultValueLight = 0xFFFFFFFF;
+const _defaultValueDark = 0xFF000000;
 
 late int _novelBackgroundColorLight;
 late int _novelBackgroundColorDark;
