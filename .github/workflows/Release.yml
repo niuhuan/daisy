@@ -229,15 +229,6 @@ jobs:
           packages: |
             platform-tools
             platforms;android-33
-            build-tools;33.0.2
-            ndk;22.1.7171670
-
-      - name: Setup android tools path (Android)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
-        run: |
-          echo "ANDROID_NDK_HOME=/usr/local/lib/android/sdk/ndk/22.1.7171670" >> $GITHUB_ENV
-          echo "ANDROID_NDK_ROOT=/usr/local/lib/android/sdk/ndk/22.1.7171670" >> $GITHUB_ENV
-          echo "ANDROID_NDK=/usr/local/lib/android/sdk/ndk/22.1.7171670" >> $GITHUB_ENV
 
       - name: Set-Version (All)
         if: steps.check_asset.outputs.skip_build != 'true'
