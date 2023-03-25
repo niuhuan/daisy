@@ -7,6 +7,8 @@ env:
   flutter_channel: 'stable'
   LLVM_VERSION: '10.0'
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  RUST_TOOLCHAIN: nightly-2023-03-13
+  NDK_VERSION: 25.2.9519653
 
 jobs:
 
@@ -36,7 +38,8 @@ jobs:
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          override: true
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -121,7 +124,8 @@ jobs:
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          override: true
 
       - name: Cargo ci build cache
         uses: actions/cache@v3
@@ -229,6 +233,8 @@ jobs:
           packages: |
             platform-tools
             platforms;android-33
+            build-tools;33.0.0
+            ndk;${{ env.NDK_VERSION }}
 
       - name: Set-Version (All)
         if: steps.check_asset.outputs.skip_build != 'true'
@@ -314,6 +320,7 @@ jobs:
       - name: Install rust target and build (Android-arm64)
         if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm64')
         run: |
+          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${{ env.NDK_VERSION }}
           rustup target install aarch64-linux-android
           cd daisy
           cd native
@@ -324,6 +331,7 @@ jobs:
       - name: Install rust target and build (Android-arm32)
         if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32')
         run: |
+          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${{ env.NDK_VERSION }}
           rustup target install armv7-linux-androideabi
           cd daisy
           cd native
@@ -334,6 +342,7 @@ jobs:
       - name: Install rust target and build (Android-x86_64)
         if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-x86_64')
         run: |
+          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${{ env.NDK_VERSION }}
           rustup target install x86_64-linux-android
           cd daisy
           cd native

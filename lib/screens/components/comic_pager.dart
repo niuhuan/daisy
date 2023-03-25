@@ -1,3 +1,5 @@
+import 'package:daisy/commons.dart';
+import 'package:daisy/ffi.dart';
 import 'package:daisy/screens/comic_detail_screen.dart';
 import 'package:daisy/screens/components/images.dart';
 import 'package:flutter/material.dart';
@@ -126,7 +128,11 @@ class _ComicPagerState extends State<ComicPager> {
   List<Widget> _buildList() {
     return _list.map((e) {
       return GestureDetector(
-        onTap: () {
+        onTap: () async {
+          if ((await native.getUid()).isEmpty) {
+            defaultToast(context, "请先登录");
+            return;
+          }
           Navigator.of(context).push(
             MaterialPageRoute(builder: (BuildContext context) {
               return ComicDetailScreen(comicId: e.id);
