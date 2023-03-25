@@ -124,6 +124,7 @@ jobs:
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
         with:
+          components: rustfmt
           toolchain: ${{ env.RUST_TOOLCHAIN }}
           override: true
 
