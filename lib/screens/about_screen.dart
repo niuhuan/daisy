@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:daisy/configs/android_display_mode.dart';
 import 'package:daisy/configs/auto_clean.dart';
 import 'package:daisy/configs/login.dart';
@@ -22,7 +24,6 @@ class AboutScreen extends StatefulWidget {
 }
 
 class _AboutState extends State<AboutScreen> {
-
   @override
   void initState() {
     loginEvent.subscribe(_l);
@@ -35,10 +36,8 @@ class _AboutState extends State<AboutScreen> {
     super.dispose();
   }
 
-  _l(_){
-    setState(() {
-
-    });
+  _l(_) {
+    setState(() {});
   }
 
   @override
@@ -72,6 +71,18 @@ class _AboutState extends State<AboutScreen> {
           const Divider(),
           novelReaderTypeSetting(context),
           const Divider(),
+          ...Platform.isAndroid
+              ? [
+                  ListTile(
+                    title: const Text("转到APP详情"),
+                    subtitle: const Text("设置URL关联等"),
+                    onTap: () {
+                      cross.androidAppInfo();
+                    },
+                  ),
+                  const Divider(),
+                ]
+              : [],
         ],
       ),
     );
@@ -186,21 +197,21 @@ class _AboutState extends State<AboutScreen> {
       ];
     } else if (loginInfo.status == 1) {
       return [
-         ListTile(
-           onTap: (){
-             Navigator.of(context).push(MaterialPageRoute(
-               builder: (BuildContext context) {
-                 return const LoginScreen();
-               },
-             ));
-           },
+        ListTile(
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) {
+                return const LoginScreen();
+              },
+            ));
+          },
           title: const Text("未登录"),
         ),
       ];
     } else if (loginInfo.status == 2) {
       return [
         ListTile(
-          onTap: (){
+          onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
               builder: (BuildContext context) {
                 return const LoginScreen();

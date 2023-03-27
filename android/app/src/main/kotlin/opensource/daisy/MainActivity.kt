@@ -1,13 +1,16 @@
-package opensource.dasiy
+package opensource.daisy
 
 import android.content.ContentValues
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.provider.Settings
 import android.view.Display
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
@@ -17,7 +20,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import java.util.concurrent.Executors
 
-class MainActivity: FlutterActivity() {
+class MainActivity : FlutterActivity() {
 
     private val pool = Executors.newCachedThreadPool { runnable ->
         Thread(runnable).also { it.isDaemon = true }
@@ -56,7 +59,10 @@ class MainActivity: FlutterActivity() {
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         // Method Channel
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "cross").setMethodCallHandler { call, result ->
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            "cross"
+        ).setMethodCallHandler { call, result ->
             result.withCoroutine {
                 when (call.method) {
                     "root" -> context!!.filesDir.absolutePath
@@ -68,6 +74,9 @@ class MainActivity: FlutterActivity() {
                         setMode(call.argument("mode")!!)
                     }
                     "androidGetVersion" -> Build.VERSION.SDK_INT
+                    "androidAppInfo" -> {
+                        goAppInfo()
+                    }
                     else -> {
                         notImplementedToken
                     }
@@ -86,16 +95,17 @@ class MainActivity: FlutterActivity() {
                     put(MediaStore.MediaColumns.IS_PENDING, 1)
                 }
             }
-            contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)?.let { uri ->
-                contentResolver.openOutputStream(uri)?.use { fos ->
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+            contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                ?.let { uri ->
+                    contentResolver.openOutputStream(uri)?.use { fos ->
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { //this one
+                        contentValues.clear()
+                        contentValues.put(MediaStore.Video.Media.IS_PENDING, 0)
+                        contentResolver.update(uri, contentValues, null, null)
+                    }
                 }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { //this one
-                    contentValues.clear()
-                    contentValues.put(MediaStore.Video.Media.IS_PENDING, 0)
-                    contentResolver.update(uri, contentValues, null, null)
-                }
-            }
         }
     }
 
@@ -148,6 +158,12 @@ class MainActivity: FlutterActivity() {
                 }
             }
         }
+    }
+
+    fun goAppInfo() {
+        var packageURI = Uri.fromParts("package", packageName, null)
+        var intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageURI)
+        startActivity(intent)
     }
 
 }

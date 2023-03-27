@@ -38,12 +38,16 @@ class Cross {
   Future<List<String>> loadAndroidModes() async {
     return List.of(await _channel.invokeMethod("androidGetModes"))
         .map((e) => "$e")
-    .toList();
+        .toList();
   }
 
   Future setAndroidMode(String androidDisplayMode) {
     return _channel
         .invokeMethod("androidSetMode", {"mode": androidDisplayMode});
+  }
+
+  Future androidAppInfo() {
+    return _channel.invokeMethod("androidAppInfo", "");
   }
 }
 

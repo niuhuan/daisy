@@ -1,12 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
+import 'package:daisy/screens/comic_detail_redirect_screen.dart';
+import 'package:daisy/screens/comic_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:uni_links/uni_links.dart';
 
 import 'cross.dart';
 
@@ -296,4 +300,56 @@ String generateMD5(String data) {
   Uint8List content = (const Utf8Encoder()).convert(data);
   Digest digest = md5.convert(content);
   return digest.toString();
+}
+
+processLink(String? uri, BuildContext context) {
+  print("processLink : $uri");
+  if (uri == null) return;
+  if (RegExp(r"^dmzj://comic/([0-9A-z]+)/$").allMatches(uri!).isNotEmpty) {
+    String comicId =
+        RegExp(r"^dmzj://comic/([0-9A-z]+)/$").allMatches(uri!).first.group(1)!;
+    if (RegExp(r"^\d+$").hasMatch(comicId)) {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) {
+          return ComicDetailScreen(comicId: int.parse(comicId));
+        },
+      ));
+    } else {
+      print("ComicDetailRedirectScreen : $comicId");
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) {
+          return ComicDetailRedirectScreen(comicIdString: comicId);
+        },
+      ));
+    }
+    return;
+  } else if (RegExp(r"^https?://m\.idmzj\.com/info/(\w+)\.html$")
+      .allMatches(uri!)
+      .isNotEmpty) {
+    String comicId = RegExp(r"^https?://m\.idmzj\.com/info/(\w+)\.html$")
+        .allMatches(uri!)
+        .first
+        .group(1)!;
+    if (RegExp(r"^\d+$").hasMatch(comicId)) {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) {
+          return ComicDetailScreen(comicId: int.parse(comicId));
+        },
+      ));
+    } else {
+      print("ComicDetailRedirectScreen : $comicId");
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) {
+          return ComicDetailRedirectScreen(comicIdString: comicId);
+        },
+      ));
+    }
+    return;
+  }
+}
+
+StreamSubscription<String?> linkSubscript(BuildContext context) {
+  return linkStream.listen((uri) async {
+    processLink(uri, context);
+  });
 }

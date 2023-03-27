@@ -18,6 +18,7 @@ import '../configs/auto_clean.dart';
 import '../configs/last_module.dart';
 import '../configs/novel_font_size.dart';
 import '../configs/themes.dart';
+import 'comic_detail_redirect_screen.dart';
 
 class InitScreen extends StatefulWidget {
   const InitScreen({Key? key}) : super(key: key);
@@ -46,7 +47,9 @@ class _InitScreenState extends State<InitScreen> {
     await initLogin();
     autoCheckNewVersion();
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (BuildContext context) => AppScreen(lastModule)),
+      MaterialPageRoute(
+        builder: (BuildContext context) => AppScreen(lastModule),
+      ),
     );
   }
 
