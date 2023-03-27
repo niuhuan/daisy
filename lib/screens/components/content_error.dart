@@ -41,6 +41,10 @@ class ContentError extends StatelessWidget {
         message = "啊哦, 被玩坏了";
         break;
     }
+    if ("$error".contains("暂时无法观看")) {
+      iconData = Icons.timer_off;
+      message = "请登录并签到一次";
+    }
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         print("$error");

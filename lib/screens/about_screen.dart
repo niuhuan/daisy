@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:daisy/commons.dart';
 import 'package:daisy/configs/android_display_mode.dart';
 import 'package:daisy/configs/auto_clean.dart';
 import 'package:daisy/configs/login.dart';
 import 'package:daisy/configs/themes.dart';
 import 'package:daisy/configs/versions.dart';
+import 'package:daisy/ffi.dart';
 import 'package:flutter/material.dart';
 
 import '../configs/novel_reader_type.dart';
@@ -52,6 +54,8 @@ class _AboutState extends State<AboutScreen> {
           _buildLogo(),
           const Divider(),
           ..._loginInfo(),
+          const Divider(),
+          _buildSign(),
           const Divider(),
           _buildCurrentVersion(),
           const Divider(),
@@ -110,6 +114,24 @@ class _AboutState extends State<AboutScreen> {
             ),
           ),
         );
+      },
+    );
+  }
+
+  Widget _buildSign() {
+    return ListTile(
+      title: const Text("签到"),
+      subtitle: const Text("新用户必须签到一次才能正常使用APP"),
+      onTap: () async {
+        try {
+          var taskIndex = await native.taskIndex();
+          if (!(taskIndex.daySignTask.status > 0)) {
+            await native.taskSign();
+          }
+          defaultToast(context, "签到成功");
+        } catch (e, s) {
+          defaultToast(context, "签到失败 : $e");
+        }
       },
     );
   }
