@@ -18,6 +18,7 @@ import io.flutter.Log
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import java.io.File
 import java.util.concurrent.Executors
 
 class MainActivity : FlutterActivity() {
@@ -51,8 +52,20 @@ class MainActivity : FlutterActivity() {
                     error("", e.message, "")
                 }
             }
-
         }
+    }
+
+    private fun downloadsDir(): File {
+        return context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
+            ?: throw java.lang.IllegalStateException()
+    }
+
+    private fun defaultPikapikaDir(): File {
+        return File(downloadsDir(), "daisy")
+    }
+
+    private fun androidDefaultExportsDir(): File {
+        return File(defaultPikapikaDir(), "exports")
     }
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -76,6 +89,9 @@ class MainActivity : FlutterActivity() {
                     "androidGetVersion" -> Build.VERSION.SDK_INT
                     "androidAppInfo" -> {
                         goAppInfo()
+                    }
+                    "androidDefaultExportsDir" -> {
+                        androidDefaultExportsDir().absolutePath
                     }
                     else -> {
                         notImplementedToken

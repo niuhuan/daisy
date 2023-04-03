@@ -1,4 +1,5 @@
 import 'package:daisy/commons.dart';
+import 'package:daisy/configs/login.dart';
 import 'package:daisy/ffi.dart';
 import 'package:daisy/screens/comic_detail_screen.dart';
 import 'package:daisy/screens/components/images.dart';
@@ -129,7 +130,7 @@ class _ComicPagerState extends State<ComicPager> {
     return _list.map((e) {
       return GestureDetector(
         onTap: () async {
-          if ((await native.getUid()).isEmpty) {
+          if (loginInfo.status == 1) {
             defaultToast(context, "请先登录");
             return;
           }
