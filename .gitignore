@@ -55,3 +55,4 @@ bridge_generated.h
 version.txt
 libnative.a
 ci/target/
+libnative.dylib

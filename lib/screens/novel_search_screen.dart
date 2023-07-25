@@ -1,6 +1,6 @@
 import 'package:daisy/ffi.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_search_bar/flutter_search_bar.dart';
+import 'package:flutter_search_bar/flutter_search_bar.dart' as sb;
 
 import 'components/novel_pager.dart';
 
@@ -56,7 +56,7 @@ class _NovelSearchScreenState extends State<NovelSearchScreen> {
   late final TextEditingController _textEditController =
       TextEditingController(text: '');
 
-  late final SearchBar _searchBar = SearchBar(
+  late final sb.SearchBar _searchBar = sb.SearchBar(
     hintText: '搜索',
     controller: _textEditController,
     inBar: false,

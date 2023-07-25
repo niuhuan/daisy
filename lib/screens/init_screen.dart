@@ -18,7 +18,6 @@ import '../configs/auto_clean.dart';
 import '../configs/last_module.dart';
 import '../configs/novel_font_size.dart';
 import '../configs/themes.dart';
-import 'comic_detail_redirect_screen.dart';
 
 class InitScreen extends StatefulWidget {
   const InitScreen({Key? key}) : super(key: key);
