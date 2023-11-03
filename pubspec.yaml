@@ -20,7 +20,7 @@ dependencies:
   another_xlider: ^1.0.1+2
   event: ^2.1.2
   modal_bottom_sheet: ^3.0.0-pre
-  photo_view: ^0.13.0
+  photo_view: ^0.14.0
   scrollable_positioned_list: ^0.2.3
   permission_handler: ^10.1.0
   flutter_styled_toast: ^2.1.3

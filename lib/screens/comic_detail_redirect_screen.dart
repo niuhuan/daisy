@@ -37,6 +37,7 @@ class _ComicDetailRedirectScreenState extends State<ComicDetailRedirectScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
+      future: _future,
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.hasError) {
           return ContentError(

@@ -11,6 +11,7 @@ import 'components/content_loading.dart';
 import 'components/images.dart';
 import 'components/subscribed_icon.dart';
 import 'novel_html_reader_screen.dart';
+import 'novel_new_reader_screen.dart';
 import 'novel_reader_screen.dart';
 
 class NovelDetailScreen extends StatefulWidget {
@@ -203,6 +204,18 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                                 ),
                               );
                               break;
+                            case NovelReaderType.picMove:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NovelNewReaderScreen(
+                                    novel: _detail,
+                                    volumes: _volumes,
+                                    initChapterId: chapter.chapterId,
+                                  ),
+                                ),
+                              );
+                              break;
                           }
                         },
                         text:
@@ -243,6 +256,18 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                             volumes: _volumes,
                             chapter: chapter,
                             volume: volume,
+                          ),
+                        ),
+                      );
+                      break;
+                    case NovelReaderType.picMove:
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NovelNewReaderScreen(
+                            novel: _detail,
+                            volumes: _volumes,
+                            initChapterId: chapter.chapterId,
                           ),
                         ),
                       );
@@ -310,6 +335,20 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                                         novel: _detail,
                                         volume: volume,
                                         chapter: e,
+                                        volumes: _volumes,
+                                        // loadChapter: _loadChapterF(),
+                                        // initRank: 0,
+                                      ),
+                                    ),
+                                  );
+                                  break;
+                                case NovelReaderType.picMove:
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => NovelNewReaderScreen(
+                                        novel: _detail,
+                                        initChapterId: e.chapterId,
                                         volumes: _volumes,
                                         // loadChapter: _loadChapterF(),
                                         // initRank: 0,
