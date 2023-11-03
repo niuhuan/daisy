@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:daisy/configs/novel_background_color.dart';
+import 'package:daisy/configs/novel_margins.dart';
 import 'package:daisy/ffi.dart';
 import 'package:daisy/screens/components/content_error.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../configs/novel_font_color.dart';
 import '../configs/novel_font_size.dart';
+import '../configs/novel_line_height.dart';
 import 'components/content_loading.dart';
 import 'components/novel_fan_component.dart';
 
@@ -101,8 +103,8 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
     }
     // 切割文字????s
     final _mq = MediaQuery.of(context);
-    final _width = _mq.size.width - 30;
-    final _height = _mq.size.height - 60;
+    final _width = _mq.size.width - novelLeftMargin - novelRightMargin;
+    final _height = _mq.size.height - novelTopMargin - novelBottomMargin;
     List<PageEntry> finalEntries = [];
     for (var entry in preEntries) {
       if (entry.text.isNotEmpty) {
@@ -116,7 +118,7 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
             text: tryRender,
             style: TextStyle(
               fontSize: 14 * novelFontSize,
-              height: 1.2,
+              height: novelLineHeight,
             ),
           );
           final max = TextPainter(
@@ -125,8 +127,8 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
           );
           max.layout(maxWidth: _width);
           int endOffset = max
-              .getPositionForOffset(
-                  Offset(_width, _height - 14 * novelFontSize * 1.2))
+              .getPositionForOffset(Offset(
+                  _width, _height - 14 * novelFontSize * novelLineHeight))
               .offset;
           finalEntries.add(PageEntry(
             bookText.substring(
@@ -382,6 +384,28 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
                     },
                   ),
                   _bottomIcon(
+                    icon: Icons.format_line_spacing_sharp,
+                    title: novelLineHeight.toString(),
+                    onPressed: () async {
+                      await modifyNovelLineHeight(context);
+                      resetFont();
+                      setState(() => {});
+                    },
+                  ),
+                  _bottomIcon(
+                    icon: Icons.fullscreen_exit_outlined,
+                    title: "边距",
+                    onPressed: () async {
+                      await novelMarginsSettingsPop(context);
+                      resetFont();
+                      setState(() => {});
+                    },
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  _bottomIcon(
                     icon: Icons.format_color_text,
                     title: "颜色",
                     onPressed: () async {
@@ -595,7 +619,7 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
         pageEntry.text,
         style: TextStyle(
           fontSize: 14 * novelFontSize,
-          height: 1.2,
+          height: novelLineHeight,
           color: getNovelFontColor(context),
         ),
       );
@@ -623,11 +647,11 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.only(
-          top: 35,
-          bottom: 25,
-          left: 15,
-          right: 15,
+        padding: EdgeInsets.only(
+          top: novelTopMargin,
+          bottom: novelBottomMargin,
+          left: novelLeftMargin,
+          right: novelRightMargin,
         ),
         child: child,
       ),
