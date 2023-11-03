@@ -7,7 +7,7 @@ env:
   flutter_channel: 'stable'
   LLVM_VERSION: '10.0'
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
-  RUST_TOOLCHAIN: nightly-2023-03-13
+  RUST_TOOLCHAIN: nightly-2023-10-31
   NDK_VERSION: 25.2.9519653
 
 jobs:
