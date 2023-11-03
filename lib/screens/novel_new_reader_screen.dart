@@ -302,6 +302,7 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
                           AppBar(
                             backgroundColor: Colors.black.withOpacity(.5),
                             title: Text(chapter.chapterName),
+                            elevation: 0,
                             actions: [
                               IconButton(
                                 onPressed: _onChooseEp,
