@@ -50,7 +50,7 @@ async fn main() -> Result<()> {
         .json(&{
             let mut params = HashMap::<String, String>::new();
             params.insert("tag_name".to_string(), code.to_string());
-            params.insert("target_commitish".to_string(), "main".to_string());
+            params.insert("target_commitish".to_string(), "master".to_string());
             params.insert("name".to_string(), code.to_string());
             params.insert("body".to_string(), info.to_string());
             params
