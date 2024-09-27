@@ -9,7 +9,7 @@ env:
   LLVM_VERSION: '10.0'
   RUST_TOOLCHAIN: nightly-2024-09-04
   NDK_VERSION: 25.2.9519653
-  REPO: ${{ github.event.inputs.repo }}
+  REPO: ${{ GITHUB_REPOSITORY }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
