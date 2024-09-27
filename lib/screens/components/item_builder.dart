@@ -9,20 +9,20 @@ class ItemBuilder<T> extends StatelessWidget {
   final double? height;
 
   const ItemBuilder({
-    Key? key,
+    super.key,
     required this.future,
     required this.successBuilder,
     required this.onRefresh,
     this.height,
     this.loadingHeight,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        var _maxWidth = constraints.maxWidth;
-        var _loadingHeight = height ?? loadingHeight ?? _maxWidth / 2;
+        var maxWidth = constraints.maxWidth;
+        var loadingHeight = height ?? this.loadingHeight ?? maxWidth / 2;
         return FutureBuilder(
             future: future,
             builder: (BuildContext context, AsyncSnapshot<T> snapshot) {
@@ -32,26 +32,26 @@ class ItemBuilder<T> extends StatelessWidget {
                 return InkWell(
                   onTap: onRefresh,
                   child: SizedBox(
-                    width: _maxWidth,
-                    height: _loadingHeight,
+                    width: maxWidth,
+                    height: loadingHeight,
                     child: Center(
                       child:
-                          Icon(Icons.sync_problem, size: _loadingHeight / 1.5),
+                          Icon(Icons.sync_problem, size: loadingHeight / 1.5),
                     ),
                   ),
                 );
               }
               if (snapshot.connectionState != ConnectionState.done) {
                 return SizedBox(
-                  width: _maxWidth,
-                  height: _loadingHeight,
+                  width: maxWidth,
+                  height: loadingHeight,
                   child: Center(
-                    child: Icon(Icons.sync, size: _loadingHeight / 1.5),
+                    child: Icon(Icons.sync, size: loadingHeight / 1.5),
                   ),
                 );
               }
               return SizedBox(
-                width: _maxWidth,
+                width: maxWidth,
                 height: height,
                 child: successBuilder(context, snapshot),
               );

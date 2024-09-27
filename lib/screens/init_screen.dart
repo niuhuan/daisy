@@ -14,7 +14,7 @@ import 'package:daisy/configs/versions.dart';
 import 'package:daisy/screens/app_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:daisy/cross.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 
 import '../configs/auto_clean.dart';
 import '../configs/last_module.dart';
@@ -22,7 +22,7 @@ import '../configs/novel_font_size.dart';
 import '../configs/themes.dart';
 
 class InitScreen extends StatefulWidget {
-  const InitScreen({Key? key}) : super(key: key);
+  const InitScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _InitScreenState();

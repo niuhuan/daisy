@@ -1,9 +1,10 @@
 /// 全屏操作
+library;
 
 import 'package:flutter/material.dart';
 
 import '../commons.dart';
-import '../ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 
 enum ReaderControllerType {
   touchOnce,

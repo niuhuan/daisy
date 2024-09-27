@@ -1,5 +1,5 @@
 import 'package:daisy/commons.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 
 const _propertyKeyLight = "novel_font_color_light";
@@ -46,7 +46,7 @@ Future modifyNovelFontColor(BuildContext context) async {
 
   Color? color = await chooseColor(
     context,
-    title: "选择字体颜色" + (dark ? " (黑暗模式)" :""),
+    title: "选择字体颜色${dark ? " (黑暗模式)" :""}",
     src: Color(dark ? _novelFontColorDark : _novelFontColorLight),
   );
   if (color != null) {

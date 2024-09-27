@@ -1,16 +1,17 @@
 import 'dart:convert';
 
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 import '../commons.dart';
+import '../src/rust/anime_home/proto.dart';
+import '../src/rust/api/bridge.dart';
 import 'comic_detail_screen.dart';
 import 'comic_reader_screen.dart';
 
 class ComicDownloadInfoScreen extends StatefulWidget {
   final DownloadComic comic;
 
-  const ComicDownloadInfoScreen({Key? key, required this.comic})
-      : super(key: key);
+  const ComicDownloadInfoScreen({super.key, required this.comic});
 
   @override
   State<StatefulWidget> createState() => _ComicDownloadInfoScreen();
@@ -301,7 +302,7 @@ class _ComicDownloadInfoScreen extends State<ComicDownloadInfoScreen>
                   child: Container(
                     color: Theme.of(context)
                         .textTheme
-                        .bodyText1!
+                        .bodyMedium!
                         .color!
                         .withOpacity(.05),
                     padding: const EdgeInsets.all(10),

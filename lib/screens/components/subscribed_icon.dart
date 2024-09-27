@@ -1,4 +1,4 @@
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 
 import '../../commons.dart';
@@ -12,8 +12,8 @@ class SubscribedIcon extends StatefulWidget {
   const SubscribedIcon({
     required this.objType,
     required this.objId,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() => _SubscribedIconState();
@@ -64,8 +64,7 @@ class _LoginSubscribedIcon extends StatefulWidget {
   const _LoginSubscribedIcon({
     required this.objType,
     required this.objId,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() => _LoginSubscribedIconState();

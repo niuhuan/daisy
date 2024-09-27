@@ -3,13 +3,13 @@ import 'package:daisy/screens/components/badged.dart';
 import 'package:daisy/screens/novel_bookshelf_screen.dart';
 import 'package:daisy/screens/novel_browser_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_search_bar/flutter_search_bar.dart' as sb;
+import 'components/flutter_search_bar.dart' as sb;
 
 import 'app_screen.dart';
 import 'novel_search_screen.dart';
 
 class NovelsScreen extends StatefulWidget {
-  const NovelsScreen({Key? key}) : super(key: key);
+  const NovelsScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _NovelsScreenState();
@@ -22,10 +22,6 @@ class _NovelsScreenState extends State<NovelsScreen>
   int _pageIndex = 1;
   late final _controller = PageController(initialPage: _pageIndex);
 
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -69,6 +65,7 @@ class _NovelsScreenState extends State<NovelsScreen>
           ),
         );
       },
+      minWidth: 50,
       child: Column(children: [
         Expanded(child: Container()),
         VersionBadged(
@@ -83,7 +80,6 @@ class _NovelsScreenState extends State<NovelsScreen>
         ),
         Expanded(child: Container()),
       ]),
-      minWidth: 50,
     ));
     for (var i = 0; i < _navPages.length; i++) {
       var index = i;
@@ -97,6 +93,7 @@ class _NovelsScreenState extends State<NovelsScreen>
           onPressed: () {
             _navButtonPressed(index);
           },
+          minWidth: 50,
           child: Column(children: [
             Expanded(child: Container()),
             Icon(_navPages[i].icon, color: color),
@@ -109,7 +106,6 @@ class _NovelsScreenState extends State<NovelsScreen>
             ),
             Expanded(child: Container()),
           ]),
-          minWidth: 50,
         ),
       ));
     }
@@ -117,6 +113,7 @@ class _NovelsScreenState extends State<NovelsScreen>
       onPressed: () {
         _searchBar.beginSearch(context);
       },
+      minWidth: 50,
       child: Column(children: [
         Expanded(child: Container()),
         const Icon(Icons.search, color: Colors.white),
@@ -129,7 +126,6 @@ class _NovelsScreenState extends State<NovelsScreen>
         ),
         Expanded(child: Container()),
       ]),
-      minWidth: 50,
     ));
     return AppBar(
       leading: IconButton(

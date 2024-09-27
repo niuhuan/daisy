@@ -11,4 +11,4 @@ PRODUCT_NAME = daisy
 PRODUCT_BUNDLE_IDENTIFIER = opensource.daisy
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2022 opensource. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2024 opensource. All rights reserved.

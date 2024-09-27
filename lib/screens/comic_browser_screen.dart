@@ -4,13 +4,14 @@ import 'package:daisy/commons.dart';
 import 'package:daisy/screens/components/content_error.dart';
 import 'package:daisy/screens/components/content_loading.dart';
 import 'package:flutter/material.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 
 import '../const.dart';
+import '../src/rust/anime_home/entities.dart';
 import 'components/comic_pager.dart';
 
 class ComicBrowserScreen extends StatefulWidget {
-  const ComicBrowserScreen({Key? key}) : super(key: key);
+  const ComicBrowserScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _ComicBrowserScreenState();
@@ -242,11 +243,11 @@ class _ComicBrowserScreenState extends State<ComicBrowserScreen>
               itemBuilder: (BuildContext context) {
                 return _sorts.entries
                     .map((e) => PopupMenuItem(
+                          value: e.key,
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: Text(e.value),
                           ),
-                          value: e.key,
                         ))
                     .toList();
               },

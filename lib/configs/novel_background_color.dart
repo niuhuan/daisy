@@ -1,5 +1,5 @@
 import 'package:daisy/commons.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 
 const _propertyKeyLight = "novel_background_color_light";
@@ -41,7 +41,7 @@ Future modifyNovelBackgroundColor(BuildContext context) async {
   bool dark = Theme.of(context).brightness == Brightness.dark;
   Color? color = await chooseColor(
     context,
-    title: "选择背景颜色" + (dark ? " (黑暗模式)" : ""),
+    title: "选择背景颜色${dark ? " (黑暗模式)" : ""}",
     src: Color(dark ? _novelBackgroundColorDark : _novelBackgroundColorLight),
   );
   if (color != null) {

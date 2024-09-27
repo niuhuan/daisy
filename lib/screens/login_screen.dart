@@ -1,5 +1,5 @@
 import 'package:daisy/cross.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -8,7 +8,7 @@ import '../configs/login.dart';
 import 'components/content_loading.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _LoginScreenState();

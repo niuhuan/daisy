@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../commons.dart';
-import '../ffi.dart';
-
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 const _propertyName = "auto_clean";
 late String autoClean;
 

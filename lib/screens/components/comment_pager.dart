@@ -1,8 +1,9 @@
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:daisy/screens/components/item_builder.dart';
 import 'package:flutter/material.dart';
 
 import '../../commons.dart';
+import '../../src/rust/anime_home/entities.dart';
 import 'avatar.dart';
 
 class CommentPager extends StatefulWidget {
@@ -10,8 +11,7 @@ class CommentPager extends StatefulWidget {
   final int objId;
   final bool hot;
 
-  const CommentPager(this.objType, this.objId, this.hot, {Key? key})
-      : super(key: key);
+  const CommentPager(this.objType, this.objId, this.hot, {super.key});
 
   @override
   State<StatefulWidget> createState() => _CommentPagerState();
@@ -167,7 +167,7 @@ class _CommentPagerState extends State<CommentPager> {
 class ComicCommentItem extends StatefulWidget {
   final Comment comment;
 
-  const ComicCommentItem(this.comment, {Key? key}) : super(key: key);
+  const ComicCommentItem(this.comment, {super.key});
 
   @override
   State<StatefulWidget> createState() => _ComicCommentItemState();
@@ -182,9 +182,9 @@ class _ComicCommentItemState extends State<ComicCommentItem> {
     var theme = Theme.of(context);
     var nameStyle = const TextStyle(fontWeight: FontWeight.bold);
     var connectStyle =
-        TextStyle(color: theme.textTheme.bodyText1?.color?.withOpacity(.8));
+        TextStyle(color: theme.textTheme.bodyMedium?.color?.withOpacity(.8));
     var datetimeStyle = TextStyle(
-        color: theme.textTheme.bodyText1?.color?.withOpacity(.6), fontSize: 12);
+        color: theme.textTheme.bodyMedium?.color?.withOpacity(.6), fontSize: 12);
     return Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(

@@ -1,12 +1,13 @@
 import 'package:daisy/commons.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
+
+import '../src/rust/anime_home/proto.dart';
 
 class ComicCreateDownloadScreen extends StatefulWidget {
   final ComicDetail comic;
 
-  const ComicCreateDownloadScreen({Key? key, required this.comic})
-      : super(key: key);
+  const ComicCreateDownloadScreen({super.key, required this.comic});
 
   @override
   State<StatefulWidget> createState() => _ComicCreateDownloadScreenState();

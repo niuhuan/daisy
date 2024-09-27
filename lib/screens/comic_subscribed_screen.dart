@@ -1,10 +1,10 @@
 import 'package:daisy/configs/login.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 import 'components/comic_pager.dart';
 
 class ComicSubscribedScreen extends StatefulWidget {
-  const ComicSubscribedScreen({Key? key}) : super(key: key);
+  const ComicSubscribedScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _ComicSubscribedScreenState();

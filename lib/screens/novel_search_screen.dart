@@ -1,13 +1,13 @@
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
-import 'package:flutter_search_bar/flutter_search_bar.dart' as sb;
+import 'components/flutter_search_bar.dart' as sb;
 
 import 'components/novel_pager.dart';
 
 class NovelSearchScreen extends StatefulWidget {
   final String content;
 
-  const NovelSearchScreen(this.content, {Key? key}) : super(key: key);
+  const NovelSearchScreen(this.content, {super.key});
 
   @override
   State<StatefulWidget> createState() => _NovelSearchScreenState();

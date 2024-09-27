@@ -1,14 +1,15 @@
 import 'dart:convert';
 
 import 'package:daisy/commons.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 
+import '../src/rust/api/bridge.dart';
 import 'comic_download_info_screen.dart';
 import 'components/comic_pager.dart';
 
 class ComicDownloadsScreen extends StatefulWidget {
-  const ComicDownloadsScreen({Key? key}) : super(key: key);
+  const ComicDownloadsScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _ComicDownloadsScreenState();

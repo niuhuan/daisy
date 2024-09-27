@@ -1,4 +1,4 @@
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 
 const _propertyKey = "last_module";
 

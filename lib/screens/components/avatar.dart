@@ -15,8 +15,8 @@ class Avatar extends StatelessWidget {
     this.url,
     this.uid, {
     this.size = 50,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

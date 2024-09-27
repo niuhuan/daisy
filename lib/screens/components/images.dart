@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -46,7 +46,7 @@ class LoadingCacheImage extends StatefulWidget {
   final BoxFit fit;
 
   const LoadingCacheImage({
-    Key? key,
+    super.key,
     required this.url,
     required this.useful,
     this.extendsFieldIntFirst,
@@ -56,7 +56,7 @@ class LoadingCacheImage extends StatefulWidget {
     this.height,
     this.onTrueSize,
     this.fit = BoxFit.cover,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() => _LoadingCacheImageState();

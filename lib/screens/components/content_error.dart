@@ -8,11 +8,11 @@ class ContentError extends StatelessWidget {
   final Future<void> Function() onRefresh;
 
   const ContentError({
-    Key? key,
+    super.key,
     required this.error,
     required this.stackTrace,
     required this.onRefresh,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

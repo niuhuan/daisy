@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:daisy/configs/novel_background_color.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:daisy/screens/components/content_error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +12,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../configs/novel_font_color.dart';
 import '../configs/novel_font_size.dart';
+import '../src/rust/anime_home/proto.dart';
 import 'components/content_loading.dart';
 
 class NovelHtmlReaderScreen extends StatefulWidget {
@@ -25,8 +26,8 @@ class NovelHtmlReaderScreen extends StatefulWidget {
     required this.volume,
     required this.chapter,
     required this.volumes,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() => _NovelHtmlReaderScreenState();
@@ -143,7 +144,7 @@ class _NovelHtmlReaderScreenState extends State<NovelHtmlReaderScreen> {
                         data: text,
                         style: {
                           "body": Style(
-                            fontSize: FontSize.em(novelFontSize),
+                            fontSize: FontSize(novelFontSize),
                             color: getNovelFontColor(context),
                           ),
                         },

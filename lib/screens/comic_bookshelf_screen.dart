@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 
 class ComicBookshelfScreen extends StatefulWidget {
-  const ComicBookshelfScreen({Key? key}) : super(key: key);
+  const ComicBookshelfScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _ComicBookshelfScreenState();
@@ -58,8 +58,8 @@ class PreferredSizeContainer extends StatelessWidget
   const PreferredSizeContainer({
     required this.child,
     this.color,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Size get preferredSize => child.preferredSize;

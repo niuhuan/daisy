@@ -21,7 +21,7 @@ import io.flutter.plugin.common.MethodChannel
 import java.io.File
 import java.util.concurrent.Executors
 
-class MainActivity : FlutterActivity() {
+class MainActivity: FlutterActivity() {
 
     private val pool = Executors.newCachedThreadPool { runnable ->
         Thread(runnable).also { it.isDaemon = true }
@@ -183,3 +183,4 @@ class MainActivity : FlutterActivity() {
     }
 
 }
+

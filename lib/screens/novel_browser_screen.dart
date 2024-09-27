@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../commons.dart';
 import '../const.dart';
-import '../ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'components/novel_pager.dart';
 
 class NovelBrowserScreen extends StatefulWidget {
-  const NovelBrowserScreen({Key? key}) : super(key: key);
+  const NovelBrowserScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _NovelBrowserScreenState();
@@ -128,11 +128,11 @@ class _NovelBrowserScreenState extends State<NovelBrowserScreen>
               itemBuilder: (BuildContext context) {
                 return _sorts.entries
                     .map((e) => PopupMenuItem(
+                          value: e.key,
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             child: Text(e.value),
                           ),
-                          value: e.key,
                         ))
                     .toList();
               },

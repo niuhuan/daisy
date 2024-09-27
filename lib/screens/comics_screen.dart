@@ -3,13 +3,13 @@ import 'package:daisy/screens/app_screen.dart';
 import 'package:daisy/screens/components/badged.dart';
 import 'package:flutter/material.dart';
 import 'package:daisy/screens/comic_browser_screen.dart';
-import 'package:flutter_search_bar/flutter_search_bar.dart' as sb;
+import 'components/flutter_search_bar.dart' as sb;
 
 import 'comic_bookshelf_screen.dart';
 import 'comic_search_screen.dart';
 
 class ComicsScreen extends StatefulWidget {
-  const ComicsScreen({Key? key}) : super(key: key);
+  const ComicsScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _ComicsScreenState();
@@ -22,11 +22,6 @@ class _ComicsScreenState extends State<ComicsScreen>
 
   int _pageIndex = 1;
   late final _controller = PageController(initialPage: _pageIndex);
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -61,6 +56,8 @@ class _ComicsScreenState extends State<ComicsScreen>
   }
 
   AppBar _buildDefaultAppBar(BuildContext context) {
+    final iconColor =
+        Theme.of(context).appBarTheme.iconTheme?.color ?? Colors.black;
     List<Widget> actions = [];
     actions.add(MaterialButton(
       onPressed: () {
@@ -70,34 +67,34 @@ class _ComicsScreenState extends State<ComicsScreen>
           ),
         );
       },
+      minWidth: 50,
       child: Column(children: [
         Expanded(child: Container()),
         VersionBadged(
-          child: Icon(Icons.settings, color: Colors.white70.withAlpha(150)),
+          child: Icon(Icons.settings, color: iconColor.withAlpha(190)),
         ),
         Text(
           "设置",
           style: TextStyle(
             fontSize: 10,
-            color: Colors.white70.withAlpha(150),
+            color: iconColor.withAlpha(190),
           ),
         ),
         Expanded(child: Container()),
       ]),
-      minWidth: 50,
     ));
     for (var i = 0; i < _navPages.length; i++) {
       var index = i;
-      final color =
-          _pageIndex == i ? Colors.white : Colors.white70.withAlpha(150);
+      final color = _pageIndex == i ? iconColor : iconColor.withAlpha(190);
       final background =
-          _pageIndex == i ? Colors.white.withAlpha(20) : Colors.transparent;
+          _pageIndex == i ? iconColor.withAlpha(20) : Colors.transparent;
       actions.add(Container(
         color: background,
         child: MaterialButton(
           onPressed: () {
             _navButtonPressed(index);
           },
+          minWidth: 50,
           child: Column(children: [
             Expanded(child: Container()),
             Icon(_navPages[i].icon, color: color),
@@ -110,7 +107,6 @@ class _ComicsScreenState extends State<ComicsScreen>
             ),
             Expanded(child: Container()),
           ]),
-          minWidth: 50,
         ),
       ));
     }
@@ -118,26 +114,26 @@ class _ComicsScreenState extends State<ComicsScreen>
       onPressed: () {
         _searchBar.beginSearch(context);
       },
+      minWidth: 50,
       child: Column(children: [
         Expanded(child: Container()),
-        const Icon(Icons.search, color: Colors.white),
-        const Text(
+        Icon(Icons.search, color: iconColor),
+        Text(
           "搜索",
           style: TextStyle(
             fontSize: 10,
-            color: Colors.white,
+            color: iconColor,
           ),
         ),
         Expanded(child: Container()),
       ]),
-      minWidth: 50,
     ));
     return AppBar(
       leading: IconButton(
         onPressed: () {
           appScreenEvent.broadcast(jumpToNovel);
         },
-        icon: Icon(Icons.cameraswitch_sharp, color: Colors.white70.withAlpha(150)),
+        icon: Icon(Icons.cameraswitch_sharp, color: iconColor.withAlpha(190)),
       ),
       title: Transform.translate(
         offset: const Offset(-20, 0),

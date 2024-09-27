@@ -1,9 +1,10 @@
 /// 显示模式, 仅安卓有效
+library;
 
 import 'dart:io';
 
 import 'package:daisy/cross.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 import '../commons.dart';
 import 'android_version.dart';

@@ -1,5 +1,5 @@
 import 'package:daisy/commons.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 
 const _defaultValue = 1.15;

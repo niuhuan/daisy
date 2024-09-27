@@ -1,4 +1,4 @@
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:daisy/screens/login_screen.dart';
 import 'package:event/event.dart';
 import 'package:flutter/material.dart';
@@ -7,11 +7,11 @@ import '../commons.dart';
 
 final loginEvent = Event();
 
-var _loginInfo = LoginInfo(status: 1, message: "");
+var _loginInfo = const native.LoginInfo(status: 1, message: "");
 
-LoginInfo get loginInfo => _loginInfo;
+native.LoginInfo get loginInfo => _loginInfo;
 
-set loginInfo(LoginInfo info) {
+set loginInfo(native.LoginInfo info) {
   _loginInfo = info;
   loginEvent.broadcast();
 }

@@ -1,11 +1,11 @@
 import 'package:daisy/configs/login.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 
 import 'components/novel_pager.dart';
 
 class NovelSubscribedScreen extends StatefulWidget {
-  const NovelSubscribedScreen({Key? key}) : super(key: key);
+  const NovelSubscribedScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _NovelSubscribedScreenState();

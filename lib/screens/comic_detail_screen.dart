@@ -2,11 +2,13 @@ import 'package:daisy/screens/components/content_error.dart';
 import 'package:daisy/screens/components/images.dart';
 import 'package:daisy/screens/components/subscribed_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:uuid/uuid.dart';
 
 import '../commons.dart';
 import '../const.dart';
+import '../src/rust/anime_home/proto.dart';
+import '../src/rust/api/bridge.dart';
 import '../utils.dart';
 import 'comic_create_download_screen.dart';
 import 'comic_reader_screen.dart';
@@ -18,8 +20,8 @@ class ComicDetailScreen extends StatefulWidget {
 
   const ComicDetailScreen({
     required this.comicId,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() => _ComicDetailScreenState();
@@ -92,11 +94,11 @@ class _ComicDetailScreenState extends State<ComicDetailScreen> with RouteAware {
           );
         }
         var comic = snapshot.requireData;
-        const _tabs = <Widget>[
+        const tabs = <Widget>[
           Tab(text: '章节'),
           Tab(text: '评论'),
         ];
-        var _views = <Widget>[
+        var views = <Widget>[
           Column(children: [
             Container(height: 20),
             _buildContinueButton(comic),
@@ -105,8 +107,9 @@ class _ComicDetailScreenState extends State<ComicDetailScreen> with RouteAware {
           CommentPager(ObjType.comic, comic.id, false),
         ];
         final theme = Theme.of(context);
+        final dividerColor = theme.dividerColor;
         return DefaultTabController(
-          length: _tabs.length,
+          length: tabs.length,
           child: Scaffold(
             appBar: AppBar(
               title: Text(comic.title),
@@ -135,14 +138,15 @@ class _ComicDetailScreenState extends State<ComicDetailScreen> with RouteAware {
                   padding: const EdgeInsets.all(10),
                   child: SelectableText(comic.description),
                 ),
-                const Divider(),
+                Divider(color: dividerColor),
                 Container(
                   height: 40,
                   color: theme.colorScheme.secondary.withOpacity(.025),
                   child: TabBar(
-                    tabs: _tabs,
+                    tabs: tabs,
                     indicatorColor: theme.colorScheme.secondary,
                     labelColor: theme.colorScheme.secondary,
+                    dividerColor: dividerColor,
                     onTap: (val) async {
                       setState(() {
                         _tabIndex = val;
@@ -150,8 +154,8 @@ class _ComicDetailScreenState extends State<ComicDetailScreen> with RouteAware {
                     },
                   ),
                 ),
-                _views[_tabIndex],
-                const Divider(),
+                views[_tabIndex],
+                Divider(color: dividerColor),
               ],
             ),
           ),
@@ -245,7 +249,7 @@ class _ComicDetailScreenState extends State<ComicDetailScreen> with RouteAware {
                     children: [
                       ...chapter.data.map(
                         (e) => Container(
-                          margin: EdgeInsets.all(3),
+                          margin: const EdgeInsets.all(3),
                           child: MaterialButton(
                             onPressed: () {
                               Navigator.push(
@@ -295,7 +299,7 @@ class _ComicDetailScreenState extends State<ComicDetailScreen> with RouteAware {
                   child: Container(
                     color: Theme.of(context)
                         .textTheme
-                        .bodyText1!
+                        .bodyMedium!
                         .color!
                         .withOpacity(.05),
                     padding: const EdgeInsets.all(10),
@@ -323,7 +327,7 @@ class _ComicDetailScreenState extends State<ComicDetailScreen> with RouteAware {
 class ComicCard extends StatelessWidget {
   final ComicDetail comic;
 
-  const ComicCard({Key? key, required this.comic}) : super(key: key);
+  const ComicCard({super.key, required this.comic});
 
   @override
   Widget build(BuildContext context) {

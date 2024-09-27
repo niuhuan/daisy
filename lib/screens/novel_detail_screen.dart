@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../commons.dart';
 import '../const.dart';
-import '../ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
+import '../src/rust/anime_home/proto.dart';
+import '../src/rust/api/bridge.dart';
 import '../utils.dart';
 import 'components/comment_pager.dart';
 import 'components/content_error.dart';
@@ -19,8 +21,8 @@ class NovelDetailScreen extends StatefulWidget {
 
   const NovelDetailScreen({
     required this.novelId,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() => _NovelDetailScreenState();
@@ -98,11 +100,11 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
             body: const ContentLoading(),
           );
         }
-        const _tabs = <Widget>[
+        const tabs = <Widget>[
           Tab(text: '章节'),
           Tab(text: '评论'),
         ];
-        var _views = <Widget>[
+        var views = <Widget>[
           Column(children: [
             Container(height: 20),
             _buildContinueButton(),
@@ -111,8 +113,9 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
           CommentPager(ObjType.novel, widget.novelId, false),
         ];
         final theme = Theme.of(context);
+        final dividerColor = theme.dividerColor;
         return DefaultTabController(
-          length: _tabs.length,
+          length: tabs.length,
           child: Scaffold(
             appBar: AppBar(
               title: Text(_detail.name),
@@ -128,12 +131,12 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                   padding: const EdgeInsets.all(10),
                   child: SelectableText(_detail.introduction),
                 ),
-                const Divider(),
+                Divider(color: dividerColor),
                 Container(
                   height: 40,
                   color: theme.colorScheme.secondary.withOpacity(.025),
                   child: TabBar(
-                    tabs: _tabs,
+                    tabs: tabs,
                     indicatorColor: theme.colorScheme.secondary,
                     labelColor: theme.colorScheme.secondary,
                     onTap: (val) async {
@@ -141,10 +144,11 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                         _tabIndex = val;
                       });
                     },
+                    dividerColor: dividerColor,
                   ),
                 ),
-                _views[_tabIndex],
-                const Divider(),
+                views[_tabIndex],
+                Divider(color: dividerColor),
               ],
             ),
           ),
@@ -331,7 +335,8 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => NovelHtmlReaderScreen(
+                                      builder: (context) =>
+                                          NovelHtmlReaderScreen(
                                         novel: _detail,
                                         volume: volume,
                                         chapter: e,
@@ -346,7 +351,8 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => NovelNewReaderScreen(
+                                      builder: (context) =>
+                                          NovelNewReaderScreen(
                                         novel: _detail,
                                         initChapterId: e.chapterId,
                                         volumes: _volumes,
@@ -393,7 +399,7 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                   child: Container(
                     color: Theme.of(context)
                         .textTheme
-                        .bodyText1!
+                        .bodyMedium!
                         .color!
                         .withOpacity(.05),
                     padding: const EdgeInsets.all(10),
@@ -421,7 +427,7 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
 class NovelCard extends StatelessWidget {
   final NovelDetail novel;
 
-  const NovelCard({Key? key, required this.novel}) : super(key: key);
+  const NovelCard({super.key, required this.novel});
 
   @override
   Widget build(BuildContext context) {

@@ -27,8 +27,8 @@ class NovelFanComponent extends StatefulWidget {
     this.onNextSetState,
     this.controller,
     required this.current,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() => _NovelFanComponentState();

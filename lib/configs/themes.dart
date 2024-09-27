@@ -1,5 +1,5 @@
 import 'package:daisy/commons.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:event/event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +14,10 @@ final _pink = ThemeData.light().copyWith(
     color: Colors.pink.shade200,
     iconTheme: const IconThemeData(
       color: Colors.white,
+    ),
+    titleTextStyle: const TextStyle(
+      color: Colors.white,
+      fontSize: 20,
     ),
   ),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
@@ -31,6 +35,9 @@ final _pink = ThemeData.light().copyWith(
     focusedBorder: UnderlineInputBorder(
       borderSide: BorderSide(color: Colors.pink.shade200),
     ),
+  ),
+  dividerTheme: DividerThemeData(
+    color: Colors.grey.shade700,
   ),
 );
 
@@ -62,6 +69,15 @@ final _dark = ThemeData.dark().copyWith(
     focusedBorder: UnderlineInputBorder(
       borderSide: BorderSide(color: Colors.pink.shade200),
     ),
+  ),
+  dividerTheme: DividerThemeData(
+    color: Colors.grey.shade700,
+  ),
+  listTileTheme: ListTileThemeData(
+    tileColor: Colors.grey.shade800,
+    selectedColor: Colors.grey.shade900,
+    iconColor: Colors.white,
+    textColor: Colors.white,
   ),
 );
 

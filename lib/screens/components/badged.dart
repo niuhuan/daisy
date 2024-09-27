@@ -6,7 +6,7 @@ class Badged extends StatelessWidget {
   final String? badge;
   final Widget child;
 
-  const Badged({Key? key, required this.child, this.badge}) : super(key: key);
+  const Badged({super.key, required this.child, this.badge});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class Badged extends StatelessWidget {
 class VersionBadged extends StatefulWidget {
   final Widget child;
 
-  const VersionBadged({required this.child, Key? key}) : super(key: key);
+  const VersionBadged({required this.child, super.key});
 
   @override
   State<StatefulWidget> createState() => _VersionBadgedState();
@@ -72,8 +72,8 @@ class _VersionBadgedState extends State<VersionBadged> {
   @override
   Widget build(BuildContext context) {
     return Badged(
-      child: widget.child,
       badge: latestVersion == null ? null : "1",
+      child: widget.child,
     );
   }
 }

@@ -3,21 +3,15 @@ use serde_derive::Deserialize;
 use serde_derive::Serialize;
 use serde_json::Value;
 
-const OWNER: &str = "niuhuan";
-const REPO: &str = "daisy";
-const UA: &str = "niuhuan daisy ci";
-
 #[tokio::main]
 async fn main() -> Result<()> {
     // get ghToken
-    let gh_token = std::env::var("GH_TOKEN")?;
+    let gh_token = std::env::var("GITHUB_TOKEN")?;
     let target = std::env::var("TARGET")?;
-    let flutter_version = std::env::var("flutter_version")?;
-
+    let repo = std::env::var("REPO")?;
+    let flutter_version = std::env::var("FLUTTER_VERSION")?;
     let vs_code_txt = tokio::fs::read_to_string("version.code.txt").await?;
-
     let code = vs_code_txt.trim();
-
     let release_file_name = match target.as_str() {
         "macos" => format!("daisy-{}.dmg", code),
         "ios" => format!("daisy-{}-nosign.ipa", code),
@@ -28,13 +22,6 @@ async fn main() -> Result<()> {
         "android-x86_64" => format!("daisy-{}-x86_64.apk", code),
         un => panic!("unknown target : {}-flutter_{}", un, flutter_version),
     };
-
-    let release_file_name = if flutter_version.starts_with("2.") {
-        format!("of-{}", release_file_name)
-    } else {
-        release_file_name
-    };
-
     let local_path = match target.as_str() {
         "macos" => "../build/macos.dmg",
         "ios" => "../build/nosign.ipa",
@@ -46,12 +33,12 @@ async fn main() -> Result<()> {
         un => panic!("unknown target : {}", un),
     };
 
-    let client = reqwest::ClientBuilder::new().user_agent(UA).build()?;
+    let client = reqwest::ClientBuilder::new().user_agent(format!("{repo} CI")).build()?;
 
     let check_response = client
         .get(format!(
-            "https://api.github.com/repos/{}/{}/releases/tags/{}",
-            OWNER, REPO, code
+            "https://api.github.com/repos/{}/releases/tags/{}",
+            repo, code
         ))
         .header("Authorization", format!("token {}", gh_token))
         .send()
@@ -71,8 +58,8 @@ async fn main() -> Result<()> {
 
     let response = client
         .post(format!(
-            "https://uploads.github.com/repos/{}/{}/releases/{}/assets?name={}",
-            OWNER, REPO, release.id, release_file_name
+            "https://uploads.github.com/repos/{}/releases/{}/assets?name={}",
+            repo, release.id, release_file_name
         ))
         .header("Authorization", format!("token {}", gh_token))
         .header("Content-Type", "application/octet-stream")

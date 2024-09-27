@@ -196,7 +196,7 @@ Future<String?> displayTextInputDialog(BuildContext context,
                               fontSize: 12,
                               color: Theme.of(context)
                                   .textTheme
-                                  .bodyText1
+                                  .bodyMedium
                                   ?.color
                                   ?.withOpacity(.5)),
                         ),
@@ -305,9 +305,9 @@ String generateMD5(String data) {
 processLink(String? uri, BuildContext context) {
   print("processLink : $uri");
   if (uri == null) return;
-  if (RegExp(r"^dmzj://comic/([0-9A-z]+)/$").allMatches(uri!).isNotEmpty) {
+  if (RegExp(r"^dmzj://comic/([0-9A-z]+)/$").allMatches(uri).isNotEmpty) {
     String comicId =
-        RegExp(r"^dmzj://comic/([0-9A-z]+)/$").allMatches(uri!).first.group(1)!;
+        RegExp(r"^dmzj://comic/([0-9A-z]+)/$").allMatches(uri).first.group(1)!;
     if (RegExp(r"^\d+$").hasMatch(comicId)) {
       Navigator.of(context).push(MaterialPageRoute(
         builder: (BuildContext context) {
@@ -324,10 +324,10 @@ processLink(String? uri, BuildContext context) {
     }
     return;
   } else if (RegExp(r"^https?://m\.idmzj\.com/info/(\w+)\.html$")
-      .allMatches(uri!)
+      .allMatches(uri)
       .isNotEmpty) {
     String comicId = RegExp(r"^https?://m\.idmzj\.com/info/(\w+)\.html$")
-        .allMatches(uri!)
+        .allMatches(uri)
         .first
         .group(1)!;
     if (RegExp(r"^\d+$").hasMatch(comicId)) {

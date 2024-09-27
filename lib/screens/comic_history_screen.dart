@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 
 import 'components/comic_pager.dart';
 
 class ComicHistoryScreen extends StatefulWidget {
-  const ComicHistoryScreen({Key? key}) : super(key: key);
+  const ComicHistoryScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _ComicHistoryScreenState();

@@ -1,15 +1,17 @@
 import 'package:daisy/screens/components/mouse_and_touch_scroll_behavior.dart';
 import 'package:daisy/configs/themes.dart';
+import 'package:daisy/src/rust/frb_generated.dart';
 import 'package:flutter/material.dart';
 import 'commons.dart';
 import 'screens/init_screen.dart';
 
-void main() {
+Future<void> main() async {
+  await RustLib.init();
   runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   State<StatefulWidget> createState() => _MyAppState();

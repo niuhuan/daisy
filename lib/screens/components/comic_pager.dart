@@ -1,6 +1,5 @@
 import 'package:daisy/commons.dart';
 import 'package:daisy/configs/login.dart';
-import 'package:daisy/ffi.dart';
 import 'package:daisy/screens/comic_detail_screen.dart';
 import 'package:daisy/screens/components/images.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +39,7 @@ class ComicInListCard {
 class ComicPager extends StatefulWidget {
   final Future<List<ComicInListCard>> Function(int page) loadComic;
 
-  const ComicPager(this.loadComic, {Key? key}) : super(key: key);
+  const ComicPager(this.loadComic, {super.key});
 
   @override
   State<StatefulWidget> createState() => _ComicPagerState();
@@ -185,7 +184,7 @@ class _ComicPagerState extends State<ComicPager> {
 class ComicCardInPager extends StatelessWidget {
   final ComicInListCard comic;
 
-  const ComicCardInPager({Key? key, required this.comic}) : super(key: key);
+  const ComicCardInPager({super.key, required this.comic});
 
   @override
   Widget build(BuildContext context) {
@@ -279,7 +278,7 @@ class ComicCardInPager extends StatelessWidget {
                     ? [
                         Container(height: 10),
                         Text(
-                          "U : " + timeFormat(comic.lastUpdateTime!),
+                          "U : ${timeFormat(comic.lastUpdateTime!)}",
                           style: const TextStyle(
                             fontSize: 12,
                           ),
@@ -290,7 +289,7 @@ class ComicCardInPager extends StatelessWidget {
                     ? [
                         Container(height: 10),
                         Text(
-                          "A : " + timeFormat(comic.addtime!),
+                          "A : ${timeFormat(comic.addtime!)}",
                           style: const TextStyle(
                             fontSize: 12,
                           ),
@@ -301,14 +300,13 @@ class ComicCardInPager extends StatelessWidget {
                     ? [
                         Container(height: 10),
                         Text(
-                          (comic.downloadStatus == 0
+                          "${comic.downloadStatus == 0
                                   ? "未完成"
                                   : comic.downloadStatus == 1
                                       ? "成功"
                                       : comic.downloadStatus == 2
                                           ? "成功"
-                                          : "其他") +
-                              " : ${comic.imageCountDownload} / ${comic.imageCount}",
+                                          : "其他"} : ${comic.imageCountDownload} / ${comic.imageCount}",
                           style: TextStyle(
                             fontSize: 12,
                             color: comic.downloadStatus == 0

@@ -1,7 +1,7 @@
   import 'package:flutter/material.dart';
 
 import '../commons.dart';
-import '../ffi.dart';
+  import 'package:daisy/src/rust/api/bridge.dart' as native;
 
 enum ReaderSliderPosition {
   bottom,

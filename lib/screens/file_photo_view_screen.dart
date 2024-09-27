@@ -9,7 +9,7 @@ import '../commons.dart';
 class FilePhotoViewScreen extends StatelessWidget {
   final String filePath;
 
-  const FilePhotoViewScreen(this.filePath, {Key? key}) : super(key: key);
+  const FilePhotoViewScreen(this.filePath, {super.key});
 
   @override
   Widget build(BuildContext context) => Scaffold(

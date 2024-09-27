@@ -1,11 +1,10 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui' as ui show Codec;
+import 'dart:ui' as ui;
 
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 
 class ImageCacheProvider extends ImageProvider<ImageCacheProvider> {
   final String url;
@@ -25,7 +24,7 @@ class ImageCacheProvider extends ImageProvider<ImageCacheProvider> {
   });
 
   @override
-  ImageStreamCompleter load(ImageCacheProvider key, DecoderCallback decode) {
+  ImageStreamCompleter loadImage(ImageCacheProvider key, ImageDecoderCallback decode) {
     return MultiFrameImageStreamCompleter(
       codec: _loadAsync(key),
       scale: key.scale,
@@ -39,7 +38,7 @@ class ImageCacheProvider extends ImageProvider<ImageCacheProvider> {
 
   Future<ui.Codec> _loadAsync(ImageCacheProvider key) async {
     assert(key == this);
-    return PaintingBinding.instance!.instantiateImageCodec(
+    return ui.instantiateImageCodec(
       await _loadImageFile((await native.loadCacheImage(
         url: url,
         useful: useful,

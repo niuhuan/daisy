@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 
 const _defaultTopMargin = 40.0;
 const _defaultBottomMargin = 30.0;
@@ -60,8 +59,7 @@ class NovelMarginsSettings extends StatefulWidget {
 
   const NovelMarginsSettings(this.initTopMargin, this.initBottomMargin,
       this.initLeftMargin, this.initRightMargin,
-      {Key? key})
-      : super(key: key);
+      {super.key});
 
   @override
   State<StatefulWidget> createState() => _NovelMarginsSettingsState();

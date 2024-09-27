@@ -4,7 +4,7 @@ import 'dart:math';
 
 import 'package:daisy/configs/novel_background_color.dart';
 import 'package:daisy/configs/novel_margins.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:daisy/screens/components/content_error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +14,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../configs/novel_font_color.dart';
 import '../configs/novel_font_size.dart';
 import '../configs/novel_line_height.dart';
+import '../src/rust/anime_home/proto.dart';
 import 'components/content_loading.dart';
 import 'components/novel_fan_component.dart';
 
@@ -26,8 +27,8 @@ class NovelNewReaderScreen extends StatefulWidget {
     required this.novel,
     required this.volumes,
     required this.initChapterId,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() => _NovelNewReaderScreenState();
@@ -102,9 +103,9 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
       }
     }
     // 切割文字????s
-    final _mq = MediaQuery.of(context);
-    final _width = _mq.size.width - novelLeftMargin - novelRightMargin;
-    final _height = _mq.size.height - novelTopMargin - novelBottomMargin;
+    final mq = MediaQuery.of(context);
+    final width = mq.size.width - novelLeftMargin - novelRightMargin;
+    final height = mq.size.height - novelTopMargin - novelBottomMargin;
     List<PageEntry> finalEntries = [];
     for (var entry in preEntries) {
       if (entry.text.isNotEmpty) {
@@ -125,10 +126,10 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
             text: span,
             textDirection: TextDirection.ltr,
           );
-          max.layout(maxWidth: _width);
+          max.layout(maxWidth: width);
           int endOffset = max
               .getPositionForOffset(Offset(
-                  _width, _height - 14 * novelFontSize * novelLineHeight))
+                  width, height - 14 * novelFontSize * novelLineHeight))
               .offset;
           finalEntries.add(PageEntry(
             bookText.substring(

@@ -1,13 +1,13 @@
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
-import 'package:flutter_search_bar/flutter_search_bar.dart' as sb;
+import 'components/flutter_search_bar.dart' as sb;
 
 import 'components/comic_pager.dart';
 
 class ComicSearchScreen extends StatefulWidget {
   final String content;
 
-  const ComicSearchScreen(this.content, {Key? key}) : super(key: key);
+  const ComicSearchScreen(this.content, {super.key});
 
   @override
   State<StatefulWidget> createState() => _ComicSearchScreenState();

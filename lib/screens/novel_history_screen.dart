@@ -1,10 +1,10 @@
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 
 import 'components/novel_pager.dart';
 
 class NovelHistoryScreen extends StatefulWidget {
-  const NovelHistoryScreen({Key? key}) : super(key: key);
+  const NovelHistoryScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _NovelHistoryScreenState();

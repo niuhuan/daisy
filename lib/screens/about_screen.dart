@@ -6,7 +6,7 @@ import 'package:daisy/configs/auto_clean.dart';
 import 'package:daisy/configs/login.dart';
 import 'package:daisy/configs/themes.dart';
 import 'package:daisy/configs/versions.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 
 import '../configs/novel_reader_type.dart';
@@ -17,7 +17,7 @@ import 'login_screen.dart';
 const _releaseUrl = "https://github.com/niuhuan/daisy/releases/";
 
 class AboutScreen extends StatefulWidget {
-  const AboutScreen({Key? key}) : super(key: key);
+  const AboutScreen({super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -44,37 +44,38 @@ class _AboutState extends State<AboutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final dividerColor = Theme.of(context).dividerColor;
     return Scaffold(
       appBar: AppBar(
         title: const Text("设置"),
       ),
       body: ListView(
         children: [
-          const Divider(),
+          Divider(color: dividerColor),
           _buildLogo(),
-          const Divider(),
+          Divider(color: dividerColor),
           ..._loginInfo(),
-          const Divider(),
+          Divider(color: dividerColor),
           _buildSign(),
-          const Divider(),
+          Divider(color: dividerColor),
           _buildCurrentVersion(),
-          const Divider(),
+          Divider(color: dividerColor),
           _buildNewestVersion(),
-          const Divider(),
+          Divider(color: dividerColor),
           _buildGotoGithub(),
-          const Divider(),
+          Divider(color: dividerColor),
           _buildVersionText(),
-          const Divider(),
-          const Divider(),
+          Divider(color: dividerColor),
+          Divider(color: dividerColor),
           autoCleanSetting(),
-          const Divider(),
+          Divider(color: dividerColor),
           lightThemeSetting(),
           darkThemeSetting(),
-          const Divider(),
+          Divider(color: dividerColor),
           androidDisplayModeSetting(),
-          const Divider(),
+          Divider(color: dividerColor),
           novelReaderTypeSetting(context),
-          const Divider(),
+          Divider(color: dividerColor),
           ...Platform.isAndroid
               ? [
                   ListTile(
@@ -84,7 +85,7 @@ class _AboutState extends State<AboutScreen> {
                       cross.androidAppInfo();
                     },
                   ),
-                  const Divider(),
+                  Divider(color: dividerColor),
                 ]
               : [],
         ],
@@ -129,7 +130,7 @@ class _AboutState extends State<AboutScreen> {
             await native.taskSign();
           }
           defaultToast(context, "签到成功");
-        } catch (e, s) {
+        } catch (e) {
           defaultToast(context, "签到失败 : $e");
         }
       },

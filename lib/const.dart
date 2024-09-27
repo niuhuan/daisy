@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'bridge_generated.dart';
+import 'package:daisy/src/rust/anime_home/entities.dart';
 
 const double coverWidth = 270;
 const double coverHeight = 360;
@@ -38,193 +38,193 @@ class ComicCategoryGroup<T> {
 
 final comicCategories = ComicCategoryGroup<List<ComicCategory>>(
   [
-    ComicCategory(
+    const ComicCategory(
       tagId: 4,
       title: "冒险",
       cover: "https://images.dmzj.com/tuijian/222_222/180720maoxian.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 7900,
       title: "仙侠",
       cover: "https://images.dmzj.com/tuijian/222_222/170811xianxia.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 3244,
       title: "秀吉",
       cover: "https://images.dmzj.com/tuijian/222_222/180803weiniang.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 13,
       title: "校园",
       cover: "https://images.dmzj.com/tuijian/222_222/170811xiaoyuan.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 6,
       title: "格斗",
       cover: "https://images.dmzj.com/tuijian/222_222/170811gedou.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 8,
       title: "爱情",
       cover: "https://images.dmzj.com/tuijian/222_222/170811shenqi.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 3245,
       title: "悬疑",
       cover: "https://images.dmzj.com/tuijian/222_222/kongbu.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 3327,
       title: "美食",
       cover: "https://images.dmzj.com/tuijian/222_222/170811meishi.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 6316,
       title: "轻小说改",
       cover: "https://images.dmzj.com/tuijian/222_222/170811qinggai.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 4518,
       title: "TS",
       cover: "https://images.muwai.com/tuijian/222_222/170817xingzhuan.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 5806,
       title: "魔幻",
       cover: "https://images.dmzj.com/tuijian/222_222/170817mohuan.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 3255,
       title: "励志",
       cover: "https://images.dmzj.com/tuijian/222_222/170817lizhi.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 3254,
       title: "治愈",
       cover: "https://images.dmzj.com/tuijian/222_222/170817zhiyu.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 3252,
       title: "萌系",
       cover: "https://images.dmzj.com/tuijian/222_222/170817mengxi.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 3248,
       title: "热血",
       cover: "https://images.dmzj.com/tuijian/222_222/170817rexue.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 17,
       title: "四格",
       cover: "https://images.dmzj.com/tuijian/222_222/170817sige.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 12,
       title: "神鬼",
       cover: "https://images.dmzj.com/tuijian/222_222/170817shengui.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 11,
       title: "魔法",
       cover: "https://images.dmzj.com/tuijian/222_222/170817mofa.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 9,
       title: "侦探",
       cover: "https://images.dmzj.com/tuijian/222_222/170817zhentan.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 7,
       title: "科幻",
       cover: "https://images.dmzj.com/tuijian/222_222/170817kehuan.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 10,
       title: "竞技",
       cover: "https://images.dmzj.com/tuijian/222_222/170811jingji.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 5848,
       title: "奇幻",
       cover: "https://images.dmzj.com/tuijian/222_222/170811qihuan.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 6437,
       title: "颜艺",
       cover: "https://images.muwai.com/tuijian/222_222/170811yanyi.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 7568,
       title: "搞笑",
       cover: "https://images.muwai.com/tuijian/222_222/170811gaoxiao.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 3328,
       title: "职场",
       cover: "https://images.muwai.com/tuijian/222_222/170811zhichang.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 5077,
       title: "东方",
       cover: "https://images.muwai.com/tuijian/222_222/170817dongfang.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 13627,
       title: "舰娘",
       cover: "https://images.muwai.com/tuijian/222_222/170817jianniang.jpg",
     ),
   ],
   [
-    ComicCategory(
+    const ComicCategory(
       tagId: 3262,
       title: "少年漫",
       cover: "https://images.dmzj.com/tuijian/222_222/180720shaonianman.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 3263,
       title: "少女漫",
       cover: "https://images.dmzj.com/tuijian/222_222/180720shaonvman.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 13626,
       title: "女青漫",
       cover: "https://images.dmzj.com/tuijian/222_222/180720nvqingman.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 3264,
       title: "青年漫",
       cover: "https://images.dmzj.com/tuijian/222_222/180720qingnianman.jpg",
     ),
   ],
   [
-    ComicCategory(
+    const ComicCategory(
       tagId: 2309,
       title: "连载",
       cover: "https://images.dmzj.com/tuijian/222_222/180720lianzai.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 2310,
       title: "完结",
       cover: "https://images.dmzj.com/tuijian/222_222/180720wanjie.jpg",
     ),
   ],
   [
-    ComicCategory(
+    const ComicCategory(
       tagId: 2308,
       title: "国漫",
       cover: "https://images.dmzj.com/tuijian/222_222/180720guoman.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 2305,
       title: "韩国",
       cover: "https://images.dmzj.com/tuijian/222_222/180720hanguo.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 2306,
       title: "欧美",
       cover: "https://images.dmzj.com/tuijian/222_222/180720oumei.jpg",
     ),
-    ComicCategory(
+    const ComicCategory(
       tagId: 2304,
       title: "日本",
       cover: "https://images.dmzj.com/tuijian/222_222/180720riben.jpg",
@@ -250,11 +250,11 @@ class NovelCategoryDart {
   }
 
   Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['tag_id'] = tagId;
-    _data['title'] = title;
-    _data['cover'] = cover;
-    return _data;
+    final data = <String, dynamic>{};
+    data['tag_id'] = tagId;
+    data['title'] = title;
+    data['cover'] = cover;
+    return data;
   }
 }
 

@@ -20,7 +20,7 @@ class NovelInPager {
 class NovelPager extends StatefulWidget {
   final Future<List<NovelInPager>> Function(int page) loadNovel;
 
-  const NovelPager(this.loadNovel, {Key? key}) : super(key: key);
+  const NovelPager(this.loadNovel, {super.key});
 
   @override
   State<StatefulWidget> createState() => _NovelPagerState();
@@ -161,7 +161,7 @@ class _NovelPagerState extends State<NovelPager> {
 class NovelCardInPager extends StatelessWidget {
   final NovelInPager novel;
 
-  const NovelCardInPager({Key? key, required this.novel}) : super(key: key);
+  const NovelCardInPager({super.key, required this.novel});
 
   @override
   Widget build(BuildContext context) {

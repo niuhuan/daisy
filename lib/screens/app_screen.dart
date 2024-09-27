@@ -24,7 +24,7 @@ AppScreenEventArgs jumpToNovel = AppScreenEventArgs(1);
 class AppScreen extends StatefulWidget {
   final int initModule;
 
-  const AppScreen(this.initModule, {Key? key}) : super(key: key);
+  const AppScreen(this.initModule, {super.key});
 
   @override
   State<StatefulWidget> createState() => _AppScreenState();

@@ -6,7 +6,7 @@ import 'package:daisy/configs/reader_controller_type.dart';
 import 'package:daisy/configs/reader_direction.dart';
 import 'package:daisy/configs/reader_slider_position.dart';
 import 'package:daisy/configs/reader_type.dart';
-import 'package:daisy/ffi.dart';
+import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:daisy/screens/components/content_error.dart';
 import 'package:daisy/screens/components/content_loading.dart';
 import 'package:event/event.dart';
@@ -17,6 +17,7 @@ import 'package:photo_view/photo_view_gallery.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../commons.dart';
+import '../src/rust/anime_home/proto.dart';
 import 'components/image_cache_provider.dart';
 import 'components/images.dart';
 
@@ -28,13 +29,13 @@ class ComicReaderScreen extends StatefulWidget {
   final bool fullScreenOnInit;
 
   const ComicReaderScreen({
-    Key? key,
+    super.key,
     required this.comic,
     required this.chapterId,
     required this.initRank,
     required this.loadChapter,
     this.fullScreenOnInit = false,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() => _ComicReaderScreenState();
@@ -207,7 +208,6 @@ Widget readerKeyboardHolder(Widget widget) {
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     widget = RawKeyboardListener(
       focusNode: FocusNode(),
-      child: widget,
       autofocus: true,
       onKey: (event) {
         if (event is RawKeyDownEvent) {
@@ -220,6 +220,7 @@ Widget readerKeyboardHolder(Widget widget) {
           }
         }
       },
+      child: widget,
     );
   }
   return widget;
@@ -258,8 +259,7 @@ class _ComicReader extends StatefulWidget {
     required this.readerDirection,
     required this.fullScreen,
     required this.onFullScreenChange,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   // ignore: no_logic_in_create_state
@@ -783,57 +783,57 @@ abstract class _ComicReaderState extends State<_ComicReader> {
 
   bool _hasNextEp() {
     // 确定分卷
-    ComicChapter? _v;
-    ComicChapterInfo? _c;
+    ComicChapter? v;
+    ComicChapterInfo? c;
     for (var v in widget.comic.chapters) {
       for (var c in v.data) {
         if (c.chapterId == widget.chapter.chapterId) {
-          _v = v;
-          _c = c;
+          v = v;
+          c = c;
         }
       }
     }
-    if (_v == null || _c == null) {
+    if (v == null || c == null) {
       return false;
     }
     // 收集orders
     List<int> orders = [];
-    for (var i = 0; i < _v.data.length; i++) {
-      orders.add(_v.data[i].chapterOrder);
+    for (var i = 0; i < v.data.length; i++) {
+      orders.add(v.data[i].chapterOrder);
     }
     orders.sort((a, b) => a - b);
     // 确定有没有下一章节
-    return _c.chapterOrder < orders.last;
+    return c.chapterOrder < orders.last;
   }
 
   void _onNextAction() {
     if (_hasNextEp()) {
       // 确定分卷
-      ComicChapter? _v;
-      ComicChapterInfo? _c;
+      ComicChapter? v;
+      ComicChapterInfo? c;
       for (var v in widget.comic.chapters) {
         for (var c in v.data) {
           if (c.chapterId == widget.chapter.chapterId) {
-            _v = v;
-            _c = c;
+            v = v;
+            c = c;
           }
         }
       }
-      if (_v == null || _c == null) {
+      if (v == null || c == null) {
         defaultToast(context, "已经到头了");
         return;
       }
       // 收集orders
       List<int> orders = [];
-      for (var i = 0; i < _v.data.length; i++) {
-        orders.add(_v.data[i].chapterOrder);
+      for (var i = 0; i < v.data.length; i++) {
+        orders.add(v.data[i].chapterOrder);
       }
       orders.sort((a, b) => a - b);
       // 确定有没有下一章节
-      int newEpOrder = orders[orders.indexOf(_c.chapterOrder) + 1];
-      for (var i = 0; i < _v.data.length; i++) {
-        if (_v.data[i].chapterOrder == newEpOrder) {
-          widget.onChangeEp(_v.data[i].chapterId);
+      int newEpOrder = orders[orders.indexOf(c.chapterOrder) + 1];
+      for (var i = 0; i < v.data.length; i++) {
+        if (v.data[i].chapterOrder == newEpOrder) {
+          widget.onChangeEp(v.data[i].chapterId);
         }
       }
     } else {
@@ -1063,7 +1063,7 @@ class _ComicReaderWebToonState extends _ComicReaderState {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         // reload _images size
-        List<Widget> _images = [];
+        List<Widget> images = [];
         for (var index = 0; index < widget.chapter.pageUrl.length; index++) {
           late Size renderSize;
           if (_trueSizes[index] != null) {
@@ -1104,7 +1104,7 @@ class _ComicReaderWebToonState extends _ComicReaderState {
             });
           }
 
-          _images.add(
+          images.add(
             LoadingCacheImage(
               url: widget.chapter.pageUrl[index],
               useful: 'comic_reader',
@@ -1142,7 +1142,7 @@ class _ComicReaderWebToonState extends _ComicReaderState {
             if (widget.chapter.pageUrl.length == index) {
               return _buildNextEp();
             }
-            return _images[index];
+            return images[index];
           },
         );
       },
@@ -1337,7 +1337,7 @@ class _ListViewReaderState extends _ComicReaderState
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         // reload _images size
-        List<Widget> _images = [];
+        List<Widget> images = [];
         for (var index = 0; index < widget.chapter.pageUrl.length; index++) {
           late Size renderSize;
           if (_trueSizes[index] != null) {
@@ -1378,7 +1378,7 @@ class _ListViewReaderState extends _ComicReaderState
             });
           }
 
-          _images.add(
+          images.add(
             LoadingCacheImage(
               url: widget.chapter.pageUrl[index],
               useful: 'comic_reader',
@@ -1413,7 +1413,7 @@ class _ListViewReaderState extends _ComicReaderState
             if (widget.chapter.pageUrl.length == index) {
               return _buildNextEp();
             }
-            return _images[index];
+            return images[index];
           },
         );
         var viewer = InteractiveViewer(
