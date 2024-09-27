@@ -193,6 +193,7 @@ jobs:
         if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'ios')
         run: |
           rustup target install aarch64-apple-ios
+          cd daisy
           /usr/libexec/PlistBuddy -c 'Add :application-identifier string opensource.daisy' ios/Runner/Info.plist
           flutter build ios --no-simulator --no-codesign --release
           cd build
@@ -237,9 +238,6 @@ jobs:
           mv appimagetool-x86_64.AppImage appimagetool
           cd daisy
           flutter pub get
-          echo > native/src/bridge_generated.rs
-          echo > native/src/bridge_generated.io.rs
-          flutter_rust_bridge_codegen --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart
           flutter config --enable-linux-desktop
           flutter build linux --release
           mv build/linux/x64/release/bundle/{daisy,AppRun}
@@ -252,8 +250,6 @@ jobs:
         run: |
           cd daisy
           flutter pub get
-          echo $null > native/src/bridge_generated.rs
-          flutter_rust_bridge_codegen --rust-crate-dir native --rust-input native/src/api.rs --dart-output lib/bridge_generated.dart --class-name Native
           flutter config --enable-windows-desktop
           flutter build windows
           cd build/windows/runner/Release
