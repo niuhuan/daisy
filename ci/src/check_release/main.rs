@@ -6,7 +6,6 @@ use std::process::exit;
 async fn main() -> Result<()> {
     // get ghToken
     let gh_token = std::env::var("GITHUB_TOKEN")?;
-    let target = std::env::var("TARGET")?;
     let repo = std::env::var("REPO")?;
     let flutter_version = std::env::var("FLUTTER_VERSION")?;
 
