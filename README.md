@@ -27,3 +27,16 @@ daisy
 
 ![](https://raw.githubusercontent.com/fzyzcjy/flutter_rust_bridge/master/book/logo.png)
 
+### 如何构建
+
+1. 安装flutter, rust-lang
+2. 安装相应平台SDK <br />
+  1). cmake, ninja, pkg-config等开发工具 （windows/linux）<br />
+  2). 安装 xcode（macOS/iOS/） <br />
+  3). android studio, android SDK 等开发工具 (android) <br />
+3. 安装`flutter_rust_bridge` 运行 `cargo install flutter_rust_bridge` <br />
+4. `flutter run`
+
+### 如何开发调试
+
+阅读flutter_rust_bridge的文档, 了解如何在flutter中调用rust代码.
