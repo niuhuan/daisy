@@ -34,7 +34,7 @@ String readerDirectionName(ReaderDirection direction, BuildContext context) {
     case ReaderDirection.leftToRight:
       return "从左到右";
     case ReaderDirection.rightToLeft:
-      return "从又到左";
+      return "从右到左";
   }
 }
 
