@@ -1730,6 +1730,7 @@ dependencies = [
  "anyhow",
  "async_once",
  "base64",
+ "build-target",
  "bytes",
  "chrono",
  "flutter_rust_bridge",

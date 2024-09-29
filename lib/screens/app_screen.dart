@@ -5,7 +5,7 @@ import 'package:daisy/screens/comics_screen.dart';
 import 'package:daisy/screens/novels_screen.dart';
 import 'package:event/event.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_links/uni_links.dart';
+import 'package:uni_links3/uni_links.dart';
 
 import '../commons.dart';
 import '../configs/last_module.dart';
