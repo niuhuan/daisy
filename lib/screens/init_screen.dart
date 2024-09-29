@@ -20,6 +20,7 @@ import '../configs/auto_clean.dart';
 import '../configs/last_module.dart';
 import '../configs/novel_font_size.dart';
 import '../configs/themes.dart';
+import '../configs/two_page_gallery_direction.dart';
 
 class InitScreen extends StatefulWidget {
   const InitScreen({super.key});
@@ -38,6 +39,7 @@ class _InitScreenState extends State<InitScreen> {
     await initReaderDirection();
     await initReaderSliderPosition();
     await initReaderType();
+    await initTwoPageDirection();
     await initNovelReaderType();
     await initNovelFontSize();
     await initNovelLineHeight();

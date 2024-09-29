@@ -7,6 +7,7 @@ enum ReaderType {
   webtoon,
   gallery,
   webToonFreeZoom,
+  towPageGallery,
 }
 
 const _propertyName = "readerType";
@@ -35,6 +36,8 @@ String readerTypeName(ReaderType type, BuildContext context) {
       return "相册";
     case ReaderType.webToonFreeZoom:
       return "自由放大滚动 无法翻页";
+    case ReaderType.towPageGallery:
+      return "双页相册";
   }
 }
 
