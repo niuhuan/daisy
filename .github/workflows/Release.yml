@@ -8,7 +8,7 @@ env:
   FLUTTER_VERSION: '3.24.3'
   LLVM_VERSION: '10.0'
   RUST_TOOLCHAIN: nightly-2024-09-04
-  NDK_VERSION: 25.2.9519653
+  NDK_VERSION: 27.0.12077973
   REPO: ${{ github.repository }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -167,13 +167,10 @@ jobs:
 
       - name: Setup android tools (Android)
         if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
-        uses: maxim-lobanov/setup-android-tools@v1
+        uses: android-actions/setup-android@v3
         with:
-          packages: |
-            platform-tools
-            platforms;android-33
-            build-tools;33.0.0
-            ndk;${{ env.NDK_VERSION }}
+          cmdline-tools-version: 8512546
+          packages: 'platform-tools platforms;android-32 build-tools;30.0.2 ndk;${{ env.NDK_VERSION }}'
 
       - name: Set-Version (All)
         if: steps.check_asset.outputs.skip_build != 'true'
