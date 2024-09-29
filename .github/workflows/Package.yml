@@ -1,0 +1,273 @@
+name: Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      macos:
+        description: 'Build macOS'
+        type: boolean
+      windows:
+        description: 'Build Windows'
+        type: boolean
+      linux:
+        description: 'Build Linux'
+        type: boolean
+      ios:
+        description: 'Build iOS'
+        type: boolean
+      android-arm64:
+        description: 'Build Android'
+        type: boolean
+
+env:
+  FLUTTER_CHANNEL: 'stable'
+  FLUTTER_VERSION: '3.24.3'
+  LLVM_VERSION: '10.0'
+  RUST_TOOLCHAIN: nightly-2024-09-04
+  NDK_VERSION: 27.0.12077973
+  REPO: ${{ github.repository }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+jobs:
+
+  ci-pass:
+    name: CI is green
+    runs-on: ubuntu-latest
+    needs:
+      - build_release_assets
+    steps:
+      - run: exit 0
+
+  build_release_assets:
+    name: Build release assets
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - target: linux
+            host: ubuntu-latest
+          - target: windows
+            host: windows-latest
+          - target: macos
+            host: macos-latest
+          - target: ios
+            host: macos-latest
+          - target: android-arm64
+            host: ubuntu-latest
+
+    runs-on: ${{ matrix.config.host }}
+
+    env:
+      TARGET: ${{ matrix.config.target }}
+
+    steps:
+
+      - if: startsWith(matrix.config.host, 'windows') == false
+        name: CHECK BUILD
+        run: |
+          echo "BUILD_TARGET=${{ github.event.inputs[matrix.config.target] }}" >> $GITHUB_ENV
+
+      - if: startsWith(matrix.config.host, 'windows')
+        name: CHECK BUILD (Windows)
+        run: |
+          echo "BUILD_TARGET=${{ github.event.inputs[matrix.config.target] }}" >> $env:GITHUB_ENV
+
+      - name: Checkout
+        if: env.BUILD_TARGET == 'true'
+        uses: actions/checkout@v3
+        with:
+          path: 'daisy'
+
+      - name: Cargo cache
+        if: env.BUILD_TARGET == 'true'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-
+
+      - name: Install rust toolchain
+        if: env.BUILD_TARGET == 'true'
+        uses: actions-rs/toolchain@v1
+        with:
+          components: rustfmt
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          override: true
+
+      - name: Cache Flutter dependencies (Linux/Android)
+        if: env.BUILD_TARGET == 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' || matrix.config.target == 'linux' )
+        uses: actions/cache@v3
+        with:
+          path: /opt/hostedtoolcache/flutter
+          key: ${{ runner.os }}-flutter
+
+      - name: Setup flutter
+        if: env.BUILD_TARGET == 'true'
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter_channel }}
+          flutter-version: ${{ env.flutter_version }}
+          architecture: x64
+
+      - name: Install LLVM and Clang (Linux/Android)
+        if: env.BUILD_TARGET == 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' || matrix.config.target == 'linux' )
+        run: |
+          sudo apt update
+          sudo apt install -y libclang-dev
+
+      - name: Install libfuse2 (Linux)
+        if: env.BUILD_TARGET == 'true' && matrix.config.target == 'linux'
+        run: |
+          sudo apt update
+          sudo apt install -y libfuse2
+
+      - name: Install cargo tools (non-android)
+        if: env.BUILD_TARGET == 'true' && ( matrix.config.target == 'macos' || matrix.config.target == 'windows' || matrix.config.target == 'linux' )
+        run: |
+          cargo install cbindgen
+
+      - name: Install cargo tools (Android)
+        if: env.BUILD_TARGET == 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
+        run: |
+          cargo install cargo-ndk
+
+      - name: Setup java (Android)
+        if: env.BUILD_TARGET == 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup android tools (Android)
+        if: env.BUILD_TARGET == 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
+        uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 8512546
+          packages: 'platform-tools platforms;android-32 build-tools;30.0.2 ndk;${{ env.NDK_VERSION }}'
+
+      - name: Set-Version (All)
+        if: env.BUILD_TARGET == 'true'
+        run: |
+          cd daisy/ci
+          cp version.code.txt ../lib/assets/version.txt
+
+      - name: Cargo native build cache
+        if: env.BUILD_TARGET == 'true'
+        uses: actions/cache@v3
+        with:
+          path: |
+            daisy/native/target/
+          key: ${{ runner.os }}-cargo-native_target-${{ matrix.config.target }}
+
+      - name: Install rust target and build (ios)
+        if: env.BUILD_TARGET == 'true' && ( matrix.config.target == 'ios')
+        run: |
+          rustup target install aarch64-apple-ios
+          cd daisy
+          /usr/libexec/PlistBuddy -c 'Add :application-identifier string opensource.daisy' ios/Runner/Info.plist
+          flutter build ios --no-simulator --no-codesign --release
+          cd build
+          rm -rf Payload
+          mkdir Payload
+          mv ios/iphoneos/Runner.app Payload/
+          sh ../scripts/thin-payload.sh Payload
+          zip -r -9 nosign.ipa Payload
+          cd ..
+
+      - name: Install rust target and build (Android-arm64)
+        if: env.BUILD_TARGET == 'true' && ( matrix.config.target == 'android-arm64')
+        run: |
+          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${{ env.NDK_VERSION }}
+          rustup target install aarch64-linux-android
+          cd daisy
+          flutter build apk --target-platform android-arm64
+
+      - name: Install rust target and build (Android-arm32)
+        if: env.BUILD_TARGET == 'true' && ( matrix.config.target == 'android-arm32')
+        run: |
+          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${{ env.NDK_VERSION }}
+          rustup target install armv7-linux-androideabi
+          cd daisy
+          flutter build apk --target-platform android-arm
+
+      - name: Install rust target and build (Android-x86_64)
+        if: env.BUILD_TARGET == 'true' && ( matrix.config.target == 'android-x86_64')
+        run: |
+          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${{ env.NDK_VERSION }}
+          rustup target install x86_64-linux-android
+          cd daisy
+          flutter build apk --target-platform android-x64
+
+      - name: Install dependencies and build (Linux)
+        if: env.BUILD_TARGET == 'true' && matrix.config.target == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt install -y ninja-build liblzma-dev libgtk-3-dev libgl1-mesa-dev xorg-dev
+          curl -JOL https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod a+x appimagetool-x86_64.AppImage
+          mv appimagetool-x86_64.AppImage appimagetool
+          cd daisy
+          flutter pub get
+          flutter config --enable-linux-desktop
+          flutter build linux --release
+          mv build/linux/x64/release/bundle/{daisy,AppRun}
+          cp linux/appimage/* build/linux/x64/release/bundle/
+          ../appimagetool build/linux/x64/release/bundle/
+          mv *.AppImage build/linux.AppImage
+          echo "ASSET_NAME=linux.AppImage" >> $GITHUB_ENV
+          echo "ASSET_PATH=linux.AppImage" >> $GITHUB_ENV
+
+      - name: build (windows)
+        if: env.BUILD_TARGET == 'true' && matrix.config.target == 'windows'
+        run: |
+          cd daisy
+          flutter pub get
+          flutter config --enable-windows-desktop
+          flutter build windows
+          cd ..
+          echo "ASSET_NAME=windows.zip" >> $env:GITHUB_ENV
+          echo "ASSET_PATH=build/windows/x64/runner/Release" >> $env:GITHUB_ENV
+
+      - name: Build (macos)
+        if: env.BUILD_TARGET == 'true' && matrix.config.target == 'macos'
+        run: |
+          cd daisy
+          flutter pub get
+          rustup target install x86_64-apple-darwin
+          rustup target install aarch64-apple-darwin
+          flutter config --enable-macos-desktop
+          flutter build macos
+          cd build
+          mkdir appimage
+          mv macos/Build/Products/Release/daisy.app appimage/
+          lipo -create -output appimage/daisy.app/Contents/Frameworks/libnative.dylib ../native/target/x86_64-apple-darwin/release/libnative.dylib ../native/target/aarch64-apple-darwin/release/libnative.dylib
+          ln -sf /Applications appimage/
+          hdiutil create -volname daisy -srcfolder appimage -ov -format UDBZ macos.dmg
+          cd ..
+          echo "ASSET_NAME=macos.dmg" >> $GITHUB_ENV
+          echo "ASSET_PATH=daisy/build/macos.dmg" >> $GITHUB_ENV
+
+      - name: Sign APK (Android)
+        if: env.BUILD_TARGET == 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
+        env:
+          KEY_FILE_BASE64: ${{ secrets.KEY_FILE_BASE64 }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          cd daisy
+          echo $KEY_FILE_BASE64 > key.jks.base64
+          base64 -d key.jks.base64 > key.jks
+          echo $KEY_PASSWORD | $ANDROID_HOME/build-tools/30.0.2/apksigner sign --ks key.jks build/app/outputs/flutter-apk/app-release.apk
+          echo "ASSET_NAME=app-release.apk" >> $GITHUB_ENV
+          echo "ASSET_PATH=build/app/outputs/flutter-apk/app-release.apk" >> $GITHUB_ENV
+
+      - name: Upload Asset (All)
+        if: env.BUILD_TARGET == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ASSET_NAME }}
+          path: ${{ env.ASSET_PATH }}
+          retention-days: 3
