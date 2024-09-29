@@ -27,13 +27,13 @@ dependencies:
   flutter_colorpicker: ^1.0.3
   crypto: ^3.0.2
   ffi: 2.0.1
-  uni_links3: ^0.5.3
   flutter_html: ^3.0.0-beta.2
   awesome_select: ^6.0.0
   url_launcher: ^6.3.0
   uuid: ^4.5.1
   date_format: ^2.0.9
   event: ^3.1.0
+  app_links: ^6.3.2
 
 dev_dependencies:
   flutter_test:

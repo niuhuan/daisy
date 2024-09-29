@@ -10,9 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:uni_links3/uni_links.dart';
-
+import 'package:app_links/app_links.dart';
 import 'cross.dart';
+
+final appLinks = AppLinks();
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
@@ -348,8 +349,8 @@ processLink(String? uri, BuildContext context) {
   }
 }
 
-StreamSubscription<String?> linkSubscript(BuildContext context) {
-  return linkStream.listen((uri) async {
-    processLink(uri, context);
+StreamSubscription<Uri?> linkSubscript(BuildContext context) {
+  return appLinks.uriLinkStream.listen((Uri? uri) {
+    processLink(uri.toString(), context);
   });
 }

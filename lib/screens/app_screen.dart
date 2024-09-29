@@ -5,8 +5,7 @@ import 'package:daisy/screens/comics_screen.dart';
 import 'package:daisy/screens/novels_screen.dart';
 import 'package:event/event.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_links3/uni_links.dart';
-
+import 'package:app_links/app_links.dart';
 import '../commons.dart';
 import '../configs/last_module.dart';
 
@@ -32,7 +31,7 @@ class AppScreen extends StatefulWidget {
 
 class _AppScreenState extends State<AppScreen> {
   late final _controller = PageController(initialPage: widget.initModule);
-  late final StreamSubscription<String?> _ls;
+  late final StreamSubscription<Uri?> _ls;
 
   @override
   void initState() {
@@ -46,7 +45,7 @@ class _AppScreenState extends State<AppScreen> {
 
   firstLink() async {
     try {
-      var initUrl = (await getInitialUri())?.toString();
+      var initUrl = (await appLinks.getInitialLink())?.toString();
       processLink(initUrl, context);
       // Use the uri and warn the user, if it is not correct,
       // but keep in mind it could be `null`.
