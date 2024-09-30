@@ -244,7 +244,6 @@ jobs:
           cd build
           mkdir appimage
           mv macos/Build/Products/Release/daisy.app appimage/
-          lipo -create -output appimage/daisy.app/Contents/Frameworks/libnative.dylib ../native/target/x86_64-apple-darwin/release/libnative.dylib ../native/target/aarch64-apple-darwin/release/libnative.dylib
           ln -sf /Applications appimage/
           hdiutil create -volname daisy -srcfolder appimage -ov -format UDBZ macos.dmg
           cd ..
