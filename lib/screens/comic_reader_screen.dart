@@ -789,11 +789,11 @@ abstract class _ComicReaderState extends State<_ComicReader> {
     // 确定分卷
     ComicChapter? v;
     ComicChapterInfo? c;
-    for (var v in widget.comic.chapters) {
-      for (var c in v.data) {
-        if (c.chapterId == widget.chapter.chapterId) {
-          v = v;
-          c = c;
+    for (var _v in widget.comic.chapters) {
+      for (var _c in _v.data) {
+        if (_c.chapterId == widget.chapter.chapterId) {
+          v = _v;
+          c = _c;
         }
       }
     }
