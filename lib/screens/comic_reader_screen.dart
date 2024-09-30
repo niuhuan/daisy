@@ -1181,9 +1181,19 @@ class _ComicReaderWebToonState extends _ComicReaderState {
 class _ComicReaderGalleryState extends _ComicReaderState {
   late PageController _pageController;
   late PhotoViewGallery _gallery;
+  final List<ImageProvider> _providers = [];
 
   @override
   void initState() {
+    for (var i = 0; i < widget.chapter.pageUrl.length; i++) {
+      _providers.add(ImageCacheProvider(
+        url: widget.chapter.pageUrl[i],
+        useful: 'comic_reader',
+        extendsFieldIntFirst: widget.comic.id,
+        extendsFieldIntSecond: widget.chapter.chapterId,
+        extendsFieldIntThird: i,
+      ));
+    }
     _pageController = PageController(initialPage: widget.startIndex);
     _gallery = PhotoViewGallery.builder(
       scrollDirection: widget.readerDirection == ReaderDirection.topToBottom
@@ -1203,13 +1213,7 @@ class _ComicReaderGalleryState extends _ComicReaderState {
       builder: (BuildContext context, int index) {
         return PhotoViewGalleryPageOptions(
           filterQuality: FilterQuality.high,
-          imageProvider: ImageCacheProvider(
-            url: widget.chapter.pageUrl[index],
-            useful: 'comic_reader',
-            extendsFieldIntFirst: widget.comic.id,
-            extendsFieldIntSecond: widget.chapter.chapterId,
-            extendsFieldIntThird: index,
-          ),
+          imageProvider: _providers[index],
           errorBuilder: (c, e, s) => LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
               return buildError(constraints.maxWidth, constraints.maxHeight);
@@ -1219,6 +1223,7 @@ class _ComicReaderGalleryState extends _ComicReaderState {
       },
     );
     super.initState();
+    _preloadJump(widget.startIndex, init: true);
   }
 
   @override
@@ -1256,9 +1261,14 @@ class _ComicReaderGalleryState extends _ComicReaderState {
     } else {
       _pageController.jumpToPage(pageIndex);
     }
+    _preloadJump(widget.startIndex, init: false);
   }
 
   void _onGalleryPageChange(int to) {
+    for (var i = to; i < to + 3 && i < _providers.length; i++) {
+      final ip = _providers[i];
+      precacheImage(ip, context);
+    }
     super._onCurrentChange(to);
   }
 
@@ -1296,6 +1306,22 @@ class _ComicReaderGalleryState extends _ComicReaderState {
         ),
       ),
     );
+  }
+
+  _preloadJump(int index, {bool init = false}) {
+    fn() {
+      for (var i = index - 1; i < index + 3; i++) {
+        if (i < 0 || i >= _providers.length) continue;
+        final ip = _providers[i];
+        precacheImage(ip, context);
+      }
+    }
+
+    if (init) {
+      WidgetsBinding.instance?.addPostFrameCallback((_) => fn());
+    } else {
+      fn();
+    }
   }
 }
 
@@ -1685,5 +1711,4 @@ class _TwoPageGalleryReaderState extends _ComicReaderState {
       ),
     );
   }
-
 }
