@@ -50,3 +50,18 @@ Future chooseTwoPageDirection(BuildContext context) async {
     _twoPageDirection = newTwoPageDirection;
   }
 }
+
+Widget twoGalleryDirectionSetting(BuildContext context) {
+  return StatefulBuilder(
+    builder: (BuildContext context, void Function(void Function()) setState) {
+      return ListTile(
+        onTap: () async {
+          await chooseTwoPageDirection(context);
+          setState(() {});
+        },
+        title: const Text("小说阅读器类型"),
+        subtitle: Text(twoPageDirectionName(_twoPageDirection, context)),
+      );
+    },
+  );
+}

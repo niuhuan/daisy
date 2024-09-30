@@ -10,6 +10,7 @@ import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 
 import '../configs/novel_reader_type.dart';
+import '../configs/two_page_gallery_direction.dart';
 import '../cross.dart';
 import 'components/badged.dart';
 import 'login_screen.dart';
@@ -75,6 +76,8 @@ class _AboutState extends State<AboutScreen> {
           androidDisplayModeSetting(),
           Divider(color: dividerColor),
           novelReaderTypeSetting(context),
+          Divider(color: dividerColor),
+          twoGalleryDirectionSetting(context),
           Divider(color: dividerColor),
           ...Platform.isAndroid
               ? [
