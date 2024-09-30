@@ -1,4 +1,6 @@
 PODS:
+  - app_links (1.0.0):
+    - FlutterMacOS
   - FlutterMacOS (1.0.0)
   - rust_lib_daisy (0.0.1):
     - FlutterMacOS
@@ -6,11 +8,14 @@ PODS:
     - FlutterMacOS
 
 DEPENDENCIES:
+  - app_links (from `Flutter/ephemeral/.symlinks/plugins/app_links/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - rust_lib_daisy (from `Flutter/ephemeral/.symlinks/plugins/rust_lib_daisy/macos`)
   - url_launcher_macos (from `Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos`)
 
 EXTERNAL SOURCES:
+  app_links:
+    :path: Flutter/ephemeral/.symlinks/plugins/app_links/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
   rust_lib_daisy:
@@ -19,6 +24,7 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos
 
 SPEC CHECKSUMS:
+  app_links: 10e0a0ab602ffaf34d142cd4862f29d34b303b2a
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   rust_lib_daisy: 1c0a13010ccf625ecf8da7b45b7d6bddc1b88e8a
   url_launcher_macos: c82c93949963e55b228a30115bd219499a6fe404
