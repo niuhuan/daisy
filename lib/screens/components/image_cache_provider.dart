@@ -51,14 +51,14 @@ class ImageCacheProvider extends ImageProvider<ImageCacheProvider> {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator == (dynamic other) {
     if (other.runtimeType != runtimeType) return false;
     final ImageCacheProvider typedOther = other;
     return url == typedOther.url && scale == typedOther.scale;
   }
 
   @override
-  int get hashCode => hashValues(url, scale);
+  int get hashCode => Object.hash(url, scale);
 
   @override
   String toString() => '$runtimeType('
