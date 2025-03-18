@@ -24,11 +24,11 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos
 
 SPEC CHECKSUMS:
-  app_links: 10e0a0ab602ffaf34d142cd4862f29d34b303b2a
+  app_links: 9028728e32c83a0831d9db8cf91c526d16cc5468
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  rust_lib_daisy: 1c0a13010ccf625ecf8da7b45b7d6bddc1b88e8a
-  url_launcher_macos: c82c93949963e55b228a30115bd219499a6fe404
+  rust_lib_daisy: 298d38ff648463f2713a3f44350fdf4d578ea640
+  url_launcher_macos: 0fba8ddabfc33ce0a9afe7c5fef5aab3d8d2d673
 
 PODFILE CHECKSUM: 236401fc2c932af29a9fcf0e97baeeb2d750d367
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
