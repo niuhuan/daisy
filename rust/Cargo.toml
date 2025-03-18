@@ -38,3 +38,6 @@ sea-orm = { version = "0.12.4", features = ["sqlx-sqlite", "macros", "runtime-to
 [build-dependencies]
 build-target = "0.4.0"
 
+[patch.crates-io]
+# tmp fix reqwest macos build
+system-configuration = { git = "https://github.com/mullvad/system-configuration-rs", version = "0.6.0" }
