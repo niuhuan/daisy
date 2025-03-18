@@ -45,3 +45,4 @@ app.*.map.json
 # dasiy
 version.txt
 target/
+.vscode/

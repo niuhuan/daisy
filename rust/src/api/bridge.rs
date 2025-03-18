@@ -168,27 +168,6 @@ pub struct LocalImage {
     pub image_height: u32,
 }
 
-pub(crate) async fn download_image_by_url(url: String) -> Result<(bytes::Bytes, String, u32, u32)> {
-    let bytes = reqwest::ClientBuilder::new()
-        .user_agent("Dalvik/2.1.0 (Linux; U; Android 12; SM-N9700 Build/SP1A.210812.016);")
-        .build()?
-        .get(url)
-        .header("Referer", "http://images.muwai.com/;")
-        .send()
-        .await?
-        .error_for_status()?
-        .bytes()
-        .await?;
-    let format = image::guess_format(&bytes)?;
-    let format = if let Some(format) = format.extensions_str().first() {
-        format.to_string()
-    } else {
-        "".to_string()
-    };
-    let image = image::load_from_memory(&bytes)?;
-    return Ok((bytes, format, image.width(), image.height()));
-}
-
 pub async fn load_cache_image(
     url: String,
     useful: String,

@@ -107,7 +107,7 @@ impl Client {
             "_m".to_owned(),
             "EAFAF04AE5D23760AB8D157C2FAB0452".to_owned(),
         );
-        let ticket = self.user_ticket.read().await;
+        let ticket = self.get_user_ticket().await;
         if !ticket.0.is_empty() && !ticket.1.is_empty() {
             map.insert("uid".to_owned(), ticket.0.clone());
             map.insert("_token".to_owned(), ticket.1.clone());
@@ -275,8 +275,7 @@ impl Client {
             return Err(anyhow::Error::msg(login_response.msg));
         }
         let data = login_response.data.with_context(|| "error body")?;
-        let mut ticket = self.user_ticket.write().await;
-        *ticket = (data.uid.clone(), data.dmzj_token.to_string());
+        self.set_user_ticket(data.uid.clone(), data.dmzj_token.to_string()).await;
         Ok(data)
     }
 
@@ -592,9 +591,8 @@ impl Client {
 
     /// obj_type 0 : 漫画 1 : 小说
     pub async fn subscribed_obj(&self, obj_type: i64, obj_id: i32) -> Result<bool> {
-        let ticket = self.user_ticket.read().await;
-        let uid = ticket.deref().0.clone();
-        drop(ticket);
+        let ticket = self.get_user_ticket().await;
+        let uid = ticket.0.clone();
         let result: ActionResult = self
             .request_v3(
                 Method::GET,
@@ -650,9 +648,8 @@ impl Client {
         if page < 0 {
             return Err(anyhow::Error::msg("error page number"));
         }
-        let token = self.user_ticket.read().await;
-        let uid = token.0.clone();
-        drop(token);
+        let ticket = self.get_user_ticket().await;
+        let uid = ticket.0.clone();
         if uid.is_empty() {
             return Err(anyhow::Error::msg("need login"));
         }
