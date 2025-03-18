@@ -21,9 +21,9 @@ on:
 
 env:
   FLUTTER_CHANNEL: 'stable'
-  FLUTTER_VERSION: '3.24.3'
+  FLUTTER_VERSION: '3.29.0'
   LLVM_VERSION: '10.0'
-  RUST_TOOLCHAIN: nightly-2024-09-04
+  RUST_TOOLCHAIN: nightly-2025-02-26
   NDK_VERSION: 27.0.12077973
   REPO: ${{ github.repository }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

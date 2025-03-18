@@ -16,7 +16,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   rust_lib_daisy:
     path: rust_builder
-  flutter_rust_bridge: 2.4.0
+  flutter_rust_bridge: 2.9.0
   another_xlider: ^1.0.1+2
   modal_bottom_sheet: ^3.0.0-pre
   photo_view: ^0.15.0
