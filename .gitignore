@@ -48,3 +48,4 @@ app.*.map.json
 version.txt
 target/
 .vscode/
+build/
