@@ -262,8 +262,17 @@ impl Client {
             Method::POST => request.form(&query),
             _ => return Err(anyhow::Error::msg("not impl")),
         };
-        let data = request.send().await?.text().await?;
-        Ok(serde_json::from_str(data.as_str())?)
+        if Method::GET == method {
+            let data = request.send().await?.text().await?;
+            Ok(serde_json::from_str(data.as_str())?)
+        } else {
+            let data = request.send().await?.text().await?;
+            let response = serde_json::from_str::<V3Response<T>>(data.as_str())?;
+            match response.code {
+                0 => Ok(response.data.with_context(|| "data not found")?),
+                _ => Err(anyhow::Error::msg(response.msg)),
+            }
+        }
     }
 
     pub async fn login(
@@ -301,9 +310,9 @@ impl Client {
     }
 
     pub async fn comic_categories(&self) -> Result<Vec<ComicCategory>> {
-        return self
+        self
             .request_v3_response(Method::GET, "/0/category.json", None, AuthLevel::NORMAL)
-            .await;
+            .await
     }
 
     pub async fn comic_classify_filters(&self) -> Result<Vec<ComicFilter>> {
@@ -609,6 +618,30 @@ impl Client {
                 params
             },
             AuthLevel::NORMAL,
+        )
+        .await
+    }
+
+    pub async fn comment_v3_add(
+        &self,
+        obj_type: ObjType,
+        obj_id: i32,
+        content: String,
+        to_comment_id: i32,
+        to_uid: i32,
+    ) -> Result<String> {
+        self.request_comment_v3_api(
+            Method::POST,
+            format!("/v1/{obj_type}/new/add/app").as_str(),
+            {
+                let mut params = HashMap::<String, String>::new();
+                params.insert("obj_id".to_owned(), obj_id.to_string());
+                params.insert("content".to_owned(), content);
+                params.insert("to_comment_id".to_owned(), to_comment_id.to_string());
+                params.insert("to_uid".to_owned(), to_uid.to_string());
+                params
+            },
+            AuthLevel::TOKEN,
         )
         .await
     }

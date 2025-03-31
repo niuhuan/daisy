@@ -6,6 +6,7 @@ use crate::anime_home::{
 };
 use crate::anime_home::{ComicRankListItem, ComicUpdateListItem};
 use crate::database::active::{comic_view_log, novel_view_log};
+use crate::database::cache::web_cache::clean_web_cache_by_key;
 use crate::database::cache::{image_cache, web_cache};
 use crate::database::download::download_comic;
 use crate::database::properties::property;
@@ -398,6 +399,29 @@ pub async fn comment(obj_type: i64, obj_id: i32, hot: bool, page: i64) -> Result
         }),
     )
     .await
+}
+
+async fn comment_v3_add(
+    obj_type: i64,
+    obj_id: i32,
+    content: String,
+    to_comment_id: i32,
+    to_uid: i32,
+) -> Result<String> {
+    let t = CLIENT
+        .read()
+        .await
+        .comment_v3_add(
+            ObjType::from_value(obj_type)?,
+            obj_id,
+            content,
+            to_comment_id,
+            to_uid,
+        )
+        .await;
+    let _ =
+        clean_web_cache_by_key(format!("COMMENT${}${}$%", obj_type.clone(), obj_id.clone(),)).await;
+    t
 }
 
 pub async fn comment_v3(
