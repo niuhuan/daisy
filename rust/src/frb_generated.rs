@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.9.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1961467821;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1113398866;
 
 // Section: executor
 
@@ -567,6 +567,51 @@ fn wire__crate__api__bridge__comment_impl(
                             api_obj_id,
                             api_hot,
                             api_page,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__bridge__comment_v3_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "comment_v3",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_obj_type = <i64>::sse_decode(&mut deserializer);
+            let api_obj_id = <i32>::sse_decode(&mut deserializer);
+            let api_page = <i64>::sse_decode(&mut deserializer);
+            let api_limit = <i64>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                    (move || async move {
+                        let output_ok = crate::api::bridge::comment_v3(
+                            api_obj_type,
+                            api_obj_id,
+                            api_page,
+                            api_limit,
                         )
                         .await?;
                         Ok(output_ok)
@@ -1899,11 +1944,83 @@ impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
     }
 }
 
+impl SseDecode for std::collections::HashMap<String, crate::anime_home::entities::ApiComment> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner =
+            <Vec<(String, crate::anime_home::entities::ApiComment)>>::sse_decode(deserializer);
+        return inner.into_iter().collect();
+    }
+}
+
 impl SseDecode for String {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <Vec<u8>>::sse_decode(deserializer);
         return String::from_utf8(inner).unwrap();
+    }
+}
+
+impl SseDecode for crate::anime_home::entities::ApiComment {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_id = <String>::sse_decode(deserializer);
+        let mut var_objId = <String>::sse_decode(deserializer);
+        let mut var_content = <String>::sse_decode(deserializer);
+        let mut var_senderIp = <String>::sse_decode(deserializer);
+        let mut var_senderUid = <String>::sse_decode(deserializer);
+        let mut var_isGoods = <String>::sse_decode(deserializer);
+        let mut var_uploadImages = <String>::sse_decode(deserializer);
+        let mut var_createTime = <String>::sse_decode(deserializer);
+        let mut var_likeAmount = <String>::sse_decode(deserializer);
+        let mut var_senderTerminal = <String>::sse_decode(deserializer);
+        let mut var_originCommentId = <String>::sse_decode(deserializer);
+        let mut var_nickname = <String>::sse_decode(deserializer);
+        let mut var_userLevel = <String>::sse_decode(deserializer);
+        let mut var_mPeriod = <String>::sse_decode(deserializer);
+        let mut var_mCate = <String>::sse_decode(deserializer);
+        let mut var_isFeeUser = <bool>::sse_decode(deserializer);
+        let mut var_avatarUrl = <String>::sse_decode(deserializer);
+        let mut var_sex = <String>::sse_decode(deserializer);
+        let mut var_isLike = <bool>::sse_decode(deserializer);
+        return crate::anime_home::entities::ApiComment {
+            id: var_id,
+            obj_id: var_objId,
+            content: var_content,
+            sender_ip: var_senderIp,
+            sender_uid: var_senderUid,
+            is_goods: var_isGoods,
+            upload_images: var_uploadImages,
+            create_time: var_createTime,
+            like_amount: var_likeAmount,
+            sender_terminal: var_senderTerminal,
+            origin_comment_id: var_originCommentId,
+            nickname: var_nickname,
+            user_level: var_userLevel,
+            m_period: var_mPeriod,
+            m_cate: var_mCate,
+            is_fee_user: var_isFeeUser,
+            avatar_url: var_avatarUrl,
+            sex: var_sex,
+            is_like: var_isLike,
+        };
+    }
+}
+
+impl SseDecode for crate::anime_home::entities::ApiCommentResponse {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_commentIds = <Vec<String>>::sse_decode(deserializer);
+        let mut var_comments = <std::collections::HashMap<
+            String,
+            crate::anime_home::entities::ApiComment,
+        >>::sse_decode(deserializer);
+        let mut var_total = <i64>::sse_decode(deserializer);
+        return crate::anime_home::entities::ApiCommentResponse {
+            comment_ids: var_commentIds,
+            comments: var_comments,
+            total: var_total,
+        };
     }
 }
 
@@ -2752,6 +2869,20 @@ impl SseDecode for Vec<u8> {
     }
 }
 
+impl SseDecode for Vec<(String, crate::anime_home::entities::ApiComment)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(
+                <(String, crate::anime_home::entities::ApiComment)>::sse_decode(deserializer),
+            );
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::anime_home::entities::Subscribed> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3213,6 +3344,15 @@ impl SseDecode for Option<crate::api::bridge::NovelViewLog> {
     }
 }
 
+impl SseDecode for (String, crate::anime_home::entities::ApiComment) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_field0 = <String>::sse_decode(deserializer);
+        let mut var_field1 = <crate::anime_home::entities::ApiComment>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
 impl SseDecode for crate::anime_home::entities::Subscribed {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3399,56 +3539,57 @@ fn pde_ffi_dispatcher_primary_impl(
         12 => wire__crate__api__bridge__comic_update_list_impl(port, ptr, rust_vec_len, data_len),
         13 => wire__crate__api__bridge__comic_view_page_impl(port, ptr, rust_vec_len, data_len),
         14 => wire__crate__api__bridge__comment_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__crate__api__bridge__create_download_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire__crate__api__bridge__delete_download_impl(port, ptr, rust_vec_len, data_len),
-        17 => wire__crate__api__bridge__desktop_root_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire__crate__api__bridge__download_comic_chapters_by_comic_id_impl(
+        15 => wire__crate__api__bridge__comment_v3_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__api__bridge__create_download_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__api__bridge__delete_download_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__api__bridge__desktop_root_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire__crate__api__bridge__download_comic_chapters_by_comic_id_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        19 => wire__crate__api__bridge__download_comic_page_by_chapter_id_impl(
+        20 => wire__crate__api__bridge__download_comic_page_by_chapter_id_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        21 => wire__crate__api__bridge__http_get_impl(port, ptr, rust_vec_len, data_len),
-        22 => wire__crate__api__bridge__init_impl(port, ptr, rust_vec_len, data_len),
-        23 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
-        24 => wire__crate__api__bridge__load_cache_image_impl(port, ptr, rust_vec_len, data_len),
-        25 => wire__crate__api__bridge__load_comic_id_impl(port, ptr, rust_vec_len, data_len),
-        26 => {
+        22 => wire__crate__api__bridge__http_get_impl(port, ptr, rust_vec_len, data_len),
+        23 => wire__crate__api__bridge__init_impl(port, ptr, rust_vec_len, data_len),
+        24 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
+        25 => wire__crate__api__bridge__load_cache_image_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire__crate__api__bridge__load_comic_id_impl(port, ptr, rust_vec_len, data_len),
+        27 => {
             wire__crate__api__bridge__load_comic_view_logs_impl(port, ptr, rust_vec_len, data_len)
         }
-        27 => {
+        28 => {
             wire__crate__api__bridge__load_novel_view_logs_impl(port, ptr, rust_vec_len, data_len)
         }
-        28 => wire__crate__api__bridge__load_property_impl(port, ptr, rust_vec_len, data_len),
-        29 => wire__crate__api__bridge__news_categories_impl(port, ptr, rust_vec_len, data_len),
-        30 => wire__crate__api__bridge__news_list_impl(port, ptr, rust_vec_len, data_len),
-        31 => wire__crate__api__bridge__novel_categories_impl(port, ptr, rust_vec_len, data_len),
-        32 => wire__crate__api__bridge__novel_chapters_impl(port, ptr, rust_vec_len, data_len),
-        33 => wire__crate__api__bridge__novel_content_impl(port, ptr, rust_vec_len, data_len),
-        34 => wire__crate__api__bridge__novel_detail_impl(port, ptr, rust_vec_len, data_len),
-        35 => wire__crate__api__bridge__novel_list_impl(port, ptr, rust_vec_len, data_len),
-        36 => wire__crate__api__bridge__novel_search_impl(port, ptr, rust_vec_len, data_len),
-        37 => wire__crate__api__bridge__novel_view_page_impl(port, ptr, rust_vec_len, data_len),
-        38 => wire__crate__api__bridge__pre_login_impl(port, ptr, rust_vec_len, data_len),
-        39 => wire__crate__api__bridge__re_login_impl(port, ptr, rust_vec_len, data_len),
-        40 => wire__crate__api__bridge__renew_all_downloads_impl(port, ptr, rust_vec_len, data_len),
-        41 => wire__crate__api__bridge__save_property_impl(port, ptr, rust_vec_len, data_len),
-        42 => wire__crate__api__bridge__subscribe_add_impl(port, ptr, rust_vec_len, data_len),
-        43 => wire__crate__api__bridge__subscribe_cancel_impl(port, ptr, rust_vec_len, data_len),
-        44 => wire__crate__api__bridge__subscribed_list_impl(port, ptr, rust_vec_len, data_len),
-        45 => wire__crate__api__bridge__subscribed_obj_impl(port, ptr, rust_vec_len, data_len),
-        46 => wire__crate__api__bridge__task_index_impl(port, ptr, rust_vec_len, data_len),
-        47 => wire__crate__api__bridge__task_sign_impl(port, ptr, rust_vec_len, data_len),
-        48 => {
+        29 => wire__crate__api__bridge__load_property_impl(port, ptr, rust_vec_len, data_len),
+        30 => wire__crate__api__bridge__news_categories_impl(port, ptr, rust_vec_len, data_len),
+        31 => wire__crate__api__bridge__news_list_impl(port, ptr, rust_vec_len, data_len),
+        32 => wire__crate__api__bridge__novel_categories_impl(port, ptr, rust_vec_len, data_len),
+        33 => wire__crate__api__bridge__novel_chapters_impl(port, ptr, rust_vec_len, data_len),
+        34 => wire__crate__api__bridge__novel_content_impl(port, ptr, rust_vec_len, data_len),
+        35 => wire__crate__api__bridge__novel_detail_impl(port, ptr, rust_vec_len, data_len),
+        36 => wire__crate__api__bridge__novel_list_impl(port, ptr, rust_vec_len, data_len),
+        37 => wire__crate__api__bridge__novel_search_impl(port, ptr, rust_vec_len, data_len),
+        38 => wire__crate__api__bridge__novel_view_page_impl(port, ptr, rust_vec_len, data_len),
+        39 => wire__crate__api__bridge__pre_login_impl(port, ptr, rust_vec_len, data_len),
+        40 => wire__crate__api__bridge__re_login_impl(port, ptr, rust_vec_len, data_len),
+        41 => wire__crate__api__bridge__renew_all_downloads_impl(port, ptr, rust_vec_len, data_len),
+        42 => wire__crate__api__bridge__save_property_impl(port, ptr, rust_vec_len, data_len),
+        43 => wire__crate__api__bridge__subscribe_add_impl(port, ptr, rust_vec_len, data_len),
+        44 => wire__crate__api__bridge__subscribe_cancel_impl(port, ptr, rust_vec_len, data_len),
+        45 => wire__crate__api__bridge__subscribed_list_impl(port, ptr, rust_vec_len, data_len),
+        46 => wire__crate__api__bridge__subscribed_obj_impl(port, ptr, rust_vec_len, data_len),
+        47 => wire__crate__api__bridge__task_index_impl(port, ptr, rust_vec_len, data_len),
+        48 => wire__crate__api__bridge__task_sign_impl(port, ptr, rust_vec_len, data_len),
+        49 => {
             wire__crate__api__bridge__view_log_by_comic_id_impl(port, ptr, rust_vec_len, data_len)
         }
-        49 => {
+        50 => {
             wire__crate__api__bridge__view_log_by_novel_id_impl(port, ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -3463,13 +3604,73 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        20 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
+        21 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
 
 // Section: rust2dart
 
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::anime_home::entities::ApiComment {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.id.into_into_dart().into_dart(),
+            self.obj_id.into_into_dart().into_dart(),
+            self.content.into_into_dart().into_dart(),
+            self.sender_ip.into_into_dart().into_dart(),
+            self.sender_uid.into_into_dart().into_dart(),
+            self.is_goods.into_into_dart().into_dart(),
+            self.upload_images.into_into_dart().into_dart(),
+            self.create_time.into_into_dart().into_dart(),
+            self.like_amount.into_into_dart().into_dart(),
+            self.sender_terminal.into_into_dart().into_dart(),
+            self.origin_comment_id.into_into_dart().into_dart(),
+            self.nickname.into_into_dart().into_dart(),
+            self.user_level.into_into_dart().into_dart(),
+            self.m_period.into_into_dart().into_dart(),
+            self.m_cate.into_into_dart().into_dart(),
+            self.is_fee_user.into_into_dart().into_dart(),
+            self.avatar_url.into_into_dart().into_dart(),
+            self.sex.into_into_dart().into_dart(),
+            self.is_like.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::anime_home::entities::ApiComment
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::anime_home::entities::ApiComment>
+    for crate::anime_home::entities::ApiComment
+{
+    fn into_into_dart(self) -> crate::anime_home::entities::ApiComment {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::anime_home::entities::ApiCommentResponse {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.comment_ids.into_into_dart().into_dart(),
+            self.comments.into_into_dart().into_dart(),
+            self.total.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::anime_home::entities::ApiCommentResponse
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::anime_home::entities::ApiCommentResponse>
+    for crate::anime_home::entities::ApiCommentResponse
+{
+    fn into_into_dart(self) -> crate::anime_home::entities::ApiCommentResponse {
+        self
+    }
+}
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::anime_home::entities::ComicCategory {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
@@ -4501,10 +4702,57 @@ impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
     }
 }
 
+impl SseEncode for std::collections::HashMap<String, crate::anime_home::entities::ApiComment> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<(String, crate::anime_home::entities::ApiComment)>>::sse_encode(
+            self.into_iter().collect(),
+            serializer,
+        );
+    }
+}
+
 impl SseEncode for String {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Vec<u8>>::sse_encode(self.into_bytes(), serializer);
+    }
+}
+
+impl SseEncode for crate::anime_home::entities::ApiComment {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.id, serializer);
+        <String>::sse_encode(self.obj_id, serializer);
+        <String>::sse_encode(self.content, serializer);
+        <String>::sse_encode(self.sender_ip, serializer);
+        <String>::sse_encode(self.sender_uid, serializer);
+        <String>::sse_encode(self.is_goods, serializer);
+        <String>::sse_encode(self.upload_images, serializer);
+        <String>::sse_encode(self.create_time, serializer);
+        <String>::sse_encode(self.like_amount, serializer);
+        <String>::sse_encode(self.sender_terminal, serializer);
+        <String>::sse_encode(self.origin_comment_id, serializer);
+        <String>::sse_encode(self.nickname, serializer);
+        <String>::sse_encode(self.user_level, serializer);
+        <String>::sse_encode(self.m_period, serializer);
+        <String>::sse_encode(self.m_cate, serializer);
+        <bool>::sse_encode(self.is_fee_user, serializer);
+        <String>::sse_encode(self.avatar_url, serializer);
+        <String>::sse_encode(self.sex, serializer);
+        <bool>::sse_encode(self.is_like, serializer);
+    }
+}
+
+impl SseEncode for crate::anime_home::entities::ApiCommentResponse {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<String>>::sse_encode(self.comment_ids, serializer);
+        <std::collections::HashMap<String, crate::anime_home::entities::ApiComment>>::sse_encode(
+            self.comments,
+            serializer,
+        );
+        <i64>::sse_encode(self.total, serializer);
     }
 }
 
@@ -5063,6 +5311,16 @@ impl SseEncode for Vec<u8> {
     }
 }
 
+impl SseEncode for Vec<(String, crate::anime_home::entities::ApiComment)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(String, crate::anime_home::entities::ApiComment)>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::anime_home::entities::Subscribed> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5343,6 +5601,14 @@ impl SseEncode for Option<crate::api::bridge::NovelViewLog> {
         if let Some(value) = self {
             <crate::api::bridge::NovelViewLog>::sse_encode(value, serializer);
         }
+    }
+}
+
+impl SseEncode for (String, crate::anime_home::entities::ApiComment) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.0, serializer);
+        <crate::anime_home::entities::ApiComment>::sse_encode(self.1, serializer);
     }
 }
 

@@ -19,14 +19,15 @@ class CommentPager extends StatefulWidget {
 
 class _CommentPagerState extends State<CommentPager> {
   int _currentPage = 1;
-  late Future<List<Comment>> _future;
+  late Future<ApiCommentResponse> _future;
 
   void _loadPage() {
-    _future = native.comment(
-        objType: widget.objType,
-        objId: widget.objId,
-        hot: widget.hot,
-        page: _currentPage);
+    _future = native.commentV3(
+      objType: widget.objType,
+      objId: widget.objId,
+      page: _currentPage,
+      limit: 10,
+    );
   }
 
   @override
@@ -46,21 +47,20 @@ class _CommentPagerState extends State<CommentPager> {
       },
       successBuilder: (
         BuildContext context,
-        AsyncSnapshot<List<Comment>> snapshot,
+        AsyncSnapshot<ApiCommentResponse> snapshot,
       ) {
-        final list = snapshot.requireData;
-
+        final ApiCommentResponse rsp = snapshot.requireData;
         return Column(children: [
           _buildPrePage(),
-          ...list.map((e) => _buildComment(e)),
-          _buildNextPage(list),
+          ...rsp.commentIds.map((e) => _buildComment(e, rsp.comments)),
+          _buildNextPage(rsp.commentIds),
           _buildPostComment(),
         ]);
       },
     );
   }
 
-  Widget _buildComment(Comment comment) {
+  Widget _buildComment(String commentId, Map<String, ApiComment> comments) {
     return InkWell(
       onTap: () {
         // Navigator.of(context).push(
@@ -70,7 +70,7 @@ class _CommentPagerState extends State<CommentPager> {
         //   ),
         // );
       },
-      child: ComicCommentItem(comment),
+      child: ComicCommentItem(comments[commentId]),
     );
   }
 
@@ -94,7 +94,7 @@ class _CommentPagerState extends State<CommentPager> {
     return Container();
   }
 
-  Widget _buildNextPage(List<Comment> list) {
+  Widget _buildNextPage(List<String> list) {
     if (list.isNotEmpty) {
       return InkWell(
         onTap: () {
@@ -113,8 +113,6 @@ class _CommentPagerState extends State<CommentPager> {
     }
     return Container();
   }
-
-
 
   Widget _buildPostComment() {
     return InkWell(
@@ -165,7 +163,7 @@ class _CommentPagerState extends State<CommentPager> {
 }
 
 class ComicCommentItem extends StatefulWidget {
-  final Comment comment;
+  final ApiComment? comment;
 
   const ComicCommentItem(this.comment, {super.key});
 
@@ -178,13 +176,17 @@ class _ComicCommentItemState extends State<ComicCommentItem> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.comment == null) {
+      return Container();
+    }
     var comment = widget.comment;
     var theme = Theme.of(context);
     var nameStyle = const TextStyle(fontWeight: FontWeight.bold);
     var connectStyle =
         TextStyle(color: theme.textTheme.bodyMedium?.color?.withOpacity(.8));
     var datetimeStyle = TextStyle(
-        color: theme.textTheme.bodyMedium?.color?.withOpacity(.6), fontSize: 12);
+        color: theme.textTheme.bodyMedium?.color?.withOpacity(.6),
+        fontSize: 12);
     return Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
@@ -204,7 +206,7 @@ class _ComicCommentItemState extends State<ComicCommentItem> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Avatar(comment.avatarUrl,comment.senderUid),
+          Avatar(comment!.avatarUrl, int.parse(comment!.senderUid)),
           Container(width: 5),
           Expanded(
             child: Column(
@@ -220,7 +222,7 @@ class _ComicCommentItemState extends State<ComicCommentItem> {
                         children: [
                           Text(comment.nickname, style: nameStyle),
                           Text(
-                            formatTimeToDateTime(comment.createTime),
+                            formatTimeToDateTime(int.parse(comment!.createTime)),
                             style: datetimeStyle,
                           ),
                         ],

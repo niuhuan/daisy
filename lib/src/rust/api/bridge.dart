@@ -96,6 +96,14 @@ Future<List<Comment>> comment(
     RustLib.instance.api.crateApiBridgeComment(
         objType: objType, objId: objId, hot: hot, page: page);
 
+Future<ApiCommentResponse> commentV3(
+        {required PlatformInt64 objType,
+        required int objId,
+        required PlatformInt64 page,
+        required PlatformInt64 limit}) =>
+    RustLib.instance.api.crateApiBridgeCommentV3(
+        objType: objType, objId: objId, page: page, limit: limit);
+
 Future<void> comicViewPage(
         {required int comicId,
         required int chapterId,

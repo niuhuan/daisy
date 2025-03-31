@@ -25,7 +25,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AnyhowException dco_decode_AnyhowException(dynamic raw);
 
   @protected
+  Map<String, ApiComment> dco_decode_Map_String_api_comment_None(dynamic raw);
+
+  @protected
   String dco_decode_String(dynamic raw);
+
+  @protected
+  ApiComment dco_decode_api_comment(dynamic raw);
+
+  @protected
+  ApiCommentResponse dco_decode_api_comment_response(dynamic raw);
 
   @protected
   bool dco_decode_bool(dynamic raw);
@@ -187,6 +196,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
+  List<(String, ApiComment)> dco_decode_list_record_string_api_comment(
+      dynamic raw);
+
+  @protected
   List<Subscribed> dco_decode_list_subscribed(dynamic raw);
 
   @protected
@@ -250,6 +263,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   NovelViewLog? dco_decode_opt_box_autoadd_novel_view_log(dynamic raw);
 
   @protected
+  (String, ApiComment) dco_decode_record_string_api_comment(dynamic raw);
+
+  @protected
   Subscribed dco_decode_subscribed(dynamic raw);
 
   @protected
@@ -277,7 +293,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
 
   @protected
+  Map<String, ApiComment> sse_decode_Map_String_api_comment_None(
+      SseDeserializer deserializer);
+
+  @protected
   String sse_decode_String(SseDeserializer deserializer);
+
+  @protected
+  ApiComment sse_decode_api_comment(SseDeserializer deserializer);
+
+  @protected
+  ApiCommentResponse sse_decode_api_comment_response(
+      SseDeserializer deserializer);
 
   @protected
   bool sse_decode_bool(SseDeserializer deserializer);
@@ -463,6 +490,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
+  List<(String, ApiComment)> sse_decode_list_record_string_api_comment(
+      SseDeserializer deserializer);
+
+  @protected
   List<Subscribed> sse_decode_list_subscribed(SseDeserializer deserializer);
 
   @protected
@@ -529,6 +560,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  (String, ApiComment) sse_decode_record_string_api_comment(
+      SseDeserializer deserializer);
+
+  @protected
   Subscribed sse_decode_subscribed(SseDeserializer deserializer);
 
   @protected
@@ -557,7 +592,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       AnyhowException self, SseSerializer serializer);
 
   @protected
+  void sse_encode_Map_String_api_comment_None(
+      Map<String, ApiComment> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_String(String self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_api_comment(ApiComment self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_api_comment_response(
+      ApiCommentResponse self, SseSerializer serializer);
 
   @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
@@ -752,6 +798,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       Uint8List self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_record_string_api_comment(
+      List<(String, ApiComment)> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_subscribed(
       List<Subscribed> self, SseSerializer serializer);
 
@@ -818,6 +868,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_novel_view_log(
       NovelViewLog? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_record_string_api_comment(
+      (String, ApiComment) self, SseSerializer serializer);
 
   @protected
   void sse_encode_subscribed(Subscribed self, SseSerializer serializer);

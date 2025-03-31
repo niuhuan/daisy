@@ -34,13 +34,13 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  app_links: e7a6750a915a9e161c58d91bc610e8cd1d4d0ad0
+  app_links: 3da4c36b46cac3bf24eb897f1a6ce80bda109874
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
-  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
-  rust_lib_daisy: 048cc12d674cb34a6248b36d96cf8ee4b9ab20fe
-  url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
+  permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
+  rust_lib_daisy: a5e7a968b89183534b9da59a2a6a324ce3b8c4b1
+  url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
 
 PODFILE CHECKSUM: ae551281e5b33bf963462ec5f471bb5a1a0d223b
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

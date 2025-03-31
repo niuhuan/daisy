@@ -20,7 +20,7 @@ const INTERFACE_URL: &str = "https://interface.muwai.com";
 const BASE_URL_V3: &str = "https://nnv3api.idmzj.com";
 const BASE_URL_V4: &str = "https://nnv4api.idmzj.com";
 const LOGIN_URL_V2: &str = "https://nnuser.idmzj.com/loginV2/m_confirm";
-
+const COMMENT_V3: &str = "https://nnv3comment.idmzj.com";
 const PAD: GeneralPurposeConfig = GeneralPurposeConfig::new();
 const STANDARD: GeneralPurpose = GeneralPurpose::new(&alphabet::STANDARD, PAD);
 
@@ -246,6 +246,26 @@ impl Client {
         Ok(T::decode(decode.as_slice())?)
     }
 
+    pub async fn request_comment_v3_api<T: for<'de> serde::Deserialize<'de>>(
+        &self,
+        method: Method,
+        path: &str,
+        query: impl Into<Option<HashMap<String, String>>>,
+        auth: AuthLevel,
+    ) -> Result<T> {
+        let query = self.query(query, auth).await?;
+        let request = self
+            .agent
+            .request(method.clone(), &format!("{}{}", COMMENT_V3, path));
+        let request = match method {
+            Method::GET => request.query(&query),
+            Method::POST => request.form(&query),
+            _ => return Err(anyhow::Error::msg("not impl")),
+        };
+        let data = request.send().await?.text().await?;
+        Ok(serde_json::from_str(data.as_str())?)
+    }
+
     pub async fn login(
         &self,
         username: String,
@@ -275,7 +295,8 @@ impl Client {
             return Err(anyhow::Error::msg(login_response.msg));
         }
         let data = login_response.data.with_context(|| "error body")?;
-        self.set_user_ticket(data.uid.clone(), data.dmzj_token.to_string()).await;
+        self.set_user_ticket(data.uid.clone(), data.dmzj_token.to_string())
+            .await;
         Ok(data)
     }
 
@@ -564,6 +585,27 @@ impl Client {
                 params.insert("hot".to_owned(), if hot { "1" } else { "0" }.to_owned());
                 params.insert("page_index".to_owned(), page.to_string());
                 params.insert("_".to_owned(), chrono::Local::now().timestamp().to_string());
+                params
+            },
+            AuthLevel::NORMAL,
+        )
+        .await
+    }
+
+    pub async fn comment_v3(
+        &self,
+        obj_type: ObjType,
+        comic_id: i32,
+        page_index: i64,
+        limit: i64,
+    ) -> Result<ApiCommentResponse> {
+        self.request_comment_v3_api(
+            Method::GET,
+            format!("/v1/{obj_type}/latest/{comic_id}").as_str(),
+            {
+                let mut params = HashMap::<String, String>::new();
+                params.insert("page_index".to_owned(), page_index.to_string());
+                params.insert("limit".to_owned(), limit.to_string());
                 params
             },
             AuthLevel::NORMAL,

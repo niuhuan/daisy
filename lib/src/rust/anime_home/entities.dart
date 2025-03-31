@@ -6,6 +6,121 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+class ApiComment {
+  final String id;
+  final String objId;
+  final String content;
+  final String senderIp;
+  final String senderUid;
+  final String isGoods;
+  final String uploadImages;
+  final String createTime;
+  final String likeAmount;
+  final String senderTerminal;
+  final String originCommentId;
+  final String nickname;
+  final String userLevel;
+  final String mPeriod;
+  final String mCate;
+  final bool isFeeUser;
+  final String avatarUrl;
+  final String sex;
+  final bool isLike;
+
+  const ApiComment({
+    required this.id,
+    required this.objId,
+    required this.content,
+    required this.senderIp,
+    required this.senderUid,
+    required this.isGoods,
+    required this.uploadImages,
+    required this.createTime,
+    required this.likeAmount,
+    required this.senderTerminal,
+    required this.originCommentId,
+    required this.nickname,
+    required this.userLevel,
+    required this.mPeriod,
+    required this.mCate,
+    required this.isFeeUser,
+    required this.avatarUrl,
+    required this.sex,
+    required this.isLike,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      objId.hashCode ^
+      content.hashCode ^
+      senderIp.hashCode ^
+      senderUid.hashCode ^
+      isGoods.hashCode ^
+      uploadImages.hashCode ^
+      createTime.hashCode ^
+      likeAmount.hashCode ^
+      senderTerminal.hashCode ^
+      originCommentId.hashCode ^
+      nickname.hashCode ^
+      userLevel.hashCode ^
+      mPeriod.hashCode ^
+      mCate.hashCode ^
+      isFeeUser.hashCode ^
+      avatarUrl.hashCode ^
+      sex.hashCode ^
+      isLike.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ApiComment &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          objId == other.objId &&
+          content == other.content &&
+          senderIp == other.senderIp &&
+          senderUid == other.senderUid &&
+          isGoods == other.isGoods &&
+          uploadImages == other.uploadImages &&
+          createTime == other.createTime &&
+          likeAmount == other.likeAmount &&
+          senderTerminal == other.senderTerminal &&
+          originCommentId == other.originCommentId &&
+          nickname == other.nickname &&
+          userLevel == other.userLevel &&
+          mPeriod == other.mPeriod &&
+          mCate == other.mCate &&
+          isFeeUser == other.isFeeUser &&
+          avatarUrl == other.avatarUrl &&
+          sex == other.sex &&
+          isLike == other.isLike;
+}
+
+class ApiCommentResponse {
+  final List<String> commentIds;
+  final Map<String, ApiComment> comments;
+  final PlatformInt64 total;
+
+  const ApiCommentResponse({
+    required this.commentIds,
+    required this.comments,
+    required this.total,
+  });
+
+  @override
+  int get hashCode => commentIds.hashCode ^ comments.hashCode ^ total.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ApiCommentResponse &&
+          runtimeType == other.runtimeType &&
+          commentIds == other.commentIds &&
+          comments == other.comments &&
+          total == other.total;
+}
+
 class ComicCategory {
   final int tagId;
   final String title;

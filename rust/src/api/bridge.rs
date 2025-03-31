@@ -1,7 +1,8 @@
 use crate::anime_home::{
-    ComicCategory, ComicChapter, ComicChapterDetail, ComicDetail, ComicFilter, ComicInFilter,
-    ComicInSearch, ComicType, Comment, LoginData, NewsCategory, NewsListItem, NovelCategory,
-    NovelDetail, NovelInFilter, NovelInSearch, NovelVolume, ObjType, Sort, Subscribed, TaskIndex,
+    ApiCommentResponse, ComicCategory, ComicChapter, ComicChapterDetail, ComicDetail, ComicFilter,
+    ComicInFilter, ComicInSearch, ComicType, Comment, LoginData, NewsCategory, NewsListItem,
+    NovelCategory, NovelDetail, NovelInFilter, NovelInSearch, NovelVolume, ObjType, Sort,
+    Subscribed, TaskIndex,
 };
 use crate::anime_home::{ComicRankListItem, ComicUpdateListItem};
 use crate::database::active::{comic_view_log, novel_view_log};
@@ -393,6 +394,33 @@ pub async fn comment(obj_type: i64, obj_id: i32, hot: bool, page: i64) -> Result
                 .read()
                 .await
                 .comment(ObjType::from_value(obj_type)?, obj_id, hot, page)
+                .await
+        }),
+    )
+    .await
+}
+
+pub async fn comment_v3(
+    obj_type: i64,
+    obj_id: i32,
+    page: i64,
+    limit: i64,
+) -> Result<ApiCommentResponse> {
+    let key = format!(
+        "COMMENT_V3${}${}${}${}",
+        obj_type.clone(),
+        obj_id.clone(),
+        page.clone(),
+        limit.clone(),
+    );
+    web_cache::cache_first(
+        key,
+        Duration::from_secs(60 * 60 / 2),
+        Box::pin(async move {
+            CLIENT
+                .read()
+                .await
+                .comment_v3(ObjType::from_value(obj_type)?, obj_id, page, limit)
                 .await
         }),
     )

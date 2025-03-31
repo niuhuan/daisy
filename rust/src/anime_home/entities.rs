@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use serde_derive::Deserialize;
 use serde_derive::Serialize;
 use std::fmt::{Display, Formatter};
@@ -414,6 +415,39 @@ pub struct ComicReDown {
     pub comic_name: String,
     pub cover: String,
     pub chapter_name: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ApiComment {
+    pub id: String,
+    pub obj_id: String,
+    pub content: String,
+    #[serde(default)]
+    pub sender_ip: String,
+    pub sender_uid: String,
+    pub is_goods: String,
+    pub upload_images: String,
+    pub create_time: String,
+    pub like_amount: String,
+    #[serde(default)]
+    pub sender_terminal: String,
+    pub origin_comment_id: String,
+    pub nickname: String,
+    pub user_level: String,
+    pub m_period: String,
+    pub m_cate: String,
+    pub is_fee_user: bool,
+    pub avatar_url: String,
+    pub sex: String,
+    pub is_like: bool,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ApiCommentResponse {
+    #[serde(rename = "commentIds")]
+    pub comment_ids: Vec<String>,
+    pub comments: HashMap<String, ApiComment>,
+    pub total: i64,
 }
 
 fn default_option<T>() -> Option<T> {
