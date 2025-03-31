@@ -107,10 +107,12 @@ impl Client {
             "_m".to_owned(),
             "EAFAF04AE5D23760AB8D157C2FAB0452".to_owned(),
         );
+        map.insert("sender_terminal".to_string(), "1".to_string());
         let ticket = self.get_user_ticket().await;
         if !ticket.0.is_empty() && !ticket.1.is_empty() {
             map.insert("uid".to_owned(), ticket.0.clone());
             map.insert("_token".to_owned(), ticket.1.clone());
+            map.insert("dmzj_token".to_owned(), ticket.1.clone());
         } else {
             if let AuthLevel::TOKEN = auth_level {
                 return Err(anyhow::Error::msg("need login"));
@@ -264,9 +266,11 @@ impl Client {
         };
         if Method::GET == method {
             let data = request.send().await?.text().await?;
+            println!("response: {}", data);
             Ok(serde_json::from_str(data.as_str())?)
         } else {
             let data = request.send().await?.text().await?;
+            println!("response: {}", data);
             let response = serde_json::from_str::<V3Response<T>>(data.as_str())?;
             match response.code {
                 0 => Ok(response.data.with_context(|| "data not found")?),
@@ -629,7 +633,7 @@ impl Client {
         content: String,
         to_comment_id: i32,
         to_uid: i32,
-    ) -> Result<String> {
+    ) -> Result<i32> {
         self.request_comment_v3_api(
             Method::POST,
             format!("/v1/{obj_type}/new/add/app").as_str(),

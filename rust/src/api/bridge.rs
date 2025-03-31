@@ -401,13 +401,13 @@ pub async fn comment(obj_type: i64, obj_id: i32, hot: bool, page: i64) -> Result
     .await
 }
 
-async fn comment_v3_add(
+pub async fn comment_v3_add(
     obj_type: i64,
     obj_id: i32,
     content: String,
     to_comment_id: i32,
     to_uid: i32,
-) -> Result<String> {
+) -> Result<i32> {
     let t = CLIENT
         .read()
         .await

@@ -51,6 +51,7 @@ class _CommentPagerState extends State<CommentPager> {
       ) {
         final ApiCommentResponse rsp = snapshot.requireData;
         return Column(children: [
+          _buildPostComment(),
           _buildPrePage(),
           ...rsp.commentIds.map((e) => _buildComment(e, rsp.comments)),
           _buildNextPage(rsp.commentIds),
@@ -117,26 +118,24 @@ class _CommentPagerState extends State<CommentPager> {
   Widget _buildPostComment() {
     return InkWell(
       onTap: () async {
-        defaultToast(context, "未开发完成");
-        // String? text = await inputString(context, '请输入评论内容');
-        // if (text != null && text.isNotEmpty) {
-        //   try {
-        //     switch (widget.mainType) {
-        //       case CommentMainType.COMIC:
-        //         await method.postChildComment(widget.comment.id, text);
-        //         break;
-        //       case CommentMainType.GAME:
-        //         await method.postGameChildComment(widget.comment.id, text);
-        //         break;
-        //     }
-        //     setState(() {
-        //       _future = _loadPage();
-        //       widget.comment.commentsCount++;
-        //     });
-        //   } catch (e) {
-        //     defaultToast(context, "评论失败");
-        //   }
-        // }
+        String? text = await displayTextInputDialog(context);
+        if (text != null && text.isNotEmpty) {
+          try {
+            await native.commentV3Add(
+              objType: widget.objType,
+              objId: widget.objId,
+              content: text!,
+              toCommentId: 0,
+              toUid: 0,
+            );
+            // await commentV3Add();
+            setState(() {
+              _loadPage();
+            });
+          } catch (e) {
+            defaultToast(context, "评论失败 : ${e}");
+          }
+        }
       },
       child: Container(
         decoration: BoxDecoration(
@@ -222,7 +221,8 @@ class _ComicCommentItemState extends State<ComicCommentItem> {
                         children: [
                           Text(comment.nickname, style: nameStyle),
                           Text(
-                            formatTimeToDateTime(int.parse(comment!.createTime)),
+                            formatTimeToDateTime(
+                                int.parse(comment!.createTime)),
                             style: datetimeStyle,
                           ),
                         ],

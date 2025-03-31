@@ -8,7 +8,7 @@ import '../anime_home/proto.dart';
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `comment_v3_add`, `map_comic_view_log`, `map_novel_view_log`
+// These functions are ignored because they are not marked as `pub`: `map_comic_view_log`, `map_novel_view_log`
 // These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `LAST_LOGIN_INFO`, `PRELOGIN_ED`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `deref`, `deref`, `fmt`, `initialize`, `initialize`
 
@@ -95,6 +95,19 @@ Future<List<Comment>> comment(
         required PlatformInt64 page}) =>
     RustLib.instance.api.crateApiBridgeComment(
         objType: objType, objId: objId, hot: hot, page: page);
+
+Future<int> commentV3Add(
+        {required PlatformInt64 objType,
+        required int objId,
+        required String content,
+        required int toCommentId,
+        required int toUid}) =>
+    RustLib.instance.api.crateApiBridgeCommentV3Add(
+        objType: objType,
+        objId: objId,
+        content: content,
+        toCommentId: toCommentId,
+        toUid: toUid);
 
 Future<ApiCommentResponse> commentV3(
         {required PlatformInt64 objType,
