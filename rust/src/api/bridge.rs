@@ -1,8 +1,8 @@
 use crate::anime_home::{
-    ApiCommentResponse, ComicCategory, ComicChapter, ComicChapterDetail, ComicDetail, ComicFilter,
-    ComicInFilter, ComicInSearch, ComicType, Comment, LoginData, NewsCategory, NewsListItem,
-    NovelCategory, NovelDetail, NovelInFilter, NovelInSearch, NovelVolume, ObjType, Sort,
-    Subscribed, TaskIndex,
+    ApiCommentResponse, Author, ComicCategory, ComicChapter, ComicChapterDetail, ComicDetail,
+    ComicFilter, ComicInFilter, ComicInSearch, ComicType, Comment, LoginData, NewsCategory,
+    NewsListItem, NovelCategory, NovelDetail, NovelInFilter, NovelInSearch, NovelVolume, ObjType,
+    Sort, Subscribed, TaskIndex,
 };
 use crate::anime_home::{ComicRankListItem, ComicUpdateListItem};
 use crate::database::active::{comic_view_log, novel_view_log};
@@ -449,6 +449,15 @@ pub async fn comment_v3(
         }),
     )
     .await
+}
+
+pub async fn author(id: i32) -> Result<Author> {
+    let key = format!("AUTHOR${}", id);
+    web_cache::cache_first(
+        key,
+        Duration::from_secs(60 * 60 * 2),
+        Box::pin(async move { CLIENT.read().await.author(id).await }),
+    ).await
 }
 
 pub async fn comic_view_page(

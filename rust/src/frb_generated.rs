@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.9.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -232846347;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -894247475;
 
 // Section: executor
 
@@ -72,6 +72,42 @@ fn wire__crate__api__bridge__all_downloads_impl(
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
                         let output_ok = crate::api::bridge::all_downloads().await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__bridge__author_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "author",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_id = <i32>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                    (move || async move {
+                        let output_ok = crate::api::bridge::author(api_id).await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -2071,6 +2107,23 @@ impl SseDecode for crate::anime_home::entities::ApiCommentResponse {
     }
 }
 
+impl SseDecode for crate::anime_home::entities::Author {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_nickname = <String>::sse_decode(deserializer);
+        let mut var_description = <String>::sse_decode(deserializer);
+        let mut var_cover = <String>::sse_decode(deserializer);
+        let mut var_data =
+            <Vec<crate::anime_home::entities::ComicInAuthor>>::sse_decode(deserializer);
+        return crate::anime_home::entities::Author {
+            nickname: var_nickname,
+            description: var_description,
+            cover: var_cover,
+            data: var_data,
+        };
+    }
+}
+
 impl SseDecode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2229,6 +2282,22 @@ impl SseDecode for crate::anime_home::entities::ComicFilterItem {
         return crate::anime_home::entities::ComicFilterItem {
             tag_id: var_tagId,
             tag_name: var_tagName,
+        };
+    }
+}
+
+impl SseDecode for crate::anime_home::entities::ComicInAuthor {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_id = <i64>::sse_decode(deserializer);
+        let mut var_name = <String>::sse_decode(deserializer);
+        let mut var_cover = <String>::sse_decode(deserializer);
+        let mut var_status = <String>::sse_decode(deserializer);
+        return crate::anime_home::entities::ComicInAuthor {
+            id: var_id,
+            name: var_name,
+            cover: var_cover,
+            status: var_status,
         };
     }
 }
@@ -2625,6 +2694,20 @@ impl SseDecode for Vec<crate::anime_home::entities::ComicFilterItem> {
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
             ans_.push(<crate::anime_home::entities::ComicFilterItem>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::anime_home::entities::ComicInAuthor> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::anime_home::entities::ComicInAuthor>::sse_decode(
                 deserializer,
             ));
         }
@@ -3561,83 +3644,84 @@ fn pde_ffi_dispatcher_primary_impl(
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
         1 => wire__crate__api__bridge__all_downloads_impl(port, ptr, rust_vec_len, data_len),
-        2 => wire__crate__api__bridge__auto_clean_impl(port, ptr, rust_vec_len, data_len),
-        3 => wire__crate__api__bridge__comic_categories_impl(port, ptr, rust_vec_len, data_len),
-        4 => wire__crate__api__bridge__comic_chapter_detail_impl(port, ptr, rust_vec_len, data_len),
-        5 => {
+        2 => wire__crate__api__bridge__author_impl(port, ptr, rust_vec_len, data_len),
+        3 => wire__crate__api__bridge__auto_clean_impl(port, ptr, rust_vec_len, data_len),
+        4 => wire__crate__api__bridge__comic_categories_impl(port, ptr, rust_vec_len, data_len),
+        5 => wire__crate__api__bridge__comic_chapter_detail_impl(port, ptr, rust_vec_len, data_len),
+        6 => {
             wire__crate__api__bridge__comic_classify_filters_impl(port, ptr, rust_vec_len, data_len)
         }
-        6 => wire__crate__api__bridge__comic_classify_filters_old_impl(
+        7 => wire__crate__api__bridge__comic_classify_filters_old_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        7 => wire__crate__api__bridge__comic_classify_with_level_impl(
+        8 => wire__crate__api__bridge__comic_classify_with_level_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        8 => wire__crate__api__bridge__comic_detail_impl(port, ptr, rust_vec_len, data_len),
-        9 => wire__crate__api__bridge__comic_rank_list_impl(port, ptr, rust_vec_len, data_len),
-        10 => wire__crate__api__bridge__comic_recommend_impl(port, ptr, rust_vec_len, data_len),
-        11 => wire__crate__api__bridge__comic_search_impl(port, ptr, rust_vec_len, data_len),
-        12 => wire__crate__api__bridge__comic_update_list_impl(port, ptr, rust_vec_len, data_len),
-        13 => wire__crate__api__bridge__comic_view_page_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__api__bridge__comment_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__crate__api__bridge__comment_v3_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire__crate__api__bridge__comment_v3_add_impl(port, ptr, rust_vec_len, data_len),
-        17 => wire__crate__api__bridge__create_download_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire__crate__api__bridge__delete_download_impl(port, ptr, rust_vec_len, data_len),
-        19 => wire__crate__api__bridge__desktop_root_impl(port, ptr, rust_vec_len, data_len),
-        20 => wire__crate__api__bridge__download_comic_chapters_by_comic_id_impl(
+        9 => wire__crate__api__bridge__comic_detail_impl(port, ptr, rust_vec_len, data_len),
+        10 => wire__crate__api__bridge__comic_rank_list_impl(port, ptr, rust_vec_len, data_len),
+        11 => wire__crate__api__bridge__comic_recommend_impl(port, ptr, rust_vec_len, data_len),
+        12 => wire__crate__api__bridge__comic_search_impl(port, ptr, rust_vec_len, data_len),
+        13 => wire__crate__api__bridge__comic_update_list_impl(port, ptr, rust_vec_len, data_len),
+        14 => wire__crate__api__bridge__comic_view_page_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire__crate__api__bridge__comment_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__api__bridge__comment_v3_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__api__bridge__comment_v3_add_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__api__bridge__create_download_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire__crate__api__bridge__delete_download_impl(port, ptr, rust_vec_len, data_len),
+        20 => wire__crate__api__bridge__desktop_root_impl(port, ptr, rust_vec_len, data_len),
+        21 => wire__crate__api__bridge__download_comic_chapters_by_comic_id_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        21 => wire__crate__api__bridge__download_comic_page_by_chapter_id_impl(
+        22 => wire__crate__api__bridge__download_comic_page_by_chapter_id_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        23 => wire__crate__api__bridge__http_get_impl(port, ptr, rust_vec_len, data_len),
-        24 => wire__crate__api__bridge__init_impl(port, ptr, rust_vec_len, data_len),
-        25 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
-        26 => wire__crate__api__bridge__load_cache_image_impl(port, ptr, rust_vec_len, data_len),
-        27 => wire__crate__api__bridge__load_comic_id_impl(port, ptr, rust_vec_len, data_len),
-        28 => {
+        24 => wire__crate__api__bridge__http_get_impl(port, ptr, rust_vec_len, data_len),
+        25 => wire__crate__api__bridge__init_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
+        27 => wire__crate__api__bridge__load_cache_image_impl(port, ptr, rust_vec_len, data_len),
+        28 => wire__crate__api__bridge__load_comic_id_impl(port, ptr, rust_vec_len, data_len),
+        29 => {
             wire__crate__api__bridge__load_comic_view_logs_impl(port, ptr, rust_vec_len, data_len)
         }
-        29 => {
+        30 => {
             wire__crate__api__bridge__load_novel_view_logs_impl(port, ptr, rust_vec_len, data_len)
         }
-        30 => wire__crate__api__bridge__load_property_impl(port, ptr, rust_vec_len, data_len),
-        31 => wire__crate__api__bridge__news_categories_impl(port, ptr, rust_vec_len, data_len),
-        32 => wire__crate__api__bridge__news_list_impl(port, ptr, rust_vec_len, data_len),
-        33 => wire__crate__api__bridge__novel_categories_impl(port, ptr, rust_vec_len, data_len),
-        34 => wire__crate__api__bridge__novel_chapters_impl(port, ptr, rust_vec_len, data_len),
-        35 => wire__crate__api__bridge__novel_content_impl(port, ptr, rust_vec_len, data_len),
-        36 => wire__crate__api__bridge__novel_detail_impl(port, ptr, rust_vec_len, data_len),
-        37 => wire__crate__api__bridge__novel_list_impl(port, ptr, rust_vec_len, data_len),
-        38 => wire__crate__api__bridge__novel_search_impl(port, ptr, rust_vec_len, data_len),
-        39 => wire__crate__api__bridge__novel_view_page_impl(port, ptr, rust_vec_len, data_len),
-        40 => wire__crate__api__bridge__pre_login_impl(port, ptr, rust_vec_len, data_len),
-        41 => wire__crate__api__bridge__re_login_impl(port, ptr, rust_vec_len, data_len),
-        42 => wire__crate__api__bridge__renew_all_downloads_impl(port, ptr, rust_vec_len, data_len),
-        43 => wire__crate__api__bridge__save_property_impl(port, ptr, rust_vec_len, data_len),
-        44 => wire__crate__api__bridge__subscribe_add_impl(port, ptr, rust_vec_len, data_len),
-        45 => wire__crate__api__bridge__subscribe_cancel_impl(port, ptr, rust_vec_len, data_len),
-        46 => wire__crate__api__bridge__subscribed_list_impl(port, ptr, rust_vec_len, data_len),
-        47 => wire__crate__api__bridge__subscribed_obj_impl(port, ptr, rust_vec_len, data_len),
-        48 => wire__crate__api__bridge__task_index_impl(port, ptr, rust_vec_len, data_len),
-        49 => wire__crate__api__bridge__task_sign_impl(port, ptr, rust_vec_len, data_len),
-        50 => {
+        31 => wire__crate__api__bridge__load_property_impl(port, ptr, rust_vec_len, data_len),
+        32 => wire__crate__api__bridge__news_categories_impl(port, ptr, rust_vec_len, data_len),
+        33 => wire__crate__api__bridge__news_list_impl(port, ptr, rust_vec_len, data_len),
+        34 => wire__crate__api__bridge__novel_categories_impl(port, ptr, rust_vec_len, data_len),
+        35 => wire__crate__api__bridge__novel_chapters_impl(port, ptr, rust_vec_len, data_len),
+        36 => wire__crate__api__bridge__novel_content_impl(port, ptr, rust_vec_len, data_len),
+        37 => wire__crate__api__bridge__novel_detail_impl(port, ptr, rust_vec_len, data_len),
+        38 => wire__crate__api__bridge__novel_list_impl(port, ptr, rust_vec_len, data_len),
+        39 => wire__crate__api__bridge__novel_search_impl(port, ptr, rust_vec_len, data_len),
+        40 => wire__crate__api__bridge__novel_view_page_impl(port, ptr, rust_vec_len, data_len),
+        41 => wire__crate__api__bridge__pre_login_impl(port, ptr, rust_vec_len, data_len),
+        42 => wire__crate__api__bridge__re_login_impl(port, ptr, rust_vec_len, data_len),
+        43 => wire__crate__api__bridge__renew_all_downloads_impl(port, ptr, rust_vec_len, data_len),
+        44 => wire__crate__api__bridge__save_property_impl(port, ptr, rust_vec_len, data_len),
+        45 => wire__crate__api__bridge__subscribe_add_impl(port, ptr, rust_vec_len, data_len),
+        46 => wire__crate__api__bridge__subscribe_cancel_impl(port, ptr, rust_vec_len, data_len),
+        47 => wire__crate__api__bridge__subscribed_list_impl(port, ptr, rust_vec_len, data_len),
+        48 => wire__crate__api__bridge__subscribed_obj_impl(port, ptr, rust_vec_len, data_len),
+        49 => wire__crate__api__bridge__task_index_impl(port, ptr, rust_vec_len, data_len),
+        50 => wire__crate__api__bridge__task_sign_impl(port, ptr, rust_vec_len, data_len),
+        51 => {
             wire__crate__api__bridge__view_log_by_comic_id_impl(port, ptr, rust_vec_len, data_len)
         }
-        51 => {
+        52 => {
             wire__crate__api__bridge__view_log_by_novel_id_impl(port, ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -3652,7 +3736,7 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        22 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
+        23 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -3716,6 +3800,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::anime_home::entities::ApiCommentRe
     for crate::anime_home::entities::ApiCommentResponse
 {
     fn into_into_dart(self) -> crate::anime_home::entities::ApiCommentResponse {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::anime_home::entities::Author {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.nickname.into_into_dart().into_dart(),
+            self.description.into_into_dart().into_dart(),
+            self.cover.into_into_dart().into_dart(),
+            self.data.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::anime_home::entities::Author
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::anime_home::entities::Author>
+    for crate::anime_home::entities::Author
+{
+    fn into_into_dart(self) -> crate::anime_home::entities::Author {
         self
     }
 }
@@ -3897,6 +4004,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::anime_home::entities::ComicFilterI
     for crate::anime_home::entities::ComicFilterItem
 {
     fn into_into_dart(self) -> crate::anime_home::entities::ComicFilterItem {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::anime_home::entities::ComicInAuthor {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.id.into_into_dart().into_dart(),
+            self.name.into_into_dart().into_dart(),
+            self.cover.into_into_dart().into_dart(),
+            self.status.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::anime_home::entities::ComicInAuthor
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::anime_home::entities::ComicInAuthor>
+    for crate::anime_home::entities::ComicInAuthor
+{
+    fn into_into_dart(self) -> crate::anime_home::entities::ComicInAuthor {
         self
     }
 }
@@ -4804,6 +4934,16 @@ impl SseEncode for crate::anime_home::entities::ApiCommentResponse {
     }
 }
 
+impl SseEncode for crate::anime_home::entities::Author {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.nickname, serializer);
+        <String>::sse_encode(self.description, serializer);
+        <String>::sse_encode(self.cover, serializer);
+        <Vec<crate::anime_home::entities::ComicInAuthor>>::sse_encode(self.data, serializer);
+    }
+}
+
 impl SseEncode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4898,6 +5038,16 @@ impl SseEncode for crate::anime_home::entities::ComicFilterItem {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i64>::sse_encode(self.tag_id, serializer);
         <String>::sse_encode(self.tag_name, serializer);
+    }
+}
+
+impl SseEncode for crate::anime_home::entities::ComicInAuthor {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i64>::sse_encode(self.id, serializer);
+        <String>::sse_encode(self.name, serializer);
+        <String>::sse_encode(self.cover, serializer);
+        <String>::sse_encode(self.status, serializer);
     }
 }
 
@@ -5145,6 +5295,16 @@ impl SseEncode for Vec<crate::anime_home::entities::ComicFilterItem> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::anime_home::entities::ComicFilterItem>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::anime_home::entities::ComicInAuthor> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::anime_home::entities::ComicInAuthor>::sse_encode(item, serializer);
         }
     }
 }

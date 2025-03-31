@@ -117,6 +117,9 @@ Future<ApiCommentResponse> commentV3(
     RustLib.instance.api.crateApiBridgeCommentV3(
         objType: objType, objId: objId, page: page, limit: limit);
 
+Future<Author> author({required int id}) =>
+    RustLib.instance.api.crateApiBridgeAuthor(id: id);
+
 Future<void> comicViewPage(
         {required int comicId,
         required int chapterId,

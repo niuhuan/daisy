@@ -314,8 +314,7 @@ impl Client {
     }
 
     pub async fn comic_categories(&self) -> Result<Vec<ComicCategory>> {
-        self
-            .request_v3_response(Method::GET, "/0/category.json", None, AuthLevel::NORMAL)
+        self.request_v3_response(Method::GET, "/0/category.json", None, AuthLevel::NORMAL)
             .await
     }
 
@@ -646,6 +645,16 @@ impl Client {
                 params
             },
             AuthLevel::TOKEN,
+        )
+        .await
+    }
+
+    pub async fn author(&self, author_id: i32) -> Result<Author> {
+        self.request_v3(
+            Method::GET,
+            &format!("/UCenter/author/{}.json", author_id),
+            None,
+            AuthLevel::NORMAL,
         )
         .await
     }

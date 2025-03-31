@@ -121,6 +121,34 @@ class ApiCommentResponse {
           total == other.total;
 }
 
+class Author {
+  final String nickname;
+  final String description;
+  final String cover;
+  final List<ComicInAuthor> data;
+
+  const Author({
+    required this.nickname,
+    required this.description,
+    required this.cover,
+    required this.data,
+  });
+
+  @override
+  int get hashCode =>
+      nickname.hashCode ^ description.hashCode ^ cover.hashCode ^ data.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Author &&
+          runtimeType == other.runtimeType &&
+          nickname == other.nickname &&
+          description == other.description &&
+          cover == other.cover &&
+          data == other.data;
+}
+
 class ComicCategory {
   final int tagId;
   final String title;
@@ -185,6 +213,34 @@ class ComicFilterItem {
           runtimeType == other.runtimeType &&
           tagId == other.tagId &&
           tagName == other.tagName;
+}
+
+class ComicInAuthor {
+  final PlatformInt64 id;
+  final String name;
+  final String cover;
+  final String status;
+
+  const ComicInAuthor({
+    required this.id,
+    required this.name,
+    required this.cover,
+    required this.status,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^ name.hashCode ^ cover.hashCode ^ status.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ComicInAuthor &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name &&
+          cover == other.cover &&
+          status == other.status;
 }
 
 class ComicInFilter {

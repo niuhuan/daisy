@@ -10,6 +10,7 @@ import '../const.dart';
 import '../src/rust/anime_home/proto.dart';
 import '../src/rust/api/bridge.dart';
 import '../utils.dart';
+import 'comic_author_screen.dart';
 import 'comic_create_download_screen.dart';
 import 'comic_reader_screen.dart';
 import 'components/comment_pager.dart';
@@ -381,10 +382,21 @@ class ComicCard extends StatelessWidget {
                 Wrap(
                   spacing: 10,
                   children: comic.authors
-                      .map((e) => Text(
-                            e.title,
-                            style: const TextStyle(
-                              fontSize: 12,
+                      .map((e) => GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (BuildContext context) {
+                                return ComicAuthorScreen(
+                                  authorId: e.id,
+                                );
+                              }));
+                            },
+                            child: Text(
+                              e.title,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                decoration: TextDecoration.underline,
+                              ),
                             ),
                           ))
                       .toList(),

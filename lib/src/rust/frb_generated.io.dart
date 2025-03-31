@@ -37,6 +37,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ApiCommentResponse dco_decode_api_comment_response(dynamic raw);
 
   @protected
+  Author dco_decode_author(dynamic raw);
+
+  @protected
   bool dco_decode_bool(dynamic raw);
 
   @protected
@@ -74,6 +77,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ComicFilterItem dco_decode_comic_filter_item(dynamic raw);
+
+  @protected
+  ComicInAuthor dco_decode_comic_in_author(dynamic raw);
 
   @protected
   ComicInFilter dco_decode_comic_in_filter(dynamic raw);
@@ -128,6 +134,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ComicFilterItem> dco_decode_list_comic_filter_item(dynamic raw);
+
+  @protected
+  List<ComicInAuthor> dco_decode_list_comic_in_author(dynamic raw);
 
   @protected
   List<ComicInFilter> dco_decode_list_comic_in_filter(dynamic raw);
@@ -307,6 +316,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  Author sse_decode_author(SseDeserializer deserializer);
+
+  @protected
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
@@ -347,6 +359,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ComicFilterItem sse_decode_comic_filter_item(SseDeserializer deserializer);
+
+  @protected
+  ComicInAuthor sse_decode_comic_in_author(SseDeserializer deserializer);
 
   @protected
   ComicInFilter sse_decode_comic_in_filter(SseDeserializer deserializer);
@@ -406,6 +421,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ComicFilterItem> sse_decode_list_comic_filter_item(
+      SseDeserializer deserializer);
+
+  @protected
+  List<ComicInAuthor> sse_decode_list_comic_in_author(
       SseDeserializer deserializer);
 
   @protected
@@ -606,6 +625,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       ApiCommentResponse self, SseSerializer serializer);
 
   @protected
+  void sse_encode_author(Author self, SseSerializer serializer);
+
+  @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
@@ -650,6 +672,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_comic_filter_item(
       ComicFilterItem self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_comic_in_author(ComicInAuthor self, SseSerializer serializer);
 
   @protected
   void sse_encode_comic_in_filter(ComicInFilter self, SseSerializer serializer);
@@ -711,6 +736,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_comic_filter_item(
       List<ComicFilterItem> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_comic_in_author(
+      List<ComicInAuthor> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_comic_in_filter(

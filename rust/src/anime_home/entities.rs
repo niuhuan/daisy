@@ -450,6 +450,22 @@ pub struct ApiCommentResponse {
     pub total: i64,
 }
 
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ComicInAuthor {
+    pub id: i64,
+    pub name: String,
+    pub cover: String,
+    pub status: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Author {
+    pub nickname: String,
+    pub description: String,
+    pub cover: String,
+    pub data: Vec<ComicInAuthor>,
+}
+
 fn default_option<T>() -> Option<T> {
     None
 }
