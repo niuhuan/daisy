@@ -1,6 +1,5 @@
 use std::collections::HashMap;
-use serde_derive::Deserialize;
-use serde_derive::Serialize;
+use serde_derive::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 use std::num::ParseIntError;
 
@@ -464,6 +463,15 @@ pub struct Author {
     pub description: String,
     pub cover: String,
     pub data: Vec<ComicInAuthor>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ViewPoint {
+    pub id: i32,
+    pub uid: i32,
+    pub content: String,
+    pub num: i64,
+    pub page: i64,
 }
 
 fn default_option<T>() -> Option<T> {

@@ -649,6 +649,60 @@ impl Client {
         .await
     }
 
+    pub async fn comment_v3_view_point(
+        &self,
+        r#type: i32,
+        sub_type: i32,
+        third_type: i32,
+    ) -> Result<Vec<ViewPoint>> {
+        self.request_comment_v3_api(
+            Method::GET,
+            format!("/viewPoint/{type}/{sub_type}/{third_type}.json").as_str(),
+            None,
+            AuthLevel::NORMAL,
+        )
+        .await
+    }
+
+    pub async fn comment_v3_view_point_praise(&self, vote_id: i32) -> Result<()> {
+        self.request_comment_v3_api(
+            Method::POST,
+            "/viewPoint/praise",
+            {
+                let mut params = HashMap::<String, String>::new();
+                params.insert("vote_id".to_owned(), vote_id.to_string());
+                params
+            },
+            AuthLevel::TOKEN,
+        )
+        .await
+    }
+
+    pub async fn comment_v3_view_point_add_v2(
+        &self,
+        r#type: i32,
+        sub_type: i32,
+        third_type: i32,
+        page: i64,
+        content: String,
+    ) -> Result<()> {
+        self.request_comment_v3_api(
+            Method::POST,
+            "/viewPoint/addv2",
+            {
+                let mut params = HashMap::<String, String>::new();
+                params.insert("type".to_owned(), r#type.to_string());
+                params.insert("sub_type".to_owned(), sub_type.to_string());
+                params.insert("third_type".to_owned(), third_type.to_string());
+                params.insert("page".to_owned(), page.to_string());
+                params.insert("content".to_owned(), content);
+                params
+            },
+            AuthLevel::TOKEN,
+        )
+        .await
+    }
+
     pub async fn author(&self, author_id: i32) -> Result<Author> {
         self.request_v3(
             Method::GET,
