@@ -139,6 +139,11 @@ Future<List<ComicViewLog>> loadComicViewLogs({required PlatformInt64 page}) =>
 Future<ComicViewLog?> viewLogByComicId({required int comicId}) =>
     RustLib.instance.api.crateApiBridgeViewLogByComicId(comicId: comicId);
 
+Future<List<ViewPoint>> viewPoint(
+        {required int type, required int subType, required int thirdType}) =>
+    RustLib.instance.api.crateApiBridgeViewPoint(
+        type: type, subType: subType, thirdType: thirdType);
+
 Future<List<NewsCategory>> newsCategories() =>
     RustLib.instance.api.crateApiBridgeNewsCategories();
 

@@ -1,9 +1,4 @@
-use crate::anime_home::{
-    ApiCommentResponse, Author, ComicCategory, ComicChapter, ComicChapterDetail, ComicDetail,
-    ComicFilter, ComicInFilter, ComicInSearch, ComicType, Comment, LoginData, NewsCategory,
-    NewsListItem, NovelCategory, NovelDetail, NovelInFilter, NovelInSearch, NovelVolume, ObjType,
-    Sort, Subscribed, TaskIndex,
-};
+use crate::anime_home::{ApiCommentResponse, AuthLevel, Author, ComicCategory, ComicChapter, ComicChapterDetail, ComicDetail, ComicFilter, ComicInFilter, ComicInSearch, ComicType, Comment, LoginData, NewsCategory, NewsListItem, NovelCategory, NovelDetail, NovelInFilter, NovelInSearch, NovelVolume, ObjType, Sort, Subscribed, TaskIndex, ViewPoint};
 use crate::anime_home::{ComicRankListItem, ComicUpdateListItem};
 use crate::database::active::{comic_view_log, novel_view_log};
 use crate::database::cache::web_cache::clean_web_cache_by_key;
@@ -17,6 +12,7 @@ use itertools::Itertools;
 use lazy_static::lazy_static;
 use serde_json::to_string;
 use std::time::Duration;
+use reqwest::Method;
 use tokio::sync::Mutex;
 
 pub async fn init(root: String) {
@@ -500,6 +496,24 @@ pub async fn view_log_by_comic_id(comic_id: i32) -> Result<Option<ComicViewLog>>
             Some(res) => Some(map_comic_view_log(res)),
         },
     )
+}
+
+pub async fn view_point(
+    r#type: i32,
+    sub_type: i32,
+    third_type: i32,
+) -> Result<Vec<ViewPoint>> {
+    web_cache::cache_first(
+        format!("VIEW_POINT${}${}${}", r#type, sub_type, third_type),
+        Duration::from_secs(60 * 60 * 2),
+        Box::pin(async move {
+            CLIENT
+                .read()
+                .await
+                .comment_v3_view_point(r#type, sub_type, third_type)
+                .await
+        }),
+    ).await
 }
 
 pub async fn news_categories() -> Result<Vec<NewsCategory>> {

@@ -71,7 +71,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.9.0';
 
   @override
-  int get rustContentHash => -894247475;
+  int get rustContentHash => -1351180083;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -240,6 +240,9 @@ abstract class RustLibApi extends BaseApi {
   Future<ComicViewLog?> crateApiBridgeViewLogByComicId({required int comicId});
 
   Future<NovelViewLog?> crateApiBridgeViewLogByNovelId({required int novelId});
+
+  Future<List<ViewPoint>> crateApiBridgeViewPoint(
+      {required int type, required int subType, required int thirdType});
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -1644,6 +1647,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         argNames: ["novelId"],
       );
 
+  @override
+  Future<List<ViewPoint>> crateApiBridgeViewPoint(
+      {required int type, required int subType, required int thirdType}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(type, serializer);
+        sse_encode_i_32(subType, serializer);
+        sse_encode_i_32(thirdType, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 53, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_view_point,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiBridgeViewPointConstMeta,
+      argValues: [type, subType, thirdType],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBridgeViewPointConstMeta => const TaskConstMeta(
+        debugName: "view_point",
+        argNames: ["type", "subType", "thirdType"],
+      );
+
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -2315,6 +2345,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<ViewPoint> dco_decode_list_view_point(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_view_point).toList();
+  }
+
+  @protected
   LocalImage dco_decode_local_image(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -2730,6 +2766,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void dco_decode_unit(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return;
+  }
+
+  @protected
+  ViewPoint dco_decode_view_point(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return ViewPoint(
+      id: dco_decode_i_32(arr[0]),
+      uid: dco_decode_i_32(arr[1]),
+      content: dco_decode_String(arr[2]),
+      num: dco_decode_i_64(arr[3]),
+      page: dco_decode_i_64(arr[4]),
+    );
   }
 
   @protected
@@ -3700,6 +3751,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<ViewPoint> sse_decode_list_view_point(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ViewPoint>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_view_point(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   LocalImage sse_decode_local_image(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_absPath = sse_decode_String(deserializer);
@@ -4216,6 +4279,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_decode_unit(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  ViewPoint sse_decode_view_point(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_i_32(deserializer);
+    var var_uid = sse_decode_i_32(deserializer);
+    var var_content = sse_decode_String(deserializer);
+    var var_num = sse_decode_i_64(deserializer);
+    var var_page = sse_decode_i_64(deserializer);
+    return ViewPoint(
+        id: var_id,
+        uid: var_uid,
+        content: var_content,
+        num: var_num,
+        page: var_page);
   }
 
   @protected
@@ -4915,6 +4994,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_view_point(
+      List<ViewPoint> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_view_point(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_local_image(LocalImage self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.absPath, serializer);
@@ -5252,5 +5341,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_unit(void self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  void sse_encode_view_point(ViewPoint self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.id, serializer);
+    sse_encode_i_32(self.uid, serializer);
+    sse_encode_String(self.content, serializer);
+    sse_encode_i_64(self.num, serializer);
+    sse_encode_i_64(self.page, serializer);
   }
 }

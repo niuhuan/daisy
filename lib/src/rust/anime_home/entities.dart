@@ -1044,3 +1044,38 @@ class TaskList {
           progress == other.progress &&
           iconChecked == other.iconChecked;
 }
+
+class ViewPoint {
+  final int id;
+  final int uid;
+  final String content;
+  final PlatformInt64 num;
+  final PlatformInt64 page;
+
+  const ViewPoint({
+    required this.id,
+    required this.uid,
+    required this.content,
+    required this.num,
+    required this.page,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      uid.hashCode ^
+      content.hashCode ^
+      num.hashCode ^
+      page.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ViewPoint &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          uid == other.uid &&
+          content == other.content &&
+          num == other.num &&
+          page == other.page;
+}

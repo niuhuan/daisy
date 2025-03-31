@@ -220,6 +220,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<TaskList> dco_decode_list_task_list(dynamic raw);
 
   @protected
+  List<ViewPoint> dco_decode_list_view_point(dynamic raw);
+
+  @protected
   LocalImage dco_decode_local_image(dynamic raw);
 
   @protected
@@ -299,6 +302,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void dco_decode_unit(dynamic raw);
+
+  @protected
+  ViewPoint dco_decode_view_point(dynamic raw);
 
   @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
@@ -524,6 +530,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<TaskList> sse_decode_list_task_list(SseDeserializer deserializer);
 
   @protected
+  List<ViewPoint> sse_decode_list_view_point(SseDeserializer deserializer);
+
+  @protected
   LocalImage sse_decode_local_image(SseDeserializer deserializer);
 
   @protected
@@ -607,6 +616,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_decode_unit(SseDeserializer deserializer);
+
+  @protected
+  ViewPoint sse_decode_view_point(SseDeserializer deserializer);
 
   @protected
   void sse_encode_AnyhowException(
@@ -843,6 +855,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_list_task_list(List<TaskList> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_view_point(
+      List<ViewPoint> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_local_image(LocalImage self, SseSerializer serializer);
 
   @protected
@@ -928,6 +944,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_unit(void self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_view_point(ViewPoint self, SseSerializer serializer);
 }
 
 // Section: wire_class

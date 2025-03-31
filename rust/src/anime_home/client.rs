@@ -657,7 +657,7 @@ impl Client {
     ) -> Result<Vec<ViewPoint>> {
         self.request_comment_v3_api(
             Method::GET,
-            format!("/viewPoint/{type}/{sub_type}/{third_type}.json").as_str(),
+            format!("/viewPoint/{}/{}/{}.json", r#type, sub_type, third_type).as_str(),
             None,
             AuthLevel::NORMAL,
         )
