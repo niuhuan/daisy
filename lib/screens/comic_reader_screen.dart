@@ -1212,6 +1212,10 @@ class _ComicReaderGalleryState extends _ComicReaderState {
       allowImplicitScrolling: true,
       builder: (BuildContext context, int index) {
         return PhotoViewGalleryPageOptions(
+          disableGestures:
+              currentReaderControllerType == ReaderControllerType.touchDouble ||
+                  currentReaderControllerType ==
+                      ReaderControllerType.touchDoubleOnceNext,
           filterQuality: FilterQuality.high,
           imageProvider: _providers[index],
           errorBuilder: (c, e, s) => LayoutBuilder(
@@ -1452,6 +1456,11 @@ class _ListViewReaderState extends _ComicReaderState
           maxScale: 2,
           child: list,
         );
+        if (currentReaderControllerType == ReaderControllerType.touchDouble ||
+            currentReaderControllerType ==
+                ReaderControllerType.touchDoubleOnceNext) {
+          return viewer;
+        }
         return GestureDetector(
           onDoubleTap: _handleDoubleTap,
           onDoubleTapDown: _handleDoubleTapDown,
@@ -1555,6 +1564,10 @@ class _TwoPageGalleryReaderState extends _ComicReaderState {
       }
       options.add(
         PhotoViewGalleryPageOptions.customChild(
+          disableGestures:
+              currentReaderControllerType == ReaderControllerType.touchDouble ||
+                  currentReaderControllerType ==
+                      ReaderControllerType.touchDoubleOnceNext,
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
               return Row(
