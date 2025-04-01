@@ -41,6 +41,7 @@ Future<Entity<T>?> chooseEntity<T>(
     context: context,
     builder: (BuildContext context) {
       return SimpleDialog(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text(title),
         children: [
           ...items.map((e) => SimpleDialogOption(
@@ -176,6 +177,7 @@ Future<String?> displayTextInputDialog(BuildContext context,
     context: context,
     builder: (context) {
       return AlertDialog(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: title == null ? null : Text(title),
         content: SingleChildScrollView(
           child: ListBody(
