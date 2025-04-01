@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:daisy/cross.dart';
 import 'package:daisy/src/rust/api/bridge.dart' as native;
 
+import '../configs/app_orientation.dart';
 import '../configs/auto_clean.dart';
 import '../configs/last_module.dart';
 import '../configs/novel_font_size.dart';
@@ -32,6 +33,7 @@ class InitScreen extends StatefulWidget {
 class _InitScreenState extends State<InitScreen> {
   Future _init() async {
     await native.init(root: await cross.root());
+    await initAppOrientation();
     await initAndroidVersion();
     await initAndroidDisplayMode();
     await initAutoClean();

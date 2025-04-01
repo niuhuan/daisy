@@ -9,6 +9,7 @@ import 'package:daisy/configs/versions.dart';
 import 'package:daisy/src/rust/api/bridge.dart' as native;
 import 'package:flutter/material.dart';
 
+import '../configs/app_orientation.dart';
 import '../configs/novel_reader_type.dart';
 import '../configs/two_page_gallery_direction.dart';
 import '../cross.dart';
@@ -74,6 +75,7 @@ class _AboutState extends State<AboutScreen> {
           darkThemeSetting(),
           Divider(color: dividerColor),
           androidDisplayModeSetting(),
+          appOrientationWidget(),
           Divider(color: dividerColor),
           novelReaderTypeSetting(context),
           Divider(color: dividerColor),
