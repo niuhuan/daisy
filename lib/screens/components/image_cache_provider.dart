@@ -24,7 +24,8 @@ class ImageCacheProvider extends ImageProvider<ImageCacheProvider> {
   });
 
   @override
-  ImageStreamCompleter loadImage(ImageCacheProvider key, ImageDecoderCallback decode) {
+  ImageStreamCompleter loadImage(
+      ImageCacheProvider key, ImageDecoderCallback decode) {
     return MultiFrameImageStreamCompleter(
       codec: _loadAsync(key),
       scale: key.scale,
@@ -40,7 +41,7 @@ class ImageCacheProvider extends ImageProvider<ImageCacheProvider> {
     assert(key == this);
     return ui.instantiateImageCodec(
       await _loadImageFile((await native.loadCacheImage(
-        url: url,
+        url: url.replaceAll("https://xs.muwai.com", "https://xs.idmzj.com'"),
         useful: useful,
         extendsFieldIntFirst: extendsFieldIntFirst,
         extendsFieldIntSecond: extendsFieldIntSecond,
@@ -51,7 +52,7 @@ class ImageCacheProvider extends ImageProvider<ImageCacheProvider> {
   }
 
   @override
-  bool operator == (dynamic other) {
+  bool operator ==(dynamic other) {
     if (other.runtimeType != runtimeType) return false;
     final ImageCacheProvider typedOther = other;
     return url == typedOther.url && scale == typedOther.scale;
