@@ -9,8 +9,7 @@ env:
   LLVM_VERSION: '10.0'
   RUST_TOOLCHAIN: nightly-2025-02-26
   NDK_VERSION: 29.0.13113456
-  REPO: ${{ github.repository }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  JDK_VERSION: 17
 
 jobs:
 
@@ -18,78 +17,87 @@ jobs:
     name: CI is green
     runs-on: ubuntu-latest
     needs:
-      - check_release
       - build_release_assets
     steps:
       - run: exit 0
 
-  check_release:
-    name: Check release
+  # 检查 Release 是否存在
+  check-and-create-release:
     runs-on: ubuntu-latest
+    outputs:
+      ios: ${{ steps.check-release.outputs.ios }} 
+      android: ${{ steps.check-release.outputs.android }}
+      windows: ${{ steps.check-release.outputs.windows }}
+      linux: ${{ steps.check-release.outputs.linux }}
     steps:
-      - name: Cargo cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-          key: ${{ runner.os }}-cargo-
-
-      - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
-          override: true
-
-      - name: Checkout
+      # 检出代码库
+      - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          repository: ${{ github.event.inputs.repo }}
-          path: 'daisy'
 
-      - name: Cargo ci build cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            daisy/ci/target/
-          key: ${{ runner.os }}-cargo-ci_target
-
-      - name: Check release
+      # 检查 Release 是否存在
+      - name: Check and create release
+        id: check-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cd daisy/ci
-          cargo run --release --bin check-release
+          export VERSION=$(cat ci/version/code.txt | xargs echo)
+          echo "VERSION : $VERSION"
+          export RELEASE=$(gh release view $VERSION --json id -q .id || echo "NOT_FOUND")
+          echo "RELEASE : $RELEASE"
+          if [ "$RELEASE" == "NOT_FOUND" ]; then
+            echo "Release does not exist. Creating release ${{ github.event.inputs.version }}."
+            echo "ios=true" >> $GITHUB_OUTPUT
+            echo "android=true" >> $GITHUB_OUTPUT
+            echo "windows=true" >> $GITHUB_OUTPUT
+            echo "linux=true" >> $GITHUB_OUTPUT
+          else
+            declare -A asset_dict
+            asset_dict["ios"]="$GITHUB_REPOSITORY-$VERSION-nosign.ipa"
+            asset_dict["android"]="$GITHUB_REPOSITORY-arm64-$VERSION.apk"
+            asset_dict["windows"]="$GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip"
+            asset_dict["linux"]="$GITHUB_REPOSITORY-$VERSION.AppImage"
+            echo "Release ${{ github.event.inputs.version }} already exists."
+            gh release view ${{ github.event.inputs.version }} --json assets > release_assets.json
+            echo release_assets.json :
+            cat release_assets.json
+            for key in "${!asset_dict[@]}"; do
+              asset_name=${asset_dict[$key]}
+              asset_exists=$(gh release view ${{ github.event.inputs.version }} --json assets -q ".assets[].name" | grep -w "$asset_name" || echo "NOT_FOUND")
+              if [ "$asset_exists" == "NOT_FOUND" ]; then
+                echo "Asset $asset_name does not exist. Upload is required."
+                echo "$key=true" >> $GITHUB_OUTPUT
+              else
+                echo "Asset $asset_name already exists. No upload is required."
+                echo "$key=false" >> $GITHUB_OUTPUT
+              fi
+            done
+          fi
+          echo "GITHUB_OUTPUT : $GITHUB_OUTPUT :"
+          cat $GITHUB_OUTPUT
 
   build_release_assets:
     name: Build release assets
     needs:
-      - check_release
+      - check-and-create-release
     strategy:
       fail-fast: false
       matrix:
         config:
+          - target: ios
+            host: macos-latest
+          - target: android
+            host: ubuntu-latest
           - target: linux
             host: ubuntu-latest
           - target: windows
             host: windows-latest
-          - target: macos
-            host: macos-latest
-          - target: ios
-            host: macos-latest
-          - target: android-arm64
-            host: ubuntu-latest
 
+    if: needs.check-and-create-release.outputs.${{ matrix.config.target }} == 'true'
     runs-on: ${{ matrix.config.host }}
-
-    env:
-      TARGET: ${{ matrix.config.target }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          path: 'daisy'
 
       - name: Cargo cache
         uses: actions/cache@v3
@@ -115,71 +123,61 @@ jobs:
             daisy/ci/target/
           key: ${{ runner.os }}-cargo-ci_target
 
-      - id: check_asset
-        name: Check asset
-        run: |
-          cd daisy/ci
-          cargo run --release --bin check-asset
-
       - name: Cache Flutter dependencies (Linux/Android)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' || matrix.config.target == 'linux' )
+        if: matrix.config.target == 'android'
         uses: actions/cache@v3
         with:
           path: /opt/hostedtoolcache/flutter
           key: ${{ runner.os }}-flutter
 
       - name: Setup flutter
-        if: steps.check_asset.outputs.skip_build != 'true'
         uses: subosito/flutter-action@v2
         with:
           channel: ${{ env.flutter_channel }}
           flutter-version: ${{ env.flutter_version }}
-          architecture: x64
 
       - name: Install LLVM and Clang (Linux/Android)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' || matrix.config.target == 'linux' )
+        if: startsWith(matrix.config.target, 'android') || startsWith(matrix.config.target, 'linux')
         run: |
           sudo apt update
           sudo apt install -y libclang-dev
 
       - name: Install libfuse2 (Linux)
-        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'linux'
+        if: matrix.config.target == 'linux'
         run: |
           sudo apt update
           sudo apt install -y libfuse2
 
       - name: Install cargo tools (non-android)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'macos' || matrix.config.target == 'windows' || matrix.config.target == 'linux' )
+        if: matrix.config.target != 'android'
         run: |
           cargo install cbindgen
 
       - name: Install cargo tools (Android)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
+        if: matrix.config.target == 'android'
         run: |
           cargo install cargo-ndk
 
       - name: Setup java (Android)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
+        if: startsWith(matrix.config.target, 'android')
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: ${{ env.JDK_VERSION }}
           distribution: 'temurin'
 
       - name: Setup android tools (Android)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
+        if: startsWith(matrix.config.target, 'android')
         uses: android-actions/setup-android@v3
         with:
           cmdline-tools-version: 8512546
           packages: 'platform-tools platforms;android-32 build-tools;30.0.2 ndk;${{ env.NDK_VERSION }}'
 
       - name: Set-Version (All)
-        if: steps.check_asset.outputs.skip_build != 'true'
         run: |
           cd daisy/ci
           cp version.code.txt ../lib/assets/version.txt
 
       - name: Cargo native build cache
-        if: steps.check_asset.outputs.skip_build != 'true'
         uses: actions/cache@v3
         with:
           path: |
@@ -187,7 +185,7 @@ jobs:
           key: ${{ runner.os }}-cargo-native_target-${{ matrix.config.target }}
 
       - name: Install rust target and build (ios)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'ios')
+        if: matrix.config.target == 'ios'
         run: |
           rustup target install aarch64-apple-ios
           cd daisy
@@ -202,7 +200,7 @@ jobs:
           cd ..
 
       - name: Install rust target and build (Android-arm64)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm64')
+        if: matrix.config.target == 'android'
         run: |
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${{ env.NDK_VERSION }}
           rustup target install aarch64-linux-android
@@ -210,7 +208,7 @@ jobs:
           flutter build apk --target-platform android-arm64
 
       - name: Install rust target and build (Android-arm32)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32')
+        if: ( matrix.config.target == 'android-arm32')
         run: |
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${{ env.NDK_VERSION }}
           rustup target install armv7-linux-androideabi
@@ -218,7 +216,7 @@ jobs:
           flutter build apk --target-platform android-arm
 
       - name: Install rust target and build (Android-x86_64)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-x86_64')
+        if: ( matrix.config.target == 'android-x86_64')
         run: |
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${{ env.NDK_VERSION }}
           rustup target install x86_64-linux-android
@@ -226,7 +224,7 @@ jobs:
           flutter build apk --target-platform android-x64
 
       - name: Install dependencies and build (Linux)
-        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'linux'
+        if: matrix.config.target == 'linux'
         run: |
           sudo apt-get update
           sudo apt install -y ninja-build liblzma-dev libgtk-3-dev libgl1-mesa-dev xorg-dev
@@ -243,7 +241,7 @@ jobs:
           mv *.AppImage build/linux.AppImage
 
       - name: build (windows)
-        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'windows'
+        if: matrix.config.target == 'windows'
         run: |
           cd daisy
           flutter pub get
@@ -254,7 +252,7 @@ jobs:
           cd ../../../../..
 
       - name: Build (macos)
-        if: steps.check_asset.outputs.skip_build != 'true' && matrix.config.target == 'macos'
+        if: matrix.config.target == 'macos'
         run: |
           cd daisy
           flutter pub get
@@ -270,7 +268,7 @@ jobs:
           cd ..
 
       - name: Sign APK (Android)
-        if: steps.check_asset.outputs.skip_build != 'true' && ( matrix.config.target == 'android-arm32' || matrix.config.target == 'android-arm64' || matrix.config.target == 'android-x86_64' )
+        if: startsWith(matrix.config.target, 'android')
         env:
           KEY_FILE_BASE64: ${{ secrets.KEY_FILE_BASE64 }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -281,15 +279,40 @@ jobs:
           echo $KEY_PASSWORD | $ANDROID_HOME/build-tools/30.0.2/apksigner sign --ks key.jks build/app/outputs/flutter-apk/app-release.apk
 
       - name: Cargo ci build cache
-        if: steps.check_asset.outputs.skip_build != 'true'
         uses: actions/cache@v3
         with:
           path: |
             daisy/ci/target/
           key: ${{ runner.os }}-cargo-ci_target
 
-      - name: Upload Asset (All)
-        if: steps.check_asset.outputs.skip_build != 'true'
+
+      - name: Upload Asset (ios)
+        if: matrix.config.target == 'ios'
         run: |
-          cd daisy/ci
-          cargo run --release --bin upload-asset
+          export VERSION=$(cat ci/version/code.txt | xargs echo)
+          echo "Uploading asset $GITHUB_REPOSITORY-$VERSION-nosign.ipa"
+          gh release upload ${{ github.event.inputs.version }} "build/nosign.ipa#$GITHUB_REPOSITORY-$VERSION-nosign.ipa" --clobber
+
+      - name: Upload Asset (android arm64)
+        if: matrix.config.target == 'android'
+        run: |
+          export VERSION=$(cat ci/version/code.txt | xargs echo)
+          if [ "${{ matrix.config.target }}" == "android-arm64" ]; then
+            echo "Uploading asset $GITHUB_REPOSITORY-arm64-$VERSION.apk"
+            gh release upload ${{ github.event.inputs.version }} "build/app/outputs/flutter-apk/app-release.apk#$GITHUB_REPOSITORY-arm64-$VERSION.apk" --clobber
+          fi
+      
+      - name: Upload Asset (windows)
+        if: matrix.config.target == 'windows'
+        run: |
+          $VERSION = (Get-Content -Path "ci/version/code.txt").Trim()
+          echo "Uploading asset $GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip"
+          gh release upload ${{ github.event.inputs.version }} "build/windows.zip#$GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip" --clobber
+
+      - name: Upload Asset (linux)
+        if: matrix.config.target == 'linux'
+        run: |
+          export VERSION=$(cat ci/version/code.txt | xargs echo)
+          echo "Uploading asset $GITHUB_REPOSITORY-$VERSION.AppImage"
+          gh release upload ${{ github.event.inputs.version }} "build/linux.AppImage#$GITHUB_REPOSITORY-$VERSION.AppImage" --clobber
+
