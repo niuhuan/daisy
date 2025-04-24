@@ -71,7 +71,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.9.0';
 
   @override
-  int get rustContentHash => -1351180083;
+  int get rustContentHash => -181498156;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -228,10 +228,15 @@ abstract class RustLibApi extends BaseApi {
       {required String objType, required int objId});
 
   Future<List<Subscribed>> crateApiBridgeSubscribedList(
-      {required PlatformInt64 subType, required PlatformInt64 page});
+      {required PlatformInt64 type,
+      required PlatformInt64 page,
+      required PlatformInt64 subType});
 
   Future<bool> crateApiBridgeSubscribedObj(
       {required PlatformInt64 subType, required int objId});
+
+  Future<void> crateApiBridgeSubscribedRead(
+      {required String objType, required int objId});
 
   Future<TaskIndex> crateApiBridgeTaskIndex();
 
@@ -1499,12 +1504,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<List<Subscribed>> crateApiBridgeSubscribedList(
-      {required PlatformInt64 subType, required PlatformInt64 page}) {
+      {required PlatformInt64 type,
+      required PlatformInt64 page,
+      required PlatformInt64 subType}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_i_64(subType, serializer);
+        sse_encode_i_64(type, serializer);
         sse_encode_i_64(page, serializer);
+        sse_encode_i_64(subType, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 47, port: port_);
       },
@@ -1513,7 +1521,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta: kCrateApiBridgeSubscribedListConstMeta,
-      argValues: [subType, page],
+      argValues: [type, page, subType],
       apiImpl: this,
     ));
   }
@@ -1521,7 +1529,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiBridgeSubscribedListConstMeta =>
       const TaskConstMeta(
         debugName: "subscribed_list",
-        argNames: ["subType", "page"],
+        argNames: ["type", "page", "subType"],
       );
 
   @override
@@ -1552,12 +1560,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<void> crateApiBridgeSubscribedRead(
+      {required String objType, required int objId}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(objType, serializer);
+        sse_encode_i_32(objId, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 49, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiBridgeSubscribedReadConstMeta,
+      argValues: [objType, objId],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBridgeSubscribedReadConstMeta =>
+      const TaskConstMeta(
+        debugName: "subscribed_read",
+        argNames: ["objType", "objId"],
+      );
+
+  @override
   Future<TaskIndex> crateApiBridgeTaskIndex() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 49, port: port_);
+            funcId: 50, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_task_index,
@@ -1580,7 +1615,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 50, port: port_);
+            funcId: 51, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1604,7 +1639,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(comicId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 51, port: port_);
+            funcId: 52, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_comic_view_log,
@@ -1629,7 +1664,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(novelId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 52, port: port_);
+            funcId: 53, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_novel_view_log,
@@ -1657,7 +1692,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(subType, serializer);
         sse_encode_i_32(thirdType, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 53, port: port_);
+            funcId: 54, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_view_point,

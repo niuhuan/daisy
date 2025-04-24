@@ -16,7 +16,7 @@ class _ComicSubscribedScreenState extends State<ComicSubscribedScreen>
   bool get wantKeepAlive => false;
 
   Future<List<ComicInListCard>> _loadComic(int page) async {
-    return (await native.subscribedList(subType: 0, page: page))
+    return (await native.subscribedList(type: 0, page: page, subType: 1))
         .map((e) => ComicInListCard(
               id: e.id,
               title: e.name,

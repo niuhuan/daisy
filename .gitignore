@@ -49,3 +49,5 @@ version.txt
 target/
 .vscode/
 build/
+
+android/app/.cxx/

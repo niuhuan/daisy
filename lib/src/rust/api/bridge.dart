@@ -214,9 +214,15 @@ Future<void> subscribeCancel({required String objType, required int objId}) =>
         .crateApiBridgeSubscribeCancel(objType: objType, objId: objId);
 
 Future<List<Subscribed>> subscribedList(
-        {required PlatformInt64 subType, required PlatformInt64 page}) =>
+        {required PlatformInt64 type,
+        required PlatformInt64 page,
+        required PlatformInt64 subType}) =>
     RustLib.instance.api
-        .crateApiBridgeSubscribedList(subType: subType, page: page);
+        .crateApiBridgeSubscribedList(type: type, page: page, subType: subType);
+
+Future<void> subscribedRead({required String objType, required int objId}) =>
+    RustLib.instance.api
+        .crateApiBridgeSubscribedRead(objType: objType, objId: objId);
 
 Future<bool> subscribedObj(
         {required PlatformInt64 subType, required int objId}) =>

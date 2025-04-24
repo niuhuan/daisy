@@ -714,16 +714,17 @@ impl Client {
     }
 
     /// page 从0开始
-    /// sub_type: 0 comic, 1 novel
-    pub async fn subscribed_list(&self, sub_type: i64, page: i64) -> Result<Vec<Subscribed>> {
+    /// type: 0 comic, 1 novel
+    pub async fn subscribed_list(&self, r#type: i64, page: i64, sub_type: i64) -> Result<Vec<Subscribed>> {
         self.request_v3(
             Method::GET,
             "/UCenter/subscribeWithLevel",
             {
                 let mut params = HashMap::<String, String>::new();
-                params.insert("type".to_owned(), sub_type.to_string());
+                params.insert("type".to_owned(), r#type.to_string());
                 params.insert("page".to_owned(), page.to_string());
                 params.insert("letter".to_owned(), "all".to_string());
+                params.insert("sub_type".to_owned(), sub_type.to_string());
                 params
             },
             AuthLevel::TOKEN,
@@ -731,6 +732,7 @@ impl Client {
         .await
     }
 
+    /// 判断漫画或者小说有没有订阅
     /// obj_type 0 : 漫画 1 : 小说
     pub async fn subscribed_obj(&self, obj_type: i64, obj_id: i32) -> Result<bool> {
         let ticket = self.get_user_ticket().await;
@@ -749,6 +751,26 @@ impl Client {
             Ok(result.code == 0)
         }
     }
+
+    /// 订阅已读
+    /// obj_type mh : 漫画 xs : 小说
+    pub async fn subscribe_read(&self, obj_type: String, obj_id: i32) -> Result<()> {
+        let result: ActionResult = self
+            .request_v3(
+                Method::POST,
+                "/subscribe/read",
+                {
+                    let mut params = HashMap::<String, String>::new();
+                    params.insert("obj_ids".to_owned(), obj_id.to_string());
+                    params.insert("type".to_owned(), obj_type);
+                    params
+                },
+                AuthLevel::TOKEN,
+            )
+            .await?;
+        ok_data_action!(result)
+    }
+
 
     /// obj_type mh : 漫画 xs : 小说
     pub async fn subscribe_add(&self, obj_type: String, obj_id: i32) -> Result<()> {

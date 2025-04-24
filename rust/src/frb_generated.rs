@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.9.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1351180083;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -181498156;
 
 // Section: executor
 
@@ -1818,14 +1818,16 @@ fn wire__crate__api__bridge__subscribed_list_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_sub_type = <i64>::sse_decode(&mut deserializer);
+            let api_type = <i64>::sse_decode(&mut deserializer);
             let api_page = <i64>::sse_decode(&mut deserializer);
+            let api_sub_type = <i64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
                         let output_ok =
-                            crate::api::bridge::subscribed_list(api_sub_type, api_page).await?;
+                            crate::api::bridge::subscribed_list(api_type, api_page, api_sub_type)
+                                .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1864,6 +1866,44 @@ fn wire__crate__api__bridge__subscribed_obj_impl(
                     (move || async move {
                         let output_ok =
                             crate::api::bridge::subscribed_obj(api_sub_type, api_obj_id).await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__bridge__subscribed_read_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "subscribed_read",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_obj_type = <String>::sse_decode(&mut deserializer);
+            let api_obj_id = <i32>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::bridge::subscribed_read(api_obj_type, api_obj_id).await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -3788,15 +3828,16 @@ fn pde_ffi_dispatcher_primary_impl(
         46 => wire__crate__api__bridge__subscribe_cancel_impl(port, ptr, rust_vec_len, data_len),
         47 => wire__crate__api__bridge__subscribed_list_impl(port, ptr, rust_vec_len, data_len),
         48 => wire__crate__api__bridge__subscribed_obj_impl(port, ptr, rust_vec_len, data_len),
-        49 => wire__crate__api__bridge__task_index_impl(port, ptr, rust_vec_len, data_len),
-        50 => wire__crate__api__bridge__task_sign_impl(port, ptr, rust_vec_len, data_len),
-        51 => {
+        49 => wire__crate__api__bridge__subscribed_read_impl(port, ptr, rust_vec_len, data_len),
+        50 => wire__crate__api__bridge__task_index_impl(port, ptr, rust_vec_len, data_len),
+        51 => wire__crate__api__bridge__task_sign_impl(port, ptr, rust_vec_len, data_len),
+        52 => {
             wire__crate__api__bridge__view_log_by_comic_id_impl(port, ptr, rust_vec_len, data_len)
         }
-        52 => {
+        53 => {
             wire__crate__api__bridge__view_log_by_novel_id_impl(port, ptr, rust_vec_len, data_len)
         }
-        53 => wire__crate__api__bridge__view_point_impl(port, ptr, rust_vec_len, data_len),
+        54 => wire__crate__api__bridge__view_point_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }

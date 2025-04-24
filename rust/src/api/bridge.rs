@@ -1,4 +1,9 @@
-use crate::anime_home::{ApiCommentResponse, AuthLevel, Author, ComicCategory, ComicChapter, ComicChapterDetail, ComicDetail, ComicFilter, ComicInFilter, ComicInSearch, ComicType, Comment, LoginData, NewsCategory, NewsListItem, NovelCategory, NovelDetail, NovelInFilter, NovelInSearch, NovelVolume, ObjType, Sort, Subscribed, TaskIndex, ViewPoint};
+use crate::anime_home::{
+    ApiCommentResponse, AuthLevel, Author, ComicCategory, ComicChapter, ComicChapterDetail,
+    ComicDetail, ComicFilter, ComicInFilter, ComicInSearch, ComicType, Comment, LoginData,
+    NewsCategory, NewsListItem, NovelCategory, NovelDetail, NovelInFilter, NovelInSearch,
+    NovelVolume, ObjType, Sort, Subscribed, TaskIndex, ViewPoint,
+};
 use crate::anime_home::{ComicRankListItem, ComicUpdateListItem};
 use crate::database::active::{comic_view_log, novel_view_log};
 use crate::database::cache::web_cache::clean_web_cache_by_key;
@@ -12,7 +17,6 @@ use itertools::Itertools;
 use lazy_static::lazy_static;
 use serde_json::to_string;
 use std::time::Duration;
-use reqwest::Method;
 use tokio::sync::Mutex;
 
 pub async fn init(root: String) {
@@ -453,7 +457,8 @@ pub async fn author(id: i32) -> Result<Author> {
         key,
         Duration::from_secs(60 * 60 * 2),
         Box::pin(async move { CLIENT.read().await.author(id).await }),
-    ).await
+    )
+    .await
 }
 
 pub async fn comic_view_page(
@@ -498,11 +503,7 @@ pub async fn view_log_by_comic_id(comic_id: i32) -> Result<Option<ComicViewLog>>
     )
 }
 
-pub async fn view_point(
-    r#type: i32,
-    sub_type: i32,
-    third_type: i32,
-) -> Result<Vec<ViewPoint>> {
+pub async fn view_point(r#type: i32, sub_type: i32, third_type: i32) -> Result<Vec<ViewPoint>> {
     web_cache::cache_first(
         format!("VIEW_POINT${}${}${}", r#type, sub_type, third_type),
         Duration::from_secs(60 * 60 * 2),
@@ -513,7 +514,8 @@ pub async fn view_point(
                 .comment_v3_view_point(r#type, sub_type, third_type)
                 .await
         }),
-    ).await
+    )
+    .await
 }
 
 pub async fn news_categories() -> Result<Vec<NewsCategory>> {
@@ -810,21 +812,37 @@ fn map_novel_view_log(res: novel_view_log::Model) -> NovelViewLog {
 }
 
 pub async fn subscribe_add(obj_type: String, obj_id: i32) -> Result<()> {
-    CLIENT.read().await.subscribe_add(obj_type, obj_id).await
+    CLIENT.read().await.subscribe_add(obj_type, obj_id).await?;
+    clean_web_cache_by_key("SUBSCRIBED_LIST$%".to_string()).await?;
+    Ok(())
 }
 
 pub async fn subscribe_cancel(obj_type: String, obj_id: i32) -> Result<()> {
-    CLIENT.read().await.subscribe_cancel(obj_type, obj_id).await
+    CLIENT.read().await.subscribe_cancel(obj_type, obj_id).await?;
+    clean_web_cache_by_key("SUBSCRIBED_LIST$%".to_string()).await?;
+    Ok(())
 }
 
-pub async fn subscribed_list(sub_type: i64, page: i64) -> Result<Vec<Subscribed>> {
-    let key = format!("SUBSCRIBED_LIST${}${}", sub_type, page);
+pub async fn subscribed_list(r#type: i64, page: i64, sub_type: i64) -> Result<Vec<Subscribed>> {
+    let key = format!("SUBSCRIBED_LIST${}${}${}", r#type, page, sub_type);
     web_cache::cache_first(
         key,
         Duration::from_secs(15),
-        Box::pin(async move { CLIENT.read().await.subscribed_list(sub_type, page).await }),
+        Box::pin(async move {
+            CLIENT
+                .read()
+                .await
+                .subscribed_list(r#type, page, sub_type)
+                .await
+        }),
     )
     .await
+}
+
+pub async fn subscribed_read(obj_type: String, obj_id: i32) -> Result<()> {
+    CLIENT.read().await.subscribe_read(obj_type, obj_id).await?;
+    clean_web_cache_by_key("SUBSCRIBED_LIST$%".to_string()).await?;
+    Ok(())
 }
 
 pub async fn subscribed_obj(sub_type: i64, obj_id: i32) -> Result<bool> {

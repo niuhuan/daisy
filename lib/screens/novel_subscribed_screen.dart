@@ -17,7 +17,7 @@ class _NovelSubscribedScreenState extends State<NovelSubscribedScreen>
   bool get wantKeepAlive => false;
 
   Future<List<NovelInPager>> _loadNovel(int page) async {
-    return (await native.subscribedList(subType: 1, page: page))
+    return (await native.subscribedList(type: 1, page: page, subType: 1))
         .map((e) => NovelInPager(
               id: e.id,
               name: e.name,
