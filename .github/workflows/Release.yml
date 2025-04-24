@@ -55,7 +55,7 @@ jobs:
             echo "Release does not exist. Creating release $VERSION."
             gh release create $VERSION -F ci/version.info.txt --target ${{ github.sha }}
             matrix='['
-            for key in host_dict[@] ; do
+            for key in "${!host_dict[@]}"; do
               if [ "$key" != "${!host_dict[@]: -1}" ]; then
                 matrix+="{\"target\": \"$key\", \"host\": \"${host_dict[$key]}\"},"
               else
