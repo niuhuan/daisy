@@ -40,10 +40,10 @@ jobs:
           export VERSION=$(cat ci/version.code.txt | xargs echo)
           echo "VERSION : $VERSION"
           declare -A asset_dict
-          asset_dict["ios"]="$GITHUB_REPOSITORY-$VERSION-nosign.ipa"
-          asset_dict["android"]="$GITHUB_REPOSITORY-arm64-$VERSION.apk"
-          asset_dict["windows"]="$GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip"
-          asset_dict["linux"]="$GITHUB_REPOSITORY-$VERSION.AppImage"
+          asset_dict["ios"]="${{ github.event.repository.name }}-$VERSION-nosign.ipa"
+          asset_dict["android"]="${{ github.event.repository.name }}-arm64-$VERSION.apk"
+          asset_dict["windows"]="${{ github.event.repository.name }}-$VERSION-windows-x86_64.zip"
+          asset_dict["linux"]="${{ github.event.repository.name }}-$VERSION.AppImage"
           declare -A host_dict
           host_dict["ios"]="macos-latest"
           host_dict["android"]="ubuntu-latest"
@@ -264,8 +264,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export VERSION=$(cat ci/version.code.txt | xargs echo)
-          echo "Uploading asset $GITHUB_REPOSITORY-$VERSION-nosign.ipa"
-          gh release upload $VERSION "build/nosign.ipa#$GITHUB_REPOSITORY-$VERSION-nosign.ipa" --clobber
+          echo "Uploading asset ${{ github.event.repository.name }}-$VERSION-nosign.ipa"
+          gh release upload $VERSION "build/nosign.ipa#${{ github.event.repository.name }}-$VERSION-nosign.ipa" --clobber
 
       - name: Upload Asset (android arm64)
         if: matrix.config.target == 'android'
@@ -274,8 +274,8 @@ jobs:
         run: |
           export VERSION=$(cat ci/version.code.txt | xargs echo)
           if [ "${{ matrix.config.target }}" == "android-arm64" ]; then
-            echo "Uploading asset $GITHUB_REPOSITORY-arm64-$VERSION.apk"
-            gh release upload $VERSION "build/app/outputs/flutter-apk/app-release.apk#$GITHUB_REPOSITORY-arm64-$VERSION.apk" --clobber
+            echo "Uploading asset ${{ github.event.repository.name }}-arm64-$VERSION.apk"
+            gh release upload $VERSION "build/app/outputs/flutter-apk/app-release.apk#${{ github.event.repository.name }}-arm64-$VERSION.apk" --clobber
           fi
       
       - name: Upload Asset (windows)
@@ -284,8 +284,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $VERSION = (Get-Content -Path "ci/version.code.txt").Trim()
-          echo "Uploading asset $GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip"
-          gh release upload $VERSION "build/windows.zip#$GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip" --clobber
+          echo "Uploading asset ${{ github.event.repository.name }}-$VERSION-windows-x86_64.zip"
+          gh release upload $VERSION "build/windows.zip#${{ github.event.repository.name }}-$VERSION-windows-x86_64.zip" --clobber
 
       - name: Upload Asset (linux)
         if: matrix.config.target == 'linux'
@@ -293,6 +293,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export VERSION=$(cat ci/version.code.txt | xargs echo)
-          echo "Uploading asset $GITHUB_REPOSITORY-$VERSION.AppImage"
-          gh release upload $VERSION "build/linux.AppImage#$GITHUB_REPOSITORY-$VERSION.AppImage" --clobber
+          echo "Uploading asset ${{ github.event.repository.name }}-$VERSION.AppImage"
+          gh release upload $VERSION "build/linux.AppImage#${{ github.event.repository.name }}-$VERSION.AppImage" --clobber
 
