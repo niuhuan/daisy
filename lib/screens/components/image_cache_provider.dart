@@ -41,7 +41,7 @@ class ImageCacheProvider extends ImageProvider<ImageCacheProvider> {
     assert(key == this);
     return ui.instantiateImageCodec(
       await _loadImageFile((await native.loadCacheImage(
-        url: url.replaceAll("https://xs.muwai.com", "https://xs.idmzj.com'"),
+        url: url, //url.replaceAll("https://xs.muwai.com", "https://xs.idmzj.com'"),
         useful: useful,
         extendsFieldIntFirst: extendsFieldIntFirst,
         extendsFieldIntSecond: extendsFieldIntSecond,

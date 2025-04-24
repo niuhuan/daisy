@@ -205,7 +205,7 @@ pub async fn load_cache_image(
             .user_agent("Dalvik/2.1.0 (Linux; U; Android 12; SM-N9700 Build/SP1A.210812.016);")
             .build()?
             .get(url.clone())
-            .header("Referer", "http://images.muwai.com/;")
+            .header("Referer", "https://images.idmzj.com/")
             .send()
             .await?
             .error_for_status()?
