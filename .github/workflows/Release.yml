@@ -37,7 +37,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          export VERSION=$(cat ci/version/code.txt | xargs echo)
+          export VERSION=$(cat ci/version.code.txt | xargs echo)
           echo "VERSION : $VERSION"
           declare -A asset_dict
           asset_dict["ios"]="$GITHUB_REPOSITORY-$VERSION-nosign.ipa"
@@ -279,14 +279,14 @@ jobs:
       - name: Upload Asset (ios)
         if: matrix.config.target == 'ios'
         run: |
-          export VERSION=$(cat ci/version/code.txt | xargs echo)
+          export VERSION=$(cat ci/version.code.txt | xargs echo)
           echo "Uploading asset $GITHUB_REPOSITORY-$VERSION-nosign.ipa"
           gh release upload ${{ github.event.inputs.version }} "build/nosign.ipa#$GITHUB_REPOSITORY-$VERSION-nosign.ipa" --clobber
 
       - name: Upload Asset (android arm64)
         if: matrix.config.target == 'android'
         run: |
-          export VERSION=$(cat ci/version/code.txt | xargs echo)
+          export VERSION=$(cat ci/version.code.txt | xargs echo)
           if [ "${{ matrix.config.target }}" == "android-arm64" ]; then
             echo "Uploading asset $GITHUB_REPOSITORY-arm64-$VERSION.apk"
             gh release upload ${{ github.event.inputs.version }} "build/app/outputs/flutter-apk/app-release.apk#$GITHUB_REPOSITORY-arm64-$VERSION.apk" --clobber
@@ -295,14 +295,14 @@ jobs:
       - name: Upload Asset (windows)
         if: matrix.config.target == 'windows'
         run: |
-          $VERSION = (Get-Content -Path "ci/version/code.txt").Trim()
+          $VERSION = (Get-Content -Path "ci/version.code.txt").Trim()
           echo "Uploading asset $GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip"
           gh release upload ${{ github.event.inputs.version }} "build/windows.zip#$GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip" --clobber
 
       - name: Upload Asset (linux)
         if: matrix.config.target == 'linux'
         run: |
-          export VERSION=$(cat ci/version/code.txt | xargs echo)
+          export VERSION=$(cat ci/version.code.txt | xargs echo)
           echo "Uploading asset $GITHUB_REPOSITORY-$VERSION.AppImage"
           gh release upload ${{ github.event.inputs.version }} "build/linux.AppImage#$GITHUB_REPOSITORY-$VERSION.AppImage" --clobber
 
