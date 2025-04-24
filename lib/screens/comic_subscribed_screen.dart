@@ -19,9 +19,9 @@ class _ComicSubscribedScreenState extends State<ComicSubscribedScreen>
 
   Future<List<ComicInListCard>> _loadComic(int page) async {
     return (await native.subscribedList(
-      type: _tabIdx + 1,
+      type: 0,
       page: page,
-      subType: 1,
+      subType: _tabIdx + 1,
     ))
         .map((e) => ComicInListCard(
               id: e.id,
