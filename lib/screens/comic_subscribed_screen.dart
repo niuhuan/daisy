@@ -15,8 +15,14 @@ class _ComicSubscribedScreenState extends State<ComicSubscribedScreen>
   @override
   bool get wantKeepAlive => false;
 
+  var _tabIdx = 0;
+
   Future<List<ComicInListCard>> _loadComic(int page) async {
-    return (await native.subscribedList(type: 0, page: page, subType: 1))
+    return (await native.subscribedList(
+      type: _tabIdx + 1,
+      page: page,
+      subType: 1,
+    ))
         .map((e) => ComicInListCard(
               id: e.id,
               title: e.name,
@@ -32,6 +38,37 @@ class _ComicSubscribedScreenState extends State<ComicSubscribedScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return loginScreen(() => ComicPager(_loadComic));
+    final AppBarTheme appBarTheme = AppBarTheme.of(context);
+    return DefaultTabController(
+      length: 4,
+      child: Column(
+        children: [
+          Container(
+            color: appBarTheme.backgroundColor,
+            child: TabBar(
+              onTap: (index) {
+                setState(() {
+                  _tabIdx = index;
+                });
+              },
+              tabs: const [
+                Tab(child: Text("全部")),
+                Tab(child: Text("未读")),
+                Tab(child: Text("已读")),
+                Tab(child: Text("完结")),
+              ],
+            ),
+          ),
+          Expanded(
+            child: loginScreen(
+              () => ComicPager(
+                key: Key("_ComicSubscribedScreenStatePager:${_tabIdx + 1}"),
+                _loadComic,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -19,7 +19,6 @@ class _ComicBookshelfScreenState extends State<ComicBookshelfScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final ThemeData theme = Theme.of(context);
     final AppBarTheme appBarTheme = AppBarTheme.of(context);
     return DefaultTabController(
       length: _navPages.length,
