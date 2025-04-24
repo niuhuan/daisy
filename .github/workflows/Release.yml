@@ -219,7 +219,7 @@ jobs:
           flutter build linux --release
           mv build/linux/x64/release/bundle/{daisy,AppRun}
           cp linux/appimage/* build/linux/x64/release/bundle/
-          appimagetool build/linux/x64/release/bundle/
+          ./appimagetool build/linux/x64/release/bundle/
           mv *.AppImage build/linux.AppImage
 
       - name: build (windows)
