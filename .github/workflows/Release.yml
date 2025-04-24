@@ -25,10 +25,7 @@ jobs:
   check-and-create-release:
     runs-on: ubuntu-latest
     outputs:
-      ios: ${{ steps.check-release.outputs.ios }} 
-      android: ${{ steps.check-release.outputs.android }}
-      windows: ${{ steps.check-release.outputs.windows }}
-      linux: ${{ steps.check-release.outputs.linux }}
+      matrix: ${{ steps.check-release.outputs.matrix }}
     steps:
       # 检出代码库
       - name: Checkout repository
@@ -42,36 +39,50 @@ jobs:
         run: |
           export VERSION=$(cat ci/version/code.txt | xargs echo)
           echo "VERSION : $VERSION"
+          declare -A asset_dict
+          asset_dict["ios"]="$GITHUB_REPOSITORY-$VERSION-nosign.ipa"
+          asset_dict["android"]="$GITHUB_REPOSITORY-arm64-$VERSION.apk"
+          asset_dict["windows"]="$GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip"
+          asset_dict["linux"]="$GITHUB_REPOSITORY-$VERSION.AppImage"
+          declare -A host_dict
+          host_dict["ios"]="macos-latest"
+          host_dict["android"]="ubuntu-latest"
+          host_dict["windows"]="windows-latest"
+          host_dict["linux"]="ubuntu-latest"
           export RELEASE=$(gh release view $VERSION --json id -q .id || echo "NOT_FOUND")
           echo "RELEASE : $RELEASE"
           if [ "$RELEASE" == "NOT_FOUND" ]; then
             echo "Release does not exist. Creating release ${{ github.event.inputs.version }}."
             gh release create ${{ github.event.inputs.version }} -F ci/version.info.txt --target ${{ github.sha }}
-            echo "ios=true" >> $GITHUB_OUTPUT
-            echo "android=true" >> $GITHUB_OUTPUT
-            echo "windows=true" >> $GITHUB_OUTPUT
-            echo "linux=true" >> $GITHUB_OUTPUT
+            matrix='['
+            for key in host_dict[@] ; do
+              if [ "$key" != "${!host_dict[@]: -1}" ]; then
+                matrix+="{\"target\": \"$key\", \"host\": \"${host_dict[$key]}\"},"
+              else
+                matrix+="{\"target\": \"$key\", \"host\": \"${host_dict[$key]}\"}"
+              fi
+            done
+            matrix+=']'
+            echo "matrix='$matrix'" >> $GITHUB_OUTPUT
           else
-            declare -A asset_dict
-            asset_dict["ios"]="$GITHUB_REPOSITORY-$VERSION-nosign.ipa"
-            asset_dict["android"]="$GITHUB_REPOSITORY-arm64-$VERSION.apk"
-            asset_dict["windows"]="$GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip"
-            asset_dict["linux"]="$GITHUB_REPOSITORY-$VERSION.AppImage"
             echo "Release ${{ github.event.inputs.version }} already exists."
             gh release view ${{ github.event.inputs.version }} --json assets > release_assets.json
             echo release_assets.json :
             cat release_assets.json
+            matrix='['
             for key in "${!asset_dict[@]}"; do
               asset_name=${asset_dict[$key]}
               asset_exists=$(gh release view ${{ github.event.inputs.version }} --json assets -q ".assets[].name" | grep -w "$asset_name" || echo "NOT_FOUND")
               if [ "$asset_exists" == "NOT_FOUND" ]; then
                 echo "Asset $asset_name does not exist. Upload is required."
-                echo "$key=true" >> $GITHUB_OUTPUT
+                matrix+="{\"target\": \"$key\", \"host\": \"${host_dict[$key]}\"},"
               else
                 echo "Asset $asset_name already exists. No upload is required."
-                echo "$key=false" >> $GITHUB_OUTPUT
               fi
             done
+            matrix=${matrix%,} # Remove trailing comma
+            matrix+=']'
+            echo "matrix='$matrix'" >> $GITHUB_OUTPUT
           fi
           echo "GITHUB_OUTPUT : $GITHUB_OUTPUT :"
           cat $GITHUB_OUTPUT
@@ -93,7 +104,6 @@ jobs:
           - target: windows
             host: windows-latest
 
-    if: needs.check-and-create-release.outputs.${{ matrix.config.target }} == 'true'
     runs-on: ${{ matrix.config.host }}
 
     steps:
