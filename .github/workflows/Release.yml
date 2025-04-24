@@ -127,13 +127,6 @@ jobs:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
           override: true
 
-      - name: Cargo ci build cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            daisy/ci/target/
-          key: ${{ runner.os }}-cargo-ci_target
-
       - name: Cache Flutter dependencies (Linux/Android)
         if: matrix.config.target == 'android'
         uses: actions/cache@v3
@@ -185,21 +178,13 @@ jobs:
 
       - name: Set-Version (All)
         run: |
-          cd daisy/ci
+          cd ci
           cp version.code.txt ../lib/assets/version.txt
-
-      - name: Cargo native build cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            daisy/native/target/
-          key: ${{ runner.os }}-cargo-native_target-${{ matrix.config.target }}
 
       - name: Install rust target and build (ios)
         if: matrix.config.target == 'ios'
         run: |
           rustup target install aarch64-apple-ios
-          cd daisy
           /usr/libexec/PlistBuddy -c 'Add :application-identifier string opensource.daisy' ios/Runner/Info.plist
           flutter build ios --no-simulator --no-codesign --release
           cd build
@@ -215,7 +200,6 @@ jobs:
         run: |
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${{ env.NDK_VERSION }}
           rustup target install aarch64-linux-android
-          cd daisy
           flutter build apk --target-platform android-arm64
 
       - name: Install rust target and build (Android-arm32)
@@ -223,7 +207,6 @@ jobs:
         run: |
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${{ env.NDK_VERSION }}
           rustup target install armv7-linux-androideabi
-          cd daisy
           flutter build apk --target-platform android-arm
 
       - name: Install rust target and build (Android-x86_64)
@@ -231,7 +214,6 @@ jobs:
         run: |
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/${{ env.NDK_VERSION }}
           rustup target install x86_64-linux-android
-          cd daisy
           flutter build apk --target-platform android-x64
 
       - name: Install dependencies and build (Linux)
@@ -242,7 +224,6 @@ jobs:
           curl -JOL https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod a+x appimagetool-x86_64.AppImage
           mv appimagetool-x86_64.AppImage appimagetool
-          cd daisy
           flutter pub get
           flutter config --enable-linux-desktop
           flutter build linux --release
@@ -254,7 +235,6 @@ jobs:
       - name: build (windows)
         if: matrix.config.target == 'windows'
         run: |
-          cd daisy
           flutter pub get
           flutter config --enable-windows-desktop
           flutter build windows
@@ -284,7 +264,6 @@ jobs:
           KEY_FILE_BASE64: ${{ secrets.KEY_FILE_BASE64 }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          cd daisy
           echo $KEY_FILE_BASE64 > key.jks.base64
           base64 -d key.jks.base64 > key.jks
           echo $KEY_PASSWORD | $ANDROID_HOME/build-tools/30.0.2/apksigner sign --ks key.jks build/app/outputs/flutter-apk/app-release.apk
