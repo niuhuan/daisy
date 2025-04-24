@@ -145,12 +145,12 @@ jobs:
       - name: Install cargo tools (non-android)
         if: matrix.config.target != 'android'
         run: |
-          cargo install cbindgen
+          cargo install -f cbindgen
 
       - name: Install cargo tools (Android)
         if: matrix.config.target == 'android'
         run: |
-          cargo install cargo-ndk
+          cargo install -f cargo-ndk
 
       - name: Setup java (Android)
         if: startsWith(matrix.config.target, 'android')
@@ -258,16 +258,10 @@ jobs:
           base64 -d key.jks.base64 > key.jks
           echo $KEY_PASSWORD | $ANDROID_HOME/build-tools/30.0.2/apksigner sign --ks key.jks build/app/outputs/flutter-apk/app-release.apk
 
-      - name: Cargo ci build cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            daisy/ci/target/
-          key: ${{ runner.os }}-cargo-ci_target
-
-
       - name: Upload Asset (ios)
         if: matrix.config.target == 'ios'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export VERSION=$(cat ci/version.code.txt | xargs echo)
           echo "Uploading asset $GITHUB_REPOSITORY-$VERSION-nosign.ipa"
@@ -275,6 +269,8 @@ jobs:
 
       - name: Upload Asset (android arm64)
         if: matrix.config.target == 'android'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export VERSION=$(cat ci/version.code.txt | xargs echo)
           if [ "${{ matrix.config.target }}" == "android-arm64" ]; then
@@ -284,6 +280,8 @@ jobs:
       
       - name: Upload Asset (windows)
         if: matrix.config.target == 'windows'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $VERSION = (Get-Content -Path "ci/version.code.txt").Trim()
           echo "Uploading asset $GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip"
@@ -291,6 +289,8 @@ jobs:
 
       - name: Upload Asset (linux)
         if: matrix.config.target == 'linux'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export VERSION=$(cat ci/version.code.txt | xargs echo)
           echo "Uploading asset $GITHUB_REPOSITORY-$VERSION.AppImage"
