@@ -814,12 +814,18 @@ fn map_novel_view_log(res: novel_view_log::Model) -> NovelViewLog {
 pub async fn subscribe_add(obj_type: String, obj_id: i32) -> Result<()> {
     CLIENT.read().await.subscribe_add(obj_type, obj_id).await?;
     clean_web_cache_by_key("SUBSCRIBED_LIST$%".to_string()).await?;
+    clean_web_cache_by_key(format!("SUBSCRIBED_OBJ$%${}", obj_id)).await?;
     Ok(())
 }
 
 pub async fn subscribe_cancel(obj_type: String, obj_id: i32) -> Result<()> {
-    CLIENT.read().await.subscribe_cancel(obj_type, obj_id).await?;
+    CLIENT
+        .read()
+        .await
+        .subscribe_cancel(obj_type, obj_id)
+        .await?;
     clean_web_cache_by_key("SUBSCRIBED_LIST$%".to_string()).await?;
+    clean_web_cache_by_key(format!("SUBSCRIBED_OBJ$%${}", obj_id)).await?;
     Ok(())
 }
 

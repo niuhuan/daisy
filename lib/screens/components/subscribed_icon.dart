@@ -71,10 +71,31 @@ class _LoginSubscribedIcon extends StatefulWidget {
 }
 
 class _LoginSubscribedIconState extends State<_LoginSubscribedIcon> {
-  late Future<bool> _future = native.subscribedObj(
-    subType: widget.objType,
-    objId: widget.objId,
-  );
+  late Future<bool> _future = _load();
+
+  Future<bool> _load() async {
+    // async read
+    native.subscribedRead(
+      objType: widget.objType == 0 ? "mh" : "xs",
+      objId: widget.objId,
+    );
+    // that
+    try {
+      var result = await native.subscribedObj(
+        subType: widget.objType,
+        objId: widget.objId,
+      );
+      if (result) {
+        if (widget.objType == 0) {
+        }
+      }
+      return result;
+    } catch (e, s) {
+      defaultToast(context, "操作失败 : $e");
+      print("$e\n$s");
+      throw e;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

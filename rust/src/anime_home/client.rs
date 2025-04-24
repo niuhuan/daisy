@@ -757,11 +757,11 @@ impl Client {
     pub async fn subscribe_read(&self, obj_type: String, obj_id: i32) -> Result<()> {
         let result: ActionResult = self
             .request_v3(
-                Method::POST,
+                Method::GET,
                 "/subscribe/read",
                 {
                     let mut params = HashMap::<String, String>::new();
-                    params.insert("obj_ids".to_owned(), obj_id.to_string());
+                    params.insert("obj_id".to_owned(), obj_id.to_string());
                     params.insert("type".to_owned(), obj_type);
                     params
                 },

@@ -19,6 +19,7 @@ class ComicInListCard {
   final int? downloadStatus;
   final int imageCountDownload;
   final int imageCount;
+  final int? subReaded;
 
   ComicInListCard({
     required this.id,
@@ -33,6 +34,7 @@ class ComicInListCard {
     this.downloadStatus,
     this.imageCountDownload = 0,
     this.imageCount = 0,
+    this.subReaded,
   });
 }
 
@@ -72,10 +74,11 @@ class _ComicPagerState extends State<ComicPager> {
       print("$e");
       print("$s");
       _fail = true;
+    } finally {
+      setState(() {
+        _loading = false;
+      });
     }
-    setState(() {
-      _loading = false;
-    });
   }
 
   void _onScroll() {
@@ -300,13 +303,7 @@ class ComicCardInPager extends StatelessWidget {
                     ? [
                         Container(height: 10),
                         Text(
-                          "${comic.downloadStatus == 0
-                                  ? "未完成"
-                                  : comic.downloadStatus == 1
-                                      ? "成功"
-                                      : comic.downloadStatus == 2
-                                          ? "成功"
-                                          : "其他"} : ${comic.imageCountDownload} / ${comic.imageCount}",
+                          "${comic.downloadStatus == 0 ? "未完成" : comic.downloadStatus == 1 ? "成功" : comic.downloadStatus == 2 ? "成功" : "其他"} : ${comic.imageCountDownload} / ${comic.imageCount}",
                           style: TextStyle(
                             fontSize: 12,
                             color: comic.downloadStatus == 0
@@ -326,6 +323,27 @@ class ComicCardInPager extends StatelessWidget {
             child: Column(
               children: [
                 statusIcon,
+                if (comic.subReaded != null && comic.subReaded == 0)
+                  Container(
+                    margin: const EdgeInsets.all(3),
+                    padding: const EdgeInsets.fromLTRB(5, 3, 5, 3),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.blue,
+                    ),
+                    child: const Text(
+                      "新",
+                      style: TextStyle(
+                        fontSize: 10,
+                        height: 1.2,
+                        color: Colors.white,
+                      ),
+                      strutStyle: StrutStyle(
+                        fontSize: 10,
+                        height: 1.2,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),

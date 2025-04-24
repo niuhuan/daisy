@@ -24,6 +24,7 @@ class _ComicSubscribedScreenState extends State<ComicSubscribedScreen>
               authors: "",
               types: "",
               status1: e.status,
+              subReaded: e.subReaded,
             ))
         .toList();
   }

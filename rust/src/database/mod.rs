@@ -25,7 +25,8 @@ pub(crate) async fn connect_db(path: &str) -> DatabaseConnection {
         .min_connections(5)
         .connect_timeout(Duration::from_secs(8))
         .idle_timeout(Duration::from_secs(8))
-        .sqlx_logging(true);
+    //    .sqlx_logging(true)
+    ;
     sea_orm::Database::connect(opt).await.unwrap()
 }
 
