@@ -52,8 +52,8 @@ jobs:
           export RELEASE=$(gh release view $VERSION --json id -q .id || echo "NOT_FOUND")
           echo "RELEASE : $RELEASE"
           if [ "$RELEASE" == "NOT_FOUND" ]; then
-            echo "Release does not exist. Creating release ${{ github.event.inputs.version }}."
-            gh release create ${{ github.event.inputs.version }} -F ci/version.info.txt --target ${{ github.sha }}
+            echo "Release does not exist. Creating release $VERSION."
+            gh release create $VERSION -F ci/version.info.txt --target ${{ github.sha }}
             matrix='['
             for key in host_dict[@] ; do
               if [ "$key" != "${!host_dict[@]: -1}" ]; then
@@ -65,14 +65,14 @@ jobs:
             matrix+=']'
             echo "matrix='$matrix'" >> $GITHUB_OUTPUT
           else
-            echo "Release ${{ github.event.inputs.version }} already exists."
-            gh release view ${{ github.event.inputs.version }} --json assets > release_assets.json
+            echo "Release $VERSION already exists."
+            gh release view $VERSION --json assets > release_assets.json
             echo release_assets.json :
             cat release_assets.json
             matrix='['
             for key in "${!asset_dict[@]}"; do
               asset_name=${asset_dict[$key]}
-              asset_exists=$(gh release view ${{ github.event.inputs.version }} --json assets -q ".assets[].name" | grep -w "$asset_name" || echo "NOT_FOUND")
+              asset_exists=$(gh release view $VERSION --json assets -q ".assets[].name" | grep -w "$asset_name" || echo "NOT_FOUND")
               if [ "$asset_exists" == "NOT_FOUND" ]; then
                 echo "Asset $asset_name does not exist. Upload is required."
                 matrix+="{\"target\": \"$key\", \"host\": \"${host_dict[$key]}\"},"
@@ -281,7 +281,7 @@ jobs:
         run: |
           export VERSION=$(cat ci/version.code.txt | xargs echo)
           echo "Uploading asset $GITHUB_REPOSITORY-$VERSION-nosign.ipa"
-          gh release upload ${{ github.event.inputs.version }} "build/nosign.ipa#$GITHUB_REPOSITORY-$VERSION-nosign.ipa" --clobber
+          gh release upload $VERSION "build/nosign.ipa#$GITHUB_REPOSITORY-$VERSION-nosign.ipa" --clobber
 
       - name: Upload Asset (android arm64)
         if: matrix.config.target == 'android'
@@ -289,7 +289,7 @@ jobs:
           export VERSION=$(cat ci/version.code.txt | xargs echo)
           if [ "${{ matrix.config.target }}" == "android-arm64" ]; then
             echo "Uploading asset $GITHUB_REPOSITORY-arm64-$VERSION.apk"
-            gh release upload ${{ github.event.inputs.version }} "build/app/outputs/flutter-apk/app-release.apk#$GITHUB_REPOSITORY-arm64-$VERSION.apk" --clobber
+            gh release upload $VERSION "build/app/outputs/flutter-apk/app-release.apk#$GITHUB_REPOSITORY-arm64-$VERSION.apk" --clobber
           fi
       
       - name: Upload Asset (windows)
@@ -297,12 +297,12 @@ jobs:
         run: |
           $VERSION = (Get-Content -Path "ci/version.code.txt").Trim()
           echo "Uploading asset $GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip"
-          gh release upload ${{ github.event.inputs.version }} "build/windows.zip#$GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip" --clobber
+          gh release upload $VERSION "build/windows.zip#$GITHUB_REPOSITORY-$VERSION-windows-x86_64.zip" --clobber
 
       - name: Upload Asset (linux)
         if: matrix.config.target == 'linux'
         run: |
           export VERSION=$(cat ci/version.code.txt | xargs echo)
           echo "Uploading asset $GITHUB_REPOSITORY-$VERSION.AppImage"
-          gh release upload ${{ github.event.inputs.version }} "build/linux.AppImage#$GITHUB_REPOSITORY-$VERSION.AppImage" --clobber
+          gh release upload $VERSION "build/linux.AppImage#$GITHUB_REPOSITORY-$VERSION.AppImage" --clobber
 
