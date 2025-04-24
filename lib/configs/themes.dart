@@ -9,6 +9,12 @@ final _pink = ThemeData.light().copyWith(
   colorScheme: ColorScheme.light(
     secondary: Colors.pink.shade200,
   ),
+  tabBarTheme: ThemeData.light().tabBarTheme.copyWith(
+    indicatorColor: Colors.white,
+    labelColor: Colors.white,
+    unselectedLabelColor: Colors.grey.shade200,
+    dividerColor: Colors.grey.shade200,
+  ),
   appBarTheme: AppBarTheme(
     systemOverlayStyle: SystemUiOverlayStyle.light,
     color: Colors.pink.shade200,
@@ -45,6 +51,11 @@ final _dark = ThemeData.dark().copyWith(
   brightness: Brightness.dark,
   colorScheme: ColorScheme.light(
     secondary: Colors.pink.shade200,
+  ),
+  tabBarTheme: ThemeData.dark().tabBarTheme.copyWith(
+    indicatorColor: Colors.white,
+    labelColor: Colors.white,
+    unselectedLabelColor: Colors.grey,
   ),
   appBarTheme: const AppBarTheme(
     systemOverlayStyle: SystemUiOverlayStyle.light,

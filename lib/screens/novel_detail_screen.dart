@@ -137,8 +137,6 @@ class _NovelDetailScreenState extends State<NovelDetailScreen> with RouteAware {
                   color: theme.colorScheme.secondary.withOpacity(.025),
                   child: TabBar(
                     tabs: tabs,
-                    indicatorColor: theme.colorScheme.secondary,
-                    labelColor: theme.colorScheme.secondary,
                     onTap: (val) async {
                       setState(() {
                         _tabIndex = val;

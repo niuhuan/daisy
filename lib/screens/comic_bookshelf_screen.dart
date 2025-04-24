@@ -27,7 +27,6 @@ class _ComicBookshelfScreenState extends State<ComicBookshelfScreen>
         appBar: PreferredSizeContainer(
           color: appBarTheme.backgroundColor,
           child: TabBar(
-            indicatorColor: theme.dividerColor,
             tabs: _navPages
                 .map((e) => Tab(
                       child: Text.rich(TextSpan(children: [

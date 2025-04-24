@@ -145,8 +145,6 @@ class _ComicDetailScreenState extends State<ComicDetailScreen> with RouteAware {
                   color: theme.colorScheme.secondary.withOpacity(.025),
                   child: TabBar(
                     tabs: tabs,
-                    indicatorColor: theme.colorScheme.secondary,
-                    labelColor: theme.colorScheme.secondary,
                     dividerColor: dividerColor,
                     onTap: (val) async {
                       setState(() {

@@ -26,7 +26,6 @@ class _NovelBookshelfScreenState extends State<NovelBookshelfScreen>
         appBar: PreferredSizeContainer(
           color: appBarTheme.backgroundColor,
           child: TabBar(
-            indicatorColor: theme.dividerColor,
             tabs: _navPages
                 .map((e) => Tab(
                       child: Text.rich(TextSpan(children: [
