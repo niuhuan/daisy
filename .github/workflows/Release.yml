@@ -273,11 +273,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export VERSION=$(cat ci/version.code.txt | xargs echo)
-          if [ "${{ matrix.config.target }}" == "android-arm64" ]; then
-            echo "Uploading asset ${{ github.event.repository.name }}-arm64-$VERSION.apk"
-            gh release upload $VERSION "build/app/outputs/flutter-apk/app-release.apk#${{ github.event.repository.name }}-arm64-$VERSION.apk" --clobber
-          fi
-      
+          echo "Uploading asset ${{ github.event.repository.name }}-arm64-$VERSION.apk"
+          gh release upload $VERSION "build/app/outputs/flutter-apk/app-release.apk#${{ github.event.repository.name }}-arm64-$VERSION.apk" --clobber
+
       - name: Upload Asset (windows)
         if: matrix.config.target == 'windows'
         env:
