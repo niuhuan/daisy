@@ -46,6 +46,7 @@ jobs:
           echo "RELEASE : $RELEASE"
           if [ "$RELEASE" == "NOT_FOUND" ]; then
             echo "Release does not exist. Creating release ${{ github.event.inputs.version }}."
+            gh release create ${{ github.event.inputs.version }} -F ci/version.info.txt --target ${{ github.sha }}
             echo "ios=true" >> $GITHUB_OUTPUT
             echo "android=true" >> $GITHUB_OUTPUT
             echo "windows=true" >> $GITHUB_OUTPUT
