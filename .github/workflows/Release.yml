@@ -63,7 +63,7 @@ jobs:
           matrix='['
           for key in "${!asset_dict[@]}"; do
             asset_name=${asset_dict[$key]}
-            asset_exists=$(gh release view $VERSION --json assets -q ".assets[].name" | grep -w "$asset_name" || echo "NOT_FOUND")
+            asset_exists=(jq ".assets[].name" release_assets.json | grep -Fx '"$asset_name"' || echo "NOT_FOUND")
             if [ "$asset_exists" == "NOT_FOUND" ]; then
               echo "Asset $asset_name does not exist. Upload is required."
               matrix+="{\"target\": \"$key\", \"host\": \"${host_dict[$key]}\"},"
