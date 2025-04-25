@@ -79,7 +79,7 @@ jobs:
 
   build_release_assets:
     name: Build release assets
-    if: ${{ needs.check-and-create-release.outputs.matrix != '[]' }}
+    if: needs.check-and-create-release.outputs.matrix != '[]'
     needs:
       - check-and-create-release
     strategy:
