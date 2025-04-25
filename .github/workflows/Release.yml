@@ -84,15 +84,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config:
-          - target: ios
-            host: macos-latest
-          - target: android
-            host: ubuntu-latest
-          - target: linux
-            host: ubuntu-latest
-          - target: windows
-            host: windows-latest
+        config: ${{ fromJson(needs.check-and-create-release.outputs.matrix) }}
 
     runs-on: ${{ matrix.config.host }}
 
