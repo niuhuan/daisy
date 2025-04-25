@@ -228,7 +228,6 @@ jobs:
       - name: Build (macos)
         if: matrix.config.target == 'macos'
         run: |
-          cd daisy
           flutter pub get
           rustup target install x86_64-apple-darwin
           rustup target install aarch64-apple-darwin
