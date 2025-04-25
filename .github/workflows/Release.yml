@@ -78,8 +78,8 @@ jobs:
           cat $GITHUB_OUTPUT
 
   build_release_assets:
-    if: "[]" != ${{ needs.check-and-create-release.outputs.matrix }}
     name: Build release assets
+    if: ${{ needs.check-and-create-release.outputs.matrix != '[]' }}
     needs:
       - check-and-create-release
     strategy:
