@@ -73,7 +73,7 @@ jobs:
           done
           matrix=${matrix%,} # Remove trailing comma
           matrix+=']'
-          echo "matrix='$matrix'" >> $GITHUB_OUTPUT
+          echo matrix=$matrix >> $GITHUB_OUTPUT
           echo "GITHUB_OUTPUT : $GITHUB_OUTPUT :"
           cat $GITHUB_OUTPUT
 
