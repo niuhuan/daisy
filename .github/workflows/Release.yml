@@ -53,7 +53,7 @@ jobs:
           echo "RELEASE : $RELEASE"
           if [ "$RELEASE" == "NOT_FOUND" ]; then
             echo "Release does not exist. Creating release $VERSION."
-            gh release create $VERSION -F ci/version.info.txt --target ${{ github.sha }}
+            gh release create $VERSION -t $VERSION -F ci/version.info.txt --target ${{ github.sha }}
           else
             echo "Release $VERSION already exists."
           fi
@@ -265,8 +265,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export VERSION=$(cat ci/version.code.txt | xargs echo)
-          echo "Uploading asset ${{ github.event.repository.name }}-arm64-$VERSION.apk"
-          gh release upload $VERSION "build/app/outputs/flutter-apk/app-release.apk#${{ github.event.repository.name }}-arm64-$VERSION.apk" --clobber
+          export asset_name="${{ github.event.repository.name }}-arm64-$VERSION.apk"
+          export asset_path="build/app/outputs/flutter-apk/app-release.apk"
+          echo "Uploading asset $asset_name from $asset_path"
+          mv $asset_path $asset_name
+          gh release upload $VERSION "${asset_name}#${asset_name}" --clobber
 
       - name: Upload Asset (windows)
         if: matrix.config.target == 'windows'
@@ -274,8 +277,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $VERSION = (Get-Content -Path "ci/version.code.txt").Trim()
-          echo "Uploading asset ${{ github.event.repository.name }}-$VERSION-windows-x86_64.zip"
-          gh release upload $VERSION "build/windows.zip#${{ github.event.repository.name }}-$VERSION-windows-x86_64.zip" --clobber
+          $asset_name = "${{ github.event.repository.name }}-$VERSION-windows-x86_64.zip"
+          $asset_path = "build/windows.zip"
+          echo "Uploading asset $asset_name from $asset_path"
+          mv $asset_path $asset_name
+          gh release upload $VERSION "$asset_name#$asset_name" --clobber
 
       - name: Upload Asset (linux)
         if: matrix.config.target == 'linux'
@@ -283,6 +289,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export VERSION=$(cat ci/version.code.txt | xargs echo)
-          echo "Uploading asset ${{ github.event.repository.name }}-$VERSION.AppImage"
-          gh release upload $VERSION "build/linux.AppImage#${{ github.event.repository.name }}-$VERSION.AppImage" --clobber
+          asset_name=${{ github.event.repository.name }}-$VERSION.AppImage
+          asset_path=build/linux.AppImage
+          echo "Uploading asset $asset_name from $asset_path"
+          mv $asset_path $asset_name
+          gh release upload $VERSION "${asset_name}#${asset_name}" --clobber
 
