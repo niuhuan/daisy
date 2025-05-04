@@ -80,9 +80,25 @@ class _InitScreenState extends State<InitScreen> {
             var padding = min / 6;
             return Container(
               padding: EdgeInsets.all(padding),
-              child: Image.asset(
-                "lib/assets/startup.png",
-                fit: BoxFit.contain,
+              child: ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  return LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black,
+                      Colors.black,
+                      Colors.black.withAlpha(150),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.8, 0.9, 1.0],
+                  ).createShader(bounds);
+                },
+                blendMode: BlendMode.dstIn,
+                child: Image.asset(
+                  "lib/assets/startup.png",
+                  fit: BoxFit.contain,
+                ),
               ),
             );
           },

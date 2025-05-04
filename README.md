@@ -1,6 +1,6 @@
 <div align="center">
   <h1 align="center">
-    <img src="lib/assets/startup.png" width="200">
+    <img src="lib/assets/icon.png" width="200">
     <br/>
     Daisy Comic
 

@@ -114,7 +114,7 @@ class _AboutState extends State<AboutScreen> {
               width: width,
               height: height,
               child: Image.asset(
-                "lib/assets/startup.png",
+                "lib/assets/icon.png",
                 fit: BoxFit.contain,
               ),
             ),
