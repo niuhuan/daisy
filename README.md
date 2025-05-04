@@ -3,13 +3,14 @@
     <img src="lib/assets/startup.png" width="200">
     <br/>
     Daisy Comic
-  </h1>
+
   <a href="https://trendshift.io/repositories/10633" target="_blank"><img src="https://trendshift.io/api/badge/repositories/10633" alt="Trendshift" style="width: 200px; height: 46px;" width="250" height="46"/></a>
     <br/>
 
 [![license](https://img.shields.io/github/license/niuhuan/daisy)](https://raw.githubusercontent.com/niuhuan/daisy/master/LICENSE)
 [![releases](https://img.shields.io/github/v/release/niuhuan/daisy)](https://github.com/niuhuan/daisy/releases)
 [![downloads](https://img.shields.io/github/downloads/niuhuan/daisy/total)](https://github.com/niuhuan/daisy/releases)
+  </h1>
 </div>
 
 
