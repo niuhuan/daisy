@@ -69,35 +69,36 @@ class _InitScreenState extends State<InitScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfff5eee6),
       body: ConstrainedBox(
         constraints: const BoxConstraints.expand(),
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
+            var width = 1081;
+            var height = 1536;
             var min = constraints.maxWidth > constraints.maxHeight
                 ? constraints.maxHeight
                 : constraints.maxWidth;
-            var padding = min / 6;
-            return Container(
-              padding: EdgeInsets.all(padding),
+            var newHeight = min;
+            var newWidth = min * (width / height);
+            return Center(
               child: ShaderMask(
                 shaderCallback: (Rect bounds) {
-                  return LinearGradient(
+                  return const LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.black,
                       Colors.black,
-                      Colors.black.withAlpha(150),
                       Colors.transparent,
                     ],
-                    stops: const [0.0, 0.8, 0.9, 1.0],
+                    stops: [0.0, 0.95, 1.0],
                   ).createShader(bounds);
                 },
                 blendMode: BlendMode.dstIn,
                 child: Image.asset(
                   "lib/assets/startup.png",
-                  fit: BoxFit.contain,
+                  width: newWidth,
+                  height: newHeight,
                 ),
               ),
             );
