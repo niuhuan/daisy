@@ -78,43 +78,69 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
     bookText = bookText.replaceAll("&rsquo;", "’");
 
     bookText = bookText.trim();
-    // 切割文字????s
     final mq = MediaQuery.of(context);
     final width = mq.size.width - novelLeftMargin - novelRightMargin;
     final height = mq.size.height - novelTopMargin - novelBottomMargin;
 
     List<String> texts = [];
-    while (true) {
-      final tryRender = bookText.substring(
-        0,
-        min(1000, bookText.length),
-      );
-      final span = TextSpan(
-        text: tryRender,
-        style: TextStyle(
-          fontSize: 14 * novelFontSize,
-          height: novelLineHeight,
-        ),
-      );
-      final max = TextPainter(
-        text: span,
-        textDirection: TextDirection.ltr,
-      );
-      max.layout(maxWidth: width);
-      int endOffset = max
-          .getPositionForOffset(
-              Offset(width, height - 14 * novelFontSize * novelLineHeight))
-          .offset;
-      texts.add(
-        bookText.substring(
-          0,
-          endOffset,
-        ),
-      );
-      bookText = bookText.substring(endOffset).trim();
-      if (bookText.isEmpty) {
-        break;
+    final paragraphs = bookText.split("\n\n");
+    var currentPageText = "";
+    var currentPageHeight = 0.0;
+    final paragraphSpacing = 14 * novelFontSize * novelParagraphSpacing;
+    final lineHeight = 14 * novelFontSize * novelLineHeight;
+
+    for (var i = 0; i < paragraphs.length; i++) {
+      var paragraph = paragraphs[i];
+      final paragraphLines = paragraph.split("\n");
+      for (var line in paragraphLines) {
+        line = line.trim();
+        if (line.isEmpty) continue;
+
+        final span = TextSpan(
+          text: line,
+          style: TextStyle(
+            fontSize: 14 * novelFontSize,
+            height: novelLineHeight,
+          ),
+        );
+        final max = TextPainter(
+          text: span,
+          textDirection: TextDirection.ltr,
+        );
+        max.layout(maxWidth: width);
+
+        if (currentPageHeight + lineHeight > height) {
+          if (currentPageText.isNotEmpty) {
+            texts.add(currentPageText);
+            currentPageText = "";
+            currentPageHeight = 0;
+          }
+        }
+
+        if (currentPageText.isNotEmpty) {
+          currentPageText += "\n";
+        }
+        currentPageText += line;
+        currentPageHeight += lineHeight;
       }
+      // 段落结束后加段落间距（不是最后一个段落且当前页有内容时）
+      if (i != paragraphs.length - 1 && currentPageText.isNotEmpty) {
+        if (currentPageHeight + paragraphSpacing > height) {
+          texts.add(currentPageText);
+          currentPageText = "";
+          currentPageHeight = 0;
+        } else {
+          currentPageHeight += paragraphSpacing;
+        }
+      }
+    }
+
+    if (currentPageText.isNotEmpty) {
+      texts.add(currentPageText);
+    }
+
+    if (texts.isEmpty) {
+      texts.add("");
     }
     return texts;
   }

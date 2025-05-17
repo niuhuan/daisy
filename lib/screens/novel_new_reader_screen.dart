@@ -76,8 +76,13 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
     fullBookText = fullBookText.replaceAll("&middot;", "·");
     fullBookText = fullBookText.replaceAll("&lsquo;", "‘");
     fullBookText = fullBookText.replaceAll("&rsquo;", "’");
+
     fullBookText = fullBookText.trim();
-    //
+    final mq = MediaQuery.of(context);
+    final width = mq.size.width - novelLeftMargin - novelRightMargin;
+    final height = mq.size.height - novelTopMargin - novelBottomMargin - 14 * novelFontSize * novelLineHeight;
+
+    // 恢复图片分割逻辑
     List<PageEntry> preEntries = [];
     final RegExp imgTagReg = RegExp('<img[^>]+/?>');
     Iterable<RegExpMatch> matches = imgTagReg.allMatches(fullBookText);
@@ -103,56 +108,185 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
         preEntries.add(PageEntry(text, ""));
       }
     }
-    // 切割文字????s
-    final mq = MediaQuery.of(context);
-    final width = mq.size.width - novelLeftMargin - novelRightMargin;
-    final height = mq.size.height - novelTopMargin - novelBottomMargin;
-    List<PageEntry> finalEntries = [];
+
+    List<PageEntry> resultPages = [];
+    final paragraphSpacing = 14 * novelFontSize * novelParagraphSpacing;
+    var currentPageText = "";
+    var currentPageHeight = 0.0;
+
     for (var entry in preEntries) {
-      if (entry.text.isNotEmpty) {
-        var bookText = entry.text;
-        while (true) {
-          final tryRender = bookText.substring(
-            0,
-            min(1000, bookText.length),
-          );
-          final span = TextSpan(
-            text: tryRender,
-            style: TextStyle(
-              fontSize: 14 * novelFontSize,
-              height: novelLineHeight,
-            ),
-          );
-          final max = TextPainter(
-            text: span,
-            textDirection: TextDirection.ltr,
-          );
-          max.layout(maxWidth: width);
-          int endOffset = max
-              .getPositionForOffset(Offset(
-                  width, height - 14 * novelFontSize * novelLineHeight))
-              .offset;
-          finalEntries.add(PageEntry(
-            bookText.substring(
-              0,
-              endOffset,
-            ),
-            "",
-          ));
-          bookText = bookText.substring(endOffset).trim();
-          if (bookText.isEmpty) {
-            break;
+      if (entry.img.isNotEmpty) {
+        // 图片单独成页，确保当前页为空
+        if (currentPageText.isNotEmpty) {
+          resultPages.add(PageEntry(currentPageText, ""));
+          currentPageText = "";
+          currentPageHeight = 0;
+        }
+        resultPages.add(PageEntry("", entry.img));
+        continue;
+      }
+
+      if (entry.text.isEmpty) continue;
+
+      final paragraphs = entry.text.split("\n\n");
+
+      for (var i = 0; i < paragraphs.length; i++) {
+        var paragraph = paragraphs[i].trim();
+        if (paragraph.isEmpty) continue;
+
+        // 计算当前段落的总高度
+        final paragraphSpan = TextSpan(
+          text: paragraph,
+          style: TextStyle(
+            fontSize: 14 * novelFontSize,
+            height: novelLineHeight,
+          ),
+        );
+        final paragraphPainter = TextPainter(
+          text: paragraphSpan,
+          textDirection: TextDirection.ltr,
+          maxLines: null,
+          strutStyle: StrutStyle(
+            fontSize: 14 * novelFontSize,
+            height: novelLineHeight,
+            forceStrutHeight: true,
+          ),
+        );
+        paragraphPainter.layout(maxWidth: width);
+        final paragraphHeight = paragraphPainter.height;
+
+        // 如果当前段落加上段落间距会超出页面高度，且当前页已有内容，则先保存当前页
+        if (currentPageHeight + paragraphHeight + (i < paragraphs.length - 1 ? paragraphSpacing : 0) > height) {
+          if (currentPageText.isNotEmpty) {
+            resultPages.add(PageEntry(currentPageText, ""));
+            currentPageText = "";
+            currentPageHeight = 0;
+          }
+        }
+
+        // 处理段落内容
+        if (paragraphHeight > height) {
+          // 如果段落高度超过页面高度，需要分割
+          var remainingText = paragraph;
+          while (remainingText.isNotEmpty) {
+            final testSpan = TextSpan(
+              text: remainingText,
+              style: TextStyle(
+                fontSize: 14 * novelFontSize,
+                height: novelLineHeight,
+              ),
+            );
+            final testPainter = TextPainter(
+              text: testSpan,
+              textDirection: TextDirection.ltr,
+              maxLines: null,
+              strutStyle: StrutStyle(
+                fontSize: 14 * novelFontSize,
+                height: novelLineHeight,
+                forceStrutHeight: true,
+              ),
+            );
+            testPainter.layout(maxWidth: width);
+
+            // 使用 getPositionForOffset 找到合适的分割点
+            final maxHeight = height - currentPageHeight;
+            if (maxHeight <= 0) {
+              // 如果当前页已满，保存并开始新页
+              if (currentPageText.isNotEmpty) {
+                resultPages.add(PageEntry(currentPageText, ""));
+                currentPageText = "";
+                currentPageHeight = 0;
+              }
+              continue;
+            }
+
+            final offset = testPainter.getPositionForOffset(Offset(width, maxHeight));
+            final splitIndex = offset.offset;
+
+            if (splitIndex <= 0) {
+              // 如果无法分割，保存当前页并开始新页
+              if (currentPageText.isNotEmpty) {
+                resultPages.add(PageEntry(currentPageText, ""));
+                currentPageText = "";
+                currentPageHeight = 0;
+              }
+              // 强制分割一个字符
+              if (remainingText.isNotEmpty) {
+                resultPages.add(PageEntry(remainingText.substring(0, 1), ""));
+                remainingText = remainingText.substring(1);
+              }
+              continue;
+            }
+
+            final splitText = remainingText.substring(0, splitIndex).trim();
+            if (splitText.isEmpty) {
+              // 如果分割后是空文本，保存当前页并继续
+              if (currentPageText.isNotEmpty) {
+                resultPages.add(PageEntry(currentPageText, ""));
+                currentPageText = "";
+                currentPageHeight = 0;
+              }
+              remainingText = remainingText.substring(splitIndex).trim();
+              continue;
+            }
+
+            if (currentPageText.isEmpty) {
+              currentPageText = splitText;
+              currentPageHeight = testPainter.height;
+            } else {
+              resultPages.add(PageEntry(currentPageText, ""));
+              currentPageText = splitText;
+              currentPageHeight = testPainter.height;
+            }
+            remainingText = remainingText.substring(splitIndex).trim();
+          }
+        } else {
+          // 如果段落高度在页面范围内，直接添加
+          if (currentPageHeight + paragraphHeight > height) {
+            if (currentPageText.isNotEmpty) {
+              resultPages.add(PageEntry(currentPageText, ""));
+              currentPageText = paragraph;
+              currentPageHeight = paragraphHeight;
+            } else {
+              // 如果当前页为空但段落仍然放不下，强制分割
+              resultPages.add(PageEntry(paragraph, ""));
+            }
+          } else {
+            if (currentPageText.isNotEmpty) {
+              currentPageText += "\n\n";
+            }
+            currentPageText += paragraph;
+            currentPageHeight += paragraphHeight;
+          }
+        }
+
+        // 添加段落间距（如果不是最后一个段落）
+        if (i < paragraphs.length - 1) {
+          if (currentPageHeight + paragraphSpacing > height) {
+            if (currentPageText.isNotEmpty) {
+              resultPages.add(PageEntry(currentPageText, ""));
+              currentPageText = "";
+              currentPageHeight = 0;
+            }
+          } else {
+            currentPageHeight += paragraphSpacing;
           }
         }
       }
-      if (entry.img.isNotEmpty) {
-        finalEntries.add(entry);
+
+      // 保存最后一页
+      if (currentPageText.isNotEmpty) {
+        resultPages.add(PageEntry(currentPageText, ""));
       }
     }
-    if (finalEntries.isEmpty) {
-      finalEntries.add(PageEntry("", ""));
+
+    // 过滤掉空页面
+    resultPages = resultPages.where((page) => page.text.isNotEmpty || page.img.isNotEmpty).toList();
+
+    if (resultPages.isEmpty) {
+      resultPages.add(PageEntry("", ""));
     }
-    return finalEntries;
+    return resultPages;
   }
 
   // 注意:
@@ -644,6 +778,11 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
                 fontSize: 14 * novelFontSize,
                 height: novelLineHeight,
                 color: getNovelFontColor(context),
+              ),
+              strutStyle: StrutStyle(
+                fontSize: 14 * novelFontSize,
+                height: novelLineHeight,
+                forceStrutHeight: true,
               ),
             ),
           );
