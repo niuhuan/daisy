@@ -38,6 +38,22 @@ class NovelHtmlReaderScreen extends StatefulWidget {
 class _NovelHtmlReaderScreenState extends State<NovelHtmlReaderScreen> {
   late Future<String> _contentFuture;
 
+  String _preprocessContent(String text) {
+    // 分割段落并用div标签包裹
+    final paragraphs = text.split("<br />\n");
+    final wrappedParagraphs = paragraphs.map((p) {
+      // 处理段落内的换行
+      final lines = p.split("\n");
+      final wrappedLines = lines.map((line) => line.trim()).where((line) => line.isNotEmpty).join("<br />");
+      return "<div class='paragraph'>$wrappedLines</div>";
+    }).join("\n");
+
+    // 添加调试信息
+    print("Processed HTML content:");
+    print(wrappedParagraphs);
+    return wrappedParagraphs;
+  }
+
   @override
   void initState() {
     native.novelViewPage(
@@ -53,7 +69,7 @@ class _NovelHtmlReaderScreenState extends State<NovelHtmlReaderScreen> {
     _contentFuture = native.novelContent(
       volumeId: widget.volume.id,
       chapterId: widget.chapter.chapterId,
-    );
+    ).then(_preprocessContent);
     super.initState();
   }
 
@@ -75,7 +91,7 @@ class _NovelHtmlReaderScreenState extends State<NovelHtmlReaderScreen> {
                   _contentFuture = native.novelContent(
                     volumeId: widget.volume.id,
                     chapterId: widget.chapter.chapterId,
-                  );
+                  ).then(_preprocessContent);
                 });
               },
             ),
@@ -151,12 +167,21 @@ class _NovelHtmlReaderScreenState extends State<NovelHtmlReaderScreen> {
                             lineHeight: LineHeight(novelLineHeight),
                             letterSpacing: 0,
                             wordSpacing: 0,
+                            margin: Margins.zero,
+                            padding: HtmlPaddings.zero,
                           ),
-                          "p": Style(
-                            margin: Margins.only(bottom: 14 * novelFontSize * novelParagraphSpacing),
+                          ".paragraph": Style(
+                            margin: Margins.only(bottom: 2 * novelFontSize * novelLineHeight * novelParagraphSpacing),
+                            padding: HtmlPaddings.zero,
+
                           ),
                         },
+                        onCssParseError: (css, messages) {
+                          print("CSS Parse Error: $css");
+                          print("Error messages: $messages");
+                        },
                       ),
+
                     ],
                   ),
                 ),
