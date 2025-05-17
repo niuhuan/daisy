@@ -5,6 +5,7 @@ import 'package:daisy/configs/novel_background_color.dart';
 import 'package:daisy/configs/novel_font_color.dart';
 import 'package:daisy/configs/novel_line_height.dart';
 import 'package:daisy/configs/novel_margins.dart';
+import 'package:daisy/configs/novel_paragraph_spacing.dart';
 import 'package:daisy/configs/novel_reader_type.dart';
 import 'package:daisy/configs/reader_controller_type.dart';
 import 'package:daisy/configs/reader_direction.dart';
@@ -45,6 +46,7 @@ class _InitScreenState extends State<InitScreen> {
     await initNovelReaderType();
     await initNovelFontSize();
     await initNovelLineHeight();
+    await initNovelParagraphSpacing();
     await initNovelMargins();
     await initNovelFontColor();
     await initNovelBackgroundColor();

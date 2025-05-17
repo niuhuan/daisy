@@ -14,6 +14,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../configs/novel_font_color.dart';
 import '../configs/novel_font_size.dart';
 import '../configs/novel_line_height.dart';
+import '../configs/novel_paragraph_spacing.dart';
 import '../src/rust/anime_home/proto.dart';
 import 'components/content_loading.dart';
 import 'components/novel_fan_component.dart';
@@ -395,6 +396,19 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
                     },
                   ),
                   _bottomIcon(
+                    icon: Icons.format_line_spacing,
+                    title: novelParagraphSpacing.toString(),
+                    onPressed: () async {
+                      await modifyNovelParagraphSpacing(context);
+                      resetFont();
+                      setState(() => {});
+                    },
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  _bottomIcon(
                     icon: Icons.fullscreen_exit_outlined,
                     title: "边距",
                     onPressed: () async {
@@ -617,13 +631,23 @@ class _NovelNewReaderScreenState extends State<NovelNewReaderScreen> {
   Widget page(PageEntry pageEntry) {
     late Widget child;
     if (pageEntry.text.isNotEmpty) {
-      child = Text(
-        pageEntry.text,
-        style: TextStyle(
-          fontSize: 14 * novelFontSize,
-          height: novelLineHeight,
-          color: getNovelFontColor(context),
-        ),
+      // Split text into paragraphs and add spacing between them
+      final paragraphs = pageEntry.text.split('\n\n');
+      child = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: paragraphs.map((paragraph) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: 14 * novelFontSize * novelParagraphSpacing),
+            child: Text(
+              paragraph,
+              style: TextStyle(
+                fontSize: 14 * novelFontSize,
+                height: novelLineHeight,
+                color: getNovelFontColor(context),
+              ),
+            ),
+          );
+        }).toList(),
       );
     } else if (pageEntry.img.isNotEmpty) {
       // todo cache

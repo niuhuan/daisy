@@ -238,6 +238,7 @@ Future chooseColor(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text(title ?? 'Pick a color!'),
         content: SingleChildScrollView(
           child: StatefulBuilder(

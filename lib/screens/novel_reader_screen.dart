@@ -14,6 +14,7 @@ import '../configs/novel_font_color.dart';
 import '../configs/novel_font_size.dart';
 import '../configs/novel_line_height.dart';
 import '../configs/novel_margins.dart';
+import '../configs/novel_paragraph_spacing.dart';
 import '../src/rust/anime_home/proto.dart';
 import 'components/content_loading.dart';
 import 'components/novel_fan_component.dart';
@@ -349,6 +350,19 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
                     },
                   ),
                   _bottomIcon(
+                    icon: Icons.format_line_spacing,
+                    title: novelParagraphSpacing.toString(),
+                    onPressed: () async {
+                      await modifyNovelParagraphSpacing(context);
+                      resetFont();
+                      setState(() => {});
+                    },
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  _bottomIcon(
                     icon: Icons.fullscreen_exit_outlined,
                     title: "边距",
                     onPressed: () async {
@@ -569,6 +583,8 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
   }
 
   Widget page(String text) {
+    // Split text into paragraphs and add spacing between them
+    final paragraphs = text.split('\n\n');
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
@@ -577,9 +593,9 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
         boxShadow: const [
           BoxShadow(
               color: Colors.black12,
-              offset: Offset(0.0, 15.0), //阴影xy轴偏移量
-              blurRadius: 15.0, //阴影模糊程度
-              spreadRadius: 1.0 //阴影扩散程度
+              offset: Offset(0.0, 15.0),
+              blurRadius: 15.0,
+              spreadRadius: 1.0
               ),
         ],
       ),
@@ -590,13 +606,21 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
           left: novelLeftMargin,
           right: novelRightMargin,
         ),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: 14 * novelFontSize,
-            height: novelLineHeight,
-            color: getNovelFontColor(context),
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: paragraphs.map((paragraph) {
+            return Padding(
+              padding: EdgeInsets.only(bottom: 14 * novelFontSize * novelParagraphSpacing),
+              child: Text(
+                paragraph,
+                style: TextStyle(
+                  fontSize: 14 * novelFontSize,
+                  height: novelLineHeight,
+                  color: getNovelFontColor(context),
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ),
     );

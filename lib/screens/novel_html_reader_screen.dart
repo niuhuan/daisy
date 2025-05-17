@@ -12,6 +12,8 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../configs/novel_font_color.dart';
 import '../configs/novel_font_size.dart';
+import '../configs/novel_line_height.dart';
+import '../configs/novel_paragraph_spacing.dart';
 import '../src/rust/anime_home/proto.dart';
 import 'components/content_loading.dart';
 
@@ -146,6 +148,12 @@ class _NovelHtmlReaderScreenState extends State<NovelHtmlReaderScreen> {
                           "body": Style(
                             fontSize: FontSize(novelFontSize * 14),
                             color: getNovelFontColor(context),
+                            lineHeight: LineHeight(novelLineHeight),
+                            letterSpacing: 0,
+                            wordSpacing: 0,
+                          ),
+                          "p": Style(
+                            margin: Margins.only(bottom: 14 * novelFontSize * novelParagraphSpacing),
                           ),
                         },
                       ),
@@ -221,6 +229,26 @@ class _NovelHtmlReaderScreenState extends State<NovelHtmlReaderScreen> {
                       setState(() => {});
                     },
                   ),
+                  _bottomIcon(
+                    icon: Icons.format_line_spacing_sharp,
+                    title: novelLineHeight.toString(),
+                    onPressed: () async {
+                      await modifyNovelLineHeight(context);
+                      setState(() => {});
+                    },
+                  ),
+                  _bottomIcon(
+                    icon: Icons.format_line_spacing,
+                    title: novelParagraphSpacing.toString(),
+                    onPressed: () async {
+                      await modifyNovelParagraphSpacing(context);
+                      setState(() => {});
+                    },
+                  ),
+                ],
+              ),
+              Row(
+                children: [
                   _bottomIcon(
                     icon: Icons.format_color_text,
                     title: "颜色",
