@@ -73,6 +73,7 @@ Future<T?> chooseMapDialog<T>(
     context: buildContext,
     builder: (BuildContext context) {
       return SimpleDialog(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text(title),
         children: values.entries
             .map((e) => SimpleDialogOption(

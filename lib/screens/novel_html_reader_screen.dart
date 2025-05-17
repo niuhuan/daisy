@@ -144,7 +144,7 @@ class _NovelHtmlReaderScreenState extends State<NovelHtmlReaderScreen> {
                         data: text,
                         style: {
                           "body": Style(
-                            fontSize: FontSize(novelFontSize),
+                            fontSize: FontSize(novelFontSize * 14),
                             color: getNovelFontColor(context),
                           ),
                         },
