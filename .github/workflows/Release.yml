@@ -256,8 +256,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export VERSION=$(cat ci/version.code.txt | xargs echo)
-          echo "Uploading asset ${{ github.event.repository.name }}-$VERSION-nosign.ipa"
-          gh release upload $VERSION "build/nosign.ipa#${{ github.event.repository.name }}-$VERSION-nosign.ipa" --clobber
+          export asset_name="${{ github.event.repository.name }}-$VERSION-nosign.ipa"
+          export asset_path="build/nosign.ipa"
+          mv $asset_path $asset_name
+          gh release upload $VERSION "${asset_name}#${asset_name}" --clobber
 
       - name: Upload Asset (android arm64)
         if: matrix.config.target == 'android'
